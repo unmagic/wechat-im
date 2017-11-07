@@ -1,0 +1,3 @@
+<import src="../../modules/chat-input/chat-input.wxml" />
+
+<template is="chat-input" data="{{inputObj:inputObj,textMessage:textMessage,showVoicePart:true}}" />

@@ -1,0 +1,328 @@
+let _page;
+let inputObj = {};
+let windowHeight, windowWidth;
+// let voice$position = {toLeft: 0, toBottom: 0};
+let singleVoiceTimeCount = 0;
+let maxVoiceTime = 60, minVoiceTime = 1, startTimeDown = 54;
+let timer;
+let sendVoiceCbOk, sendVoiceCbError, startVoiceRecordCbOk, tabbarHeigth = 0;
+let cancelLineYPosition = 0;
+
+// let isRecordAuth = false;
+
+function init(page, opt) {
+    windowHeight = opt.systemInfo.windowHeight;
+    windowWidth = opt.systemInfo.windowWidth;
+    minVoiceTime = opt.minVoiceTime ? opt.minVoiceTime : 1;
+    maxVoiceTime = opt.maxVoiceTime && opt.maxVoiceTime <= 60 ? opt.maxVoiceTime : 60;
+    startTimeDown = opt.startTimeDown && opt.startTimeDown < maxVoiceTime && opt.startTimeDown > 0 ? opt.startTimeDown : 54;
+    if (!isNaN(opt.tabbarHeigth)) {
+        tabbarHeigth = opt.tabbarHeigth;
+    }
+    if (!windowHeight || !windowWidth) {
+        console.error('没有获取到手机的屏幕尺寸：windowWidth', windowWidth, 'windowHeight', windowHeight);
+        return;
+    }
+    _page = page;
+    initData();
+    initVoiceData();
+    initExtraData(opt.extraArr);
+
+    initChangeInputWayEvent();
+    dealVoiceLongClickEvent();
+    dealVoiceMoveEvent();
+    dealVoiceMoveEndEvent();
+}
+
+function clickExtraListener(cb) {
+    _page.chatInputExtraItemClickEvent = typeof cb === "function" ? cb : null;
+}
+
+function sendVoiceListener(cbOk, cbError) {
+    sendVoiceCbError = cbError;
+    sendVoiceCbOk = cbOk;
+}
+
+function setVoiceRecordStatusListener() {
+    startVoiceRecordCbOk = arguments[0];
+}
+
+function initChangeInputWayEvent() {
+    _page.changeInputWayEvent = function () {
+        _page.setData({
+            'inputObj.inputStatus': _page.data.inputObj.inputStatus === 'text' ? 'voice' : 'text',
+            'inputObj.extraObj.chatInputShowExtra': false
+        });
+    }
+}
+
+function initVoiceData() {
+    let width = windowWidth / 2.6;
+    _page.setData({
+        'inputObj.inputStatus': 'text',
+        'inputObj.windowHeight': windowHeight,
+        'inputObj.windowWidth': windowWidth,
+        'inputObj.voiceObj.status': 'end',
+        'inputObj.voiceObj.startStatus': 0,
+        'inputObj.voiceObj.voicePartWidth': width,
+        'inputObj.voiceObj.moveToCancel': false,
+        'inputObj.voiceObj.voicePartPositionToBottom': (windowHeight - width / 2.4) / 2,
+        'inputObj.voiceObj.voicePartPositionToLeft': (windowWidth - width) / 2
+    });
+    cancelLineYPosition = windowHeight * 0.12;
+    // let voicePartWidth = _page.data.inputObj.voiceObj.voicePartWidth;
+    // voice$position.toLeft = parseInt(_page.data.inputObj.voiceObj.voicePartPositionToLeft);
+    // voice$position.toBottom = parseInt(_page.data.inputObj.voiceObj.voicePartPositionToBottom);
+    // voice$position.toRight = parseInt(voice$position.toLeft + voicePartWidth);//距离是从左侧算的
+    // voice$position.toTop = parseInt(voice$position.toBottom + voicePartWidth);//距离是从底部算的
+    // if (wx.getSetting) {
+    //     wx.getSetting({//获取语音授权信息
+    //         success: res => {
+    //             isRecordAuth = res.authSetting['scope.record'];
+    //         }
+    //     });
+    // }
+}
+
+function initExtraData(extra$arr) {
+    _page.setData({
+        'inputObj.extraObj.chatInputExtraArr': extra$arr
+    });
+    _page.chatInputExtraClickEvent = function () {
+        _page.setData({
+            'inputObj.extraObj.chatInputShowExtra': !_page.data.inputObj.extraObj.chatInputShowExtra
+        })
+    };
+}
+
+
+function dealVoiceLongClickEvent() {
+    _page.long$click$voice$btn = function (e) {
+        console.log('长按', e);
+        if ('send$voice$btn' === e.currentTarget.id) {//长按时需要打开录音功能，开始录音
+            singleVoiceTimeCount = 0;
+            _page.setData({//调出取消弹窗
+                'inputObj.voiceObj.showCancelSendVoicePart': true,
+                'inputObj.voiceObj.timeDownNum': maxVoiceTime - singleVoiceTimeCount,
+                'inputObj.voiceObj.status': 'start',
+                'inputObj.voiceObj.startStatus': 1,
+                'inputObj.voiceObj.moveToCancel': false
+            });
+            typeof startVoiceRecordCbOk === "function" && startVoiceRecordCbOk(1);
+            checkRecordAuth(function () {
+                wx.startRecord({
+                    success: function (res) {
+                        console.log(res, _page.data.inputObj.voiceObj.status);
+                        if (_page.data.inputObj.voiceObj.status === 'short' || inputObj.voiceObj.moveToCancel) {//录音时间太短或者移动到了取消录音区域， 则取消录音
+                            return;
+                        }
+                        console.log('录音成功');
+                        typeof sendVoiceCbOk === "function" && sendVoiceCbOk(res, singleVoiceTimeCount + '');
+                        typeof startVoiceRecordCbOk === "function" && startVoiceRecordCbOk(0);
+                    }
+                });
+                //设置定时器计时60秒
+                timer = setInterval(function () {
+                    singleVoiceTimeCount++;
+                    if (singleVoiceTimeCount >= startTimeDown && singleVoiceTimeCount < maxVoiceTime) {
+                        _page.setData({
+                            'inputObj.voiceObj.timeDownNum': maxVoiceTime - singleVoiceTimeCount,
+                            'inputObj.voiceObj.status': 'timeDown'
+                        })
+                    } else if (singleVoiceTimeCount >= maxVoiceTime) {
+                        _page.setData({
+                            'inputObj.voiceObj.status': 'timeout'
+                        });
+                        delayDismissCancelView();
+                        clearInterval(timer);
+                        //TODO 停止录音并生成IM语音信息 并将时长拼入到IM消息中
+                        endRecord();
+                    }
+                }, 1000);
+            }, function () {
+                //录音失败
+                console.error('录音拒绝授权');
+                clearInterval(timer);
+                endRecord();
+                _page.setData({
+                    'inputObj.voiceObj.status': 'end',
+                    'inputObj.voiceObj.showCancelSendVoicePart': false
+                });
+                if (!sendVoiceCbError) {
+                    if (wx.openSetting) {
+                        wx.showModal({
+                            title: '您未授权语音功能',
+                            content: '暂时不能使用语音',
+                            confirmText: '去设置',
+                            success: res => {
+                                if (res.confirm) {
+                                    wx.openSetting({
+                                        success: res => {
+                                            if (res.authSetting['scope.record']) {
+                                                _page.setData({
+                                                    'inputObj.extraObj.chatInputShowExtra': false
+                                                });
+                                            }
+                                        }
+                                    });
+                                } else {
+                                    _page.setData({
+                                        'inputObj.inputStatus': 'text',
+                                        'inputObj.extraObj.chatInputShowExtra': false
+                                    });
+                                }
+                            }
+                        });
+
+                    } else {
+                        wx.showModal({
+                            title: '无法使用语音',
+                            content: '请将微信升级至最新版本才可使用语音功能',
+                            success: res => {
+                                if (res.confirm) {
+
+                                }
+                            }
+                        })
+                    }
+                } else {
+                    typeof sendVoiceCbError === "function" && sendVoiceCbError(res);
+                }
+            });
+        }
+    };
+}
+
+function dealVoiceMoveEvent() {
+    _page.send$voice$move$event = function (e) {
+        // console.log('移动', e);
+        if ('send$voice$btn' === e.currentTarget.id) {
+            // let x = e.touches[0].clientX;
+            let y = windowHeight + tabbarHeigth - e.touches[0].clientY;
+            // if (x > voice$position.toLeft && x < voice$position.toRight && y > voice$position.toBottom && y < voice$position.toTop) {//如果移动到了该区域
+            if (y > cancelLineYPosition) {
+                if (!inputObj.voiceObj.moveToCancel) {
+                    _page.setData({
+                        'inputObj.voiceObj.moveToCancel': true
+                    });
+                }
+            } else {
+                if (inputObj.voiceObj.moveToCancel) {//如果移出了该区域
+                    _page.setData({
+                        'inputObj.voiceObj.moveToCancel': false
+                    })
+                }
+            }
+
+        }
+    };
+}
+
+function dealVoiceMoveEndEvent() {
+    _page.send$voice$move$end$event = function (e) {
+        console.log('离开', e);
+        if ('send$voice$btn' === e.currentTarget.id) {
+            console.log('时间短', singleVoiceTimeCount, minVoiceTime);
+            if (singleVoiceTimeCount < minVoiceTime) {//语音时间太短
+                _page.setData({
+                    'inputObj.voiceObj.status': 'short'
+                });
+                delayDismissCancelView();
+            } else {//语音时间正常
+                _page.setData({
+                    'inputObj.voiceObj.showCancelSendVoicePart': false,
+                    'inputObj.voiceObj.status': 'end'
+                });
+            }
+            if (timer) {//关闭定时器
+                clearInterval(timer);
+            }
+            endRecord();
+        }
+    }
+}
+
+function checkRecordAuth(cbOk, cbError) {
+    if (getApp().getNetworkConnected) {
+        if (wx.getSetting) {
+            wx.getSetting({
+                success(res) {
+                    if (!res.authSetting['scope.record']) {
+                        wx.authorize({
+                            scope: 'scope.record',
+                            success(res) {
+                                // 用户已经同意小程序使用录音功能，后续调用 wx.startRecord 接口不会弹窗询问
+                                console.log('同意', res);
+                            }, fail: res => {
+                                console.log('拒绝', res);
+                                cbError && cbError();
+                            }
+                        })
+                    } else {
+                        cbOk && cbOk();
+                    }
+                }
+            })
+        } else {
+            wx.showModal({
+                title: '无法使用语音',
+                content: '请将微信升级至最新版本才可使用语音功能',
+                success: res => {
+                    if (res.confirm) {
+
+                    }
+                }
+            })
+        }
+    } else {
+        cbOk && cbOk();
+    }
+}
+
+function closeExtraView() {
+    _page.setData({
+        'inputObj.extraObj.chatInputShowExtra': false
+    });
+}
+
+function delayDismissCancelView() {
+    setTimeout(function () {
+        if (inputObj.voiceObj.status !== 'start') {
+            _page.setData({
+                'inputObj.voiceObj.showCancelSendVoicePart': false,
+                'inputObj.voiceObj.status': 'end'
+            });
+        }
+    }, 1000)
+}
+
+function initData() {
+    _page.data.inputObj = inputObj = {voiceObj: {}};
+}
+
+function endRecord() {
+    _page.setData({
+        'inputObj.voiceObj.startStatus': 0
+    });
+    wx.stopRecord();
+}
+
+function setTextMessageListener(cb) {
+    if (_page) {
+        _page.chatInputSendTextMessage = function (e) {
+            _page.setData({
+                textMessage: ''
+            });
+            typeof cb === "function" && cb(e);
+        }
+    }
+}
+
+module.exports = {
+    init: init,
+    clickExtraListener: clickExtraListener,
+    closeExtraView: closeExtraView,
+    recordVoiceListener: sendVoiceListener,
+    setVoiceRecordStatusListener: setVoiceRecordStatusListener,
+    setTextMessageListener: setTextMessageListener
+};

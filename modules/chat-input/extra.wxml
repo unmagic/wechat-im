@@ -1,0 +1,9 @@
+<template name="chat-extra-function-part">
+    <view  class="extra-super" >
+
+        <view wx:for="{{chat$input$extra$arr}}" wx:key="{{index}}" class="flex-column" style="width: 25%" bindtap="chatInputExtraItemClickEvent" data-index="{{index}}">
+            <image class="extra-image-size" src="./../../image/chat/extra/{{item.picName}}.png" />
+            <text class="extra-text-size">{{item.description}}</text>
+        </view>
+    </view>
+</template>

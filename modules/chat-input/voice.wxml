@@ -1,0 +1,15 @@
+<template name="voice">
+    <button bind:longtap="long$click$voice$btn" catch:touchmove="send$voice$move$event"
+            catch:touchend="send$voice$move$end$event" id="send$voice$btn" hover-class="btn-voice-press">{{voiceObj.startStatus?'松开 结束':'按住 说话'}}
+    </button>
+    <view wx:if="{{voiceObj.showCancelSendVoicePart}}"
+          style="width: {{voiceObj.voicePartWidth}}px;height: {{voiceObj.voicePartWidth}}px;display: flex;position: fixed;left: {{voiceObj.voicePartPositionToLeft}}px;bottom: {{voiceObj.voicePartPositionToBottom}}px;justify-content:center;align-items: center;border-radius: 20rpx;">
+        <view style="background-color:black;opacity:{{voiceObj.status==='timeDown'?0.6:0}};width: 100%;height: 100%;border-radius: 20rpx;position: absolute"/>
+        <image src="./../../image/chat/voice/{{voiceObj.status==='start'?(voiceObj.moveToCancel?'recall':'speak'):'attention'}}.png" style="width: 100%;height: 100%;border-radius: 20rpx" wx:if="{{voiceObj.status!=='timeDown'}}"/>
+        <text style="margin-bottom:30rpx;font-size: 150rpx;text-align: center;color: white;position: relative" wx:if="{{voiceObj.status==='timeDown'}}">{{voiceObj.timeDownNum}}</text>
+        <view class="voice-record-git-status-style" wx:if="{{!voiceObj.moveToCancel&&voiceObj.status!=='short'}}">
+            <image src="data:image/gif;base64,R0lGODlhOgAKAKIFAERERIWFhWVlZdbW1qampv///wAAAAAAACH/C05FVFNDQVBFMi4wAwEAAAAh+QQFFAAFACwAAAAAOgAKAAADazi6XEUwSheqvU7ozR34YMiMgyOdBHWtGed6YUw2Dxqpq9W6GxyDs4XJBsHlAjuewPcDBBVDojGX5DF/z1JNWjjqCspeoQl8Rm1TFji8HJOd5i2660Wuw1dZnFike6svbmRZZyhpGHdKeSEJACH5BAUUAAUALAAAAAA6AAoAAANrCLpcNTBKR6q9LujNnfhgyIyAI50Dda0Z53phTDYPGqmr1bobHIOzhckGweUIO17A9xMEFUOiMZfkMX/PUk1aOOoKyl6hCXxGbVMWOLwck53mLbrrRa7DV1mcWKR7qy9uZFlnKGkYd0p5IQkAIfkEBRQABQAsAAAAADoACgAAA2soulwFMEo3qr2O6M1d+GDIjIIjnQB1rRnnemFMNg8aqavVuhscg7OFyQbB5QY7HsH3CwQVQ6Ixl+Qxf89STVo46grKXqEJfEZtUxY4vByTneYtuutFrsNXWZxYpHurL25kWWcoaRh3SnkhCQAh+QQFFAAFACwAAAAAOgAKAAADaxi6XCUwSgeqvW7ozR35YMiMgSOdAnWtGed6YUw2Dxqpq9W6GxyDs4XJBsHlADvewPcjBBVDojGX5DF/z1JNWjjqCspeoQl8Rm1TFji8HJOd5i2660Wuw1dZnFike6svbmRZZyhpGHdKeSEJACH5BAUUAAUALAAAAAA6AAoAAANrSLpcFTBKJ6q9DujN3fhgyIyEI50Bda0Z53phTDYPGqmr1bobHIOzhckGweUEOx7A9xsEFUOiMZfkMX/PUk1aOOoKyl6hCXxGbVMWOLwck53mLbrrRa7DV1mcWKR7qy9uZFlnKGkYd0p5IQkAOw==" class="voice-record-git-size-style"/>
+        </view>
+        <text class="voice-status-style" style="background-color: {{voiceObj.moveToCancel?'#ab1900':'transparent'}};">{{voiceObj.status==='start'||voiceObj.status==='timeDown'?(voiceObj.moveToCancel?'松开手指，取消发送':'手指上滑，取消发送'):(voiceObj.status==='short'?'说话时间太短':'说话时间超时')}}</text>
+    </view>
+</template>
