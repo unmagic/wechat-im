@@ -7,6 +7,14 @@ let maxVoiceTime = 60, minVoiceTime = 1, startTimeDown = 54;
 let timer;
 let sendVoiceCbOk, sendVoiceCbError, startVoiceRecordCbOk, tabbarHeigth = 0;
 let cancelLineYPosition = 0;
+let status = {
+    START: 1,
+    SUCCESS: 2,
+    CANCEL: 3,
+    SHORT: 4,
+    FAIL: 5,
+    UNAUTH: 6
+};
 
 // let isRecordAuth = false;
 
@@ -70,18 +78,6 @@ function initVoiceData() {
         'inputObj.voiceObj.voicePartPositionToLeft': (windowWidth - width) / 2
     });
     cancelLineYPosition = windowHeight * 0.12;
-    // let voicePartWidth = _page.data.inputObj.voiceObj.voicePartWidth;
-    // voice$position.toLeft = parseInt(_page.data.inputObj.voiceObj.voicePartPositionToLeft);
-    // voice$position.toBottom = parseInt(_page.data.inputObj.voiceObj.voicePartPositionToBottom);
-    // voice$position.toRight = parseInt(voice$position.toLeft + voicePartWidth);//距离是从左侧算的
-    // voice$position.toTop = parseInt(voice$position.toBottom + voicePartWidth);//距离是从底部算的
-    // if (wx.getSetting) {
-    //     wx.getSetting({//获取语音授权信息
-    //         success: res => {
-    //             isRecordAuth = res.authSetting['scope.record'];
-    //         }
-    //     });
-    // }
 }
 
 function initExtraData(extra$arr) {
@@ -108,17 +104,25 @@ function dealVoiceLongClickEvent() {
                 'inputObj.voiceObj.startStatus': 1,
                 'inputObj.voiceObj.moveToCancel': false
             });
-            typeof startVoiceRecordCbOk === "function" && startVoiceRecordCbOk(1);
+            typeof startVoiceRecordCbOk === "function" && startVoiceRecordCbOk(status.START);
             checkRecordAuth(function () {
                 wx.startRecord({
                     success: function (res) {
                         console.log(res, _page.data.inputObj.voiceObj.status);
-                        if (_page.data.inputObj.voiceObj.status === 'short' || inputObj.voiceObj.moveToCancel) {//录音时间太短或者移动到了取消录音区域， 则取消录音
+                        if (_page.data.inputObj.voiceObj.status === 'short') {//录音时间太短或者移动到了取消录音区域， 则取消录音
+                            typeof startVoiceRecordCbOk === "function" && startVoiceRecordCbOk(status.SHORT);
+                            return;
+                        } else if (_page.data.inputObj.voiceObj.moveToCancel) {
+                            typeof startVoiceRecordCbOk === "function" && startVoiceRecordCbOk(status.CANCEL);
                             return;
                         }
                         console.log('录音成功');
+                        typeof startVoiceRecordCbOk === "function" && startVoiceRecordCbOk(status.SUCCESS);
                         typeof sendVoiceCbOk === "function" && sendVoiceCbOk(res, singleVoiceTimeCount + '');
-                        typeof startVoiceRecordCbOk === "function" && startVoiceRecordCbOk(0);
+                    },
+                    fail:res=>{
+                        typeof startVoiceRecordCbOk === "function" && startVoiceRecordCbOk(status.FAIL);
+                        typeof sendVoiceCbError === "function" && sendVoiceCbError(res);
                     }
                 });
                 //设置定时器计时60秒
@@ -139,7 +143,7 @@ function dealVoiceLongClickEvent() {
                         endRecord();
                     }
                 }, 1000);
-            }, function () {
+            }, function (res) {
                 //录音失败
                 console.error('录音拒绝授权');
                 clearInterval(timer);
@@ -148,6 +152,8 @@ function dealVoiceLongClickEvent() {
                     'inputObj.voiceObj.status': 'end',
                     'inputObj.voiceObj.showCancelSendVoicePart': false
                 });
+                typeof startVoiceRecordCbOk === "function" && startVoiceRecordCbOk(status.UNAUTH);
+
                 if (!sendVoiceCbError) {
                     if (wx.openSetting) {
                         wx.showModal({
@@ -195,11 +201,8 @@ function dealVoiceLongClickEvent() {
 
 function dealVoiceMoveEvent() {
     _page.send$voice$move$event = function (e) {
-        // console.log('移动', e);
         if ('send$voice$btn' === e.currentTarget.id) {
-            // let x = e.touches[0].clientX;
             let y = windowHeight + tabbarHeigth - e.touches[0].clientY;
-            // if (x > voice$position.toLeft && x < voice$position.toRight && y > voice$position.toBottom && y < voice$position.toTop) {//如果移动到了该区域
             if (y > cancelLineYPosition) {
                 if (!inputObj.voiceObj.moveToCancel) {
                     _page.setData({
@@ -219,27 +222,27 @@ function dealVoiceMoveEvent() {
 }
 
 function dealVoiceMoveEndEvent() {
-    _page.send$voice$move$end$event = function (e) {
-        console.log('离开', e);
-        if ('send$voice$btn' === e.currentTarget.id) {
-            console.log('时间短', singleVoiceTimeCount, minVoiceTime);
-            if (singleVoiceTimeCount < minVoiceTime) {//语音时间太短
-                _page.setData({
-                    'inputObj.voiceObj.status': 'short'
-                });
-                delayDismissCancelView();
-            } else {//语音时间正常
-                _page.setData({
-                    'inputObj.voiceObj.showCancelSendVoicePart': false,
-                    'inputObj.voiceObj.status': 'end'
-                });
-            }
-            if (timer) {//关闭定时器
-                clearInterval(timer);
-            }
-            endRecord();
+_page.send$voice$move$end$event = function (e) {
+    console.log('离开', e);
+    if ('send$voice$btn' === e.currentTarget.id) {
+        console.log('时间短', singleVoiceTimeCount, minVoiceTime);
+        if (singleVoiceTimeCount < minVoiceTime) {//语音时间太短
+            _page.setData({
+                'inputObj.voiceObj.status': 'short'
+            });
+            delayDismissCancelView();
+        } else {//语音时间正常
+            _page.setData({
+                'inputObj.voiceObj.showCancelSendVoicePart': false,
+                'inputObj.voiceObj.status': 'end'
+            });
         }
+        if (timer) {//关闭定时器
+            clearInterval(timer);
+        }
+        endRecord();
     }
+}
 }
 
 function checkRecordAuth(cbOk, cbError) {
@@ -324,5 +327,6 @@ module.exports = {
     closeExtraView: closeExtraView,
     recordVoiceListener: sendVoiceListener,
     setVoiceRecordStatusListener: setVoiceRecordStatusListener,
-    setTextMessageListener: setTextMessageListener
+    setTextMessageListener: setTextMessageListener,
+    VRStatus: status
 };

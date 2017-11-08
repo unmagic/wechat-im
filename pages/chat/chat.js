@@ -64,13 +64,24 @@ Page({
         });
         chatInput.setVoiceRecordStatusListener(function (status) {
             switch (status) {
-                case 1://开始录音
-                    console.log('开始录音');
-                    break;
-                case 0://结束录音
-                    console.log('结束录音');
-                    break;
+                case chatInput.VRStatus.START://开始录音
 
+                    break;
+                case chatInput.VRStatus.SUCCESS://录音成功
+
+                    break;
+                case chatInput.VRStatus.CANCEL://取消录音
+
+                    break;
+                case chatInput.VRStatus.SHORT://录音时长太短
+
+                    break;
+                case chatInput.VRStatus.UNAUTH://未授权录音功能
+
+                    break;
+                case chatInput.VRStatus.FAIL://录音失败(已经授权了)
+
+                    break;
             }
         })
     },
