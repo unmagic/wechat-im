@@ -80,14 +80,15 @@ function initVoiceData() {
     cancelLineYPosition = windowHeight * 0.12;
 }
 
-function initExtraData(extra$arr) {
+function initExtraData(extra$arr, clickEvent) {
     _page.setData({
         'inputObj.extraObj.chatInputExtraArr': extra$arr
     });
     _page.chatInputExtraClickEvent = function () {
         _page.setData({
             'inputObj.extraObj.chatInputShowExtra': !_page.data.inputObj.extraObj.chatInputShowExtra
-        })
+        });
+        clickEvent && clickEvent();
     };
 }
 
@@ -120,7 +121,7 @@ function dealVoiceLongClickEvent() {
                         typeof startVoiceRecordCbOk === "function" && startVoiceRecordCbOk(status.SUCCESS);
                         typeof sendVoiceCbOk === "function" && sendVoiceCbOk(res, singleVoiceTimeCount + '');
                     },
-                    fail:res=>{
+                    fail: res => {
                         typeof startVoiceRecordCbOk === "function" && startVoiceRecordCbOk(status.FAIL);
                         typeof sendVoiceCbError === "function" && sendVoiceCbError(res);
                     }
@@ -222,27 +223,27 @@ function dealVoiceMoveEvent() {
 }
 
 function dealVoiceMoveEndEvent() {
-_page.send$voice$move$end$event = function (e) {
-    console.log('离开', e);
-    if ('send$voice$btn' === e.currentTarget.id) {
-        console.log('时间短', singleVoiceTimeCount, minVoiceTime);
-        if (singleVoiceTimeCount < minVoiceTime) {//语音时间太短
-            _page.setData({
-                'inputObj.voiceObj.status': 'short'
-            });
-            delayDismissCancelView();
-        } else {//语音时间正常
-            _page.setData({
-                'inputObj.voiceObj.showCancelSendVoicePart': false,
-                'inputObj.voiceObj.status': 'end'
-            });
+    _page.send$voice$move$end$event = function (e) {
+        console.log('离开', e);
+        if ('send$voice$btn' === e.currentTarget.id) {
+            console.log('时间短', singleVoiceTimeCount, minVoiceTime);
+            if (singleVoiceTimeCount < minVoiceTime) {//语音时间太短
+                _page.setData({
+                    'inputObj.voiceObj.status': 'short'
+                });
+                delayDismissCancelView();
+            } else {//语音时间正常
+                _page.setData({
+                    'inputObj.voiceObj.showCancelSendVoicePart': false,
+                    'inputObj.voiceObj.status': 'end'
+                });
+            }
+            if (timer) {//关闭定时器
+                clearInterval(timer);
+            }
+            endRecord();
         }
-        if (timer) {//关闭定时器
-            clearInterval(timer);
-        }
-        endRecord();
     }
-}
 }
 
 function checkRecordAuth(cbOk, cbError) {
