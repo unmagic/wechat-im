@@ -1,5 +1,6 @@
 # wechat-im
 微信小程序即时通讯组件
+具体集成方式 请前往 http://blog.csdn.net/sinat_27612147/article/details/78456363
 
 更新日志：
 
