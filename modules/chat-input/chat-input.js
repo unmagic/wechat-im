@@ -5,7 +5,7 @@ let windowHeight, windowWidth;
 let singleVoiceTimeCount = 0;
 let maxVoiceTime = 60, minVoiceTime = 1, startTimeDown = 54;
 let timer;
-let sendVoiceCbOk, sendVoiceCbError, startVoiceRecordCbOk, tabbarHeigth = 0;
+let sendVoiceCbOk, sendVoiceCbError, startVoiceRecordCbOk, tabbarHeigth = 0, extraButtonClickEvent;
 let cancelLineYPosition = 0;
 let status = {
     START: 1,
@@ -42,7 +42,7 @@ function init(page, opt) {
     dealVoiceMoveEndEvent();
 }
 
-function clickExtraListener(cb) {
+function clickExtraItemListener(cb) {
     _page.chatInputExtraItemClickEvent = typeof cb === "function" ? cb : null;
 }
 
@@ -80,7 +80,11 @@ function initVoiceData() {
     cancelLineYPosition = windowHeight * 0.12;
 }
 
-function initExtraData(extra$arr, clickEvent) {
+function setExtraButtonClickListener(fun) {
+    extraButtonClickEvent = fun;
+}
+
+function initExtraData(extra$arr) {
     _page.setData({
         'inputObj.extraObj.chatInputExtraArr': extra$arr
     });
@@ -88,7 +92,7 @@ function initExtraData(extra$arr, clickEvent) {
         _page.setData({
             'inputObj.extraObj.chatInputShowExtra': !_page.data.inputObj.extraObj.chatInputShowExtra
         });
-        clickEvent && clickEvent();
+        extraButtonClickEvent && extraButtonClickEvent(!_page.data.inputObj.extraObj.chatInputShowExtra);
     };
 }
 
@@ -324,10 +328,11 @@ function setTextMessageListener(cb) {
 
 module.exports = {
     init: init,
-    clickExtraListener: clickExtraListener,
+    clickExtraListener: clickExtraItemListener,
     closeExtraView: closeExtraView,
     recordVoiceListener: sendVoiceListener,
     setVoiceRecordStatusListener: setVoiceRecordStatusListener,
     setTextMessageListener: setTextMessageListener,
+    setExtraButtonClickListener: setExtraButtonClickListener,
     VRStatus: status
 };
