@@ -7,7 +7,7 @@
                 <image src="../../image/chat/voice/{{inputObj.inputStatus==='voice'?'keyboard':'voice'}}.png"
                        class="extra-btn-style" bindtap="changeInputWayEvent" />
                 <block wx:if="{{inputObj.inputStatus==='voice'}}">
-                    <template is="voice" data="{{voiceObj:inputObj.voiceObj}}" />
+                    <template is="voice" data="{{voiceObj:inputObj.voiceObj,canUsePress:inputObj.canUsePress}}" />
                 </block>
             </block>
             <input wx:if="{{inputObj.inputStatus==='text'}}"

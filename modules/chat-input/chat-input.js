@@ -5,7 +5,7 @@ let windowHeight, windowWidth;
 let singleVoiceTimeCount = 0;
 let maxVoiceTime = 60, minVoiceTime = 1, startTimeDown = 54;
 let timer;
-let sendVoiceCbOk, sendVoiceCbError, startVoiceRecordCbOk, tabbarHeigth = 0, extraButtonClickEvent;
+let sendVoiceCbOk, sendVoiceCbError, startVoiceRecordCbOk, tabbarHeigth = 0, extraButtonClickEvent, canUsePress = false;
 let cancelLineYPosition = 0;
 let status = {
     START: 1,
@@ -21,6 +21,7 @@ let status = {
 function init(page, opt) {
     windowHeight = opt.systemInfo.windowHeight;
     windowWidth = opt.systemInfo.windowWidth;
+    canUsePress = opt.systemInfo.SDKVersion > '1.5.0';
     minVoiceTime = opt.minVoiceTime ? opt.minVoiceTime : 1;
     maxVoiceTime = opt.maxVoiceTime && opt.maxVoiceTime <= 60 ? opt.maxVoiceTime : 60;
     startTimeDown = opt.startTimeDown && opt.startTimeDown < maxVoiceTime && opt.startTimeDown > 0 ? opt.startTimeDown : 54;
@@ -91,6 +92,7 @@ function initChangeInputWayEvent() {
 function initVoiceData() {
     let width = windowWidth / 2.6;
     _page.setData({
+        'inputObj.canUsePress': canUsePress,
         'inputObj.inputStatus': 'text',
         'inputObj.windowHeight': windowHeight,
         'inputObj.windowWidth': windowWidth,
