@@ -7,7 +7,13 @@
 2018-06-29
  - 加入`wx.getRecorderManager()`以支持小程序基础库1.6.0以上。
  - 兼容长按事件，根据版本调用`longpress`或`longtap`。
- - 新增接口`format: 'mp3'`,有效值为 aac/mp3 , 默认值为'mp3'
+ - `init`方法参数新增`format`字段，用于管理录音格式，只在基础库1.6.0及以上生效，低版本不生效。有效格式为 aac或mp3 , 默认值为'mp3'，如下：
+ ```
+ chatInput.init(pageContext, {
+            systemInfo: systemInfo,
+            format: 'mp3'//aac/mp3
+        });
+ ```
 
 2018-06-26
  - 新增右下角加号button点击事件
