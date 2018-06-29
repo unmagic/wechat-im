@@ -28,6 +28,7 @@ Page({
             minVoiceTime: 1,
             maxVoiceTime: 60,
             startTimeDown: 56,
+            format: 'mp3',//aac/mp3
             extraArr: [{
                 picName: 'choose_picture',
                 description: '照片'

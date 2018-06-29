@@ -5,7 +5,8 @@ let windowHeight, windowWidth;
 let singleVoiceTimeCount = 0;
 let maxVoiceTime = 60, minVoiceTime = 1, startTimeDown = 54;
 let timer;
-let sendVoiceCbOk, sendVoiceCbError, startVoiceRecordCbOk, tabbarHeigth = 0, extraButtonClickEvent, canUsePress = false;
+let sendVoiceCbOk, sendVoiceCbError, startVoiceRecordCbOk, tabbarHeigth = 0, extraButtonClickEvent, canUsePress = false,
+    voiceFormat;
 let cancelLineYPosition = 0;
 let status = {
     START: 1,
@@ -24,6 +25,7 @@ function init(page, opt) {
     canUsePress = opt.systemInfo.SDKVersion > '1.5.0';
     minVoiceTime = opt.minVoiceTime ? opt.minVoiceTime : 1;
     maxVoiceTime = opt.maxVoiceTime && opt.maxVoiceTime <= 60 ? opt.maxVoiceTime : 60;
+    voiceFormat = opt.format || 'mp3';
     startTimeDown = opt.startTimeDown && opt.startTimeDown < maxVoiceTime && opt.startTimeDown > 0 ? opt.startTimeDown : 54;
     if (!isNaN(opt.tabbarHeigth)) {
         tabbarHeigth = opt.tabbarHeigth;
@@ -155,7 +157,7 @@ function dealVoiceLongClickEventWithHighVersion() {
             });
             typeof startVoiceRecordCbOk === "function" && startVoiceRecordCbOk(status.START);
             checkRecordAuth(function () {
-                recorderManager.start({duration: 60000, format: 'mp3'});
+                recorderManager.start({duration: 60000, format: voiceFormat});
             }, function (res) {
                 //录音失败
                 console.error('录音拒绝授权');
