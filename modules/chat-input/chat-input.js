@@ -1,5 +1,5 @@
 let _page;
-let inputObj = {};
+let inputObj = {}, recorderManager;
 let windowHeight, windowWidth;
 // let voice$position = {toLeft: 0, toBottom: 0};
 let singleVoiceTimeCount = 0;
@@ -37,7 +37,12 @@ function init(page, opt) {
     initExtraData(opt.extraArr);
 
     initChangeInputWayEvent();
-    dealVoiceLongClickEvent();
+    if (wx.getRecorderManager) {
+        recorderManager = wx.getRecorderManager();
+        dealVoiceLongClickEventWithHighVersion();
+    } else {
+        dealVoiceLongClickEventWithLowVersion();
+    }
     dealVoiceMoveEvent();
     dealVoiceMoveEndEvent();
 }
@@ -49,6 +54,25 @@ function clickExtraItemListener(cb) {
 function sendVoiceListener(cbOk, cbError) {
     sendVoiceCbError = cbError;
     sendVoiceCbOk = cbOk;
+    if (!!recorderManager) {
+        typeof cbOk === "function" && (recorderManager.onStop(function (res) {
+            console.log(res, _page.data.inputObj.voiceObj.status);
+            if (_page.data.inputObj.voiceObj.status === 'short') {//录音时间太短或者移动到了取消录音区域， 则取消录音
+                typeof startVoiceRecordCbOk === "function" && startVoiceRecordCbOk(status.SHORT);
+                return;
+            } else if (_page.data.inputObj.voiceObj.moveToCancel) {
+                typeof startVoiceRecordCbOk === "function" && startVoiceRecordCbOk(status.CANCEL);
+                return;
+            }
+            console.log('录音成功');
+            typeof startVoiceRecordCbOk === "function" && startVoiceRecordCbOk(status.SUCCESS);
+            typeof sendVoiceCbOk === "function" && sendVoiceCbOk(res, Math.round(res.duration / 1000));
+        }));
+        typeof cbError === "function" && (recorderManager.onError(function (res) {
+            typeof startVoiceRecordCbOk === "function" && startVoiceRecordCbOk(status.FAIL);
+            typeof sendVoiceCbError === "function" && sendVoiceCbError(res);
+        }));
+    }
 }
 
 function setVoiceRecordStatusListener() {
@@ -96,10 +120,98 @@ function initExtraData(extra$arr) {
     };
 }
 
-
-function dealVoiceLongClickEvent() {
+function dealVoiceLongClickEventWithHighVersion() {
+    recorderManager.onStart(function () {
+        singleVoiceTimeCount = 0;
+        //设置定时器计时60秒
+        timer = setInterval(function () {
+            singleVoiceTimeCount++;
+            if (singleVoiceTimeCount >= startTimeDown && singleVoiceTimeCount < maxVoiceTime) {
+                _page.setData({
+                    'inputObj.voiceObj.timeDownNum': maxVoiceTime - singleVoiceTimeCount,
+                    'inputObj.voiceObj.status': 'timeDown'
+                })
+            } else if (singleVoiceTimeCount >= maxVoiceTime) {
+                _page.setData({
+                    'inputObj.voiceObj.status': 'timeout'
+                });
+                delayDismissCancelView();
+                clearInterval(timer);
+                //TODO 停止录音并生成IM语音信息 并将时长拼入到IM消息中
+                endRecord();
+            }
+        }, 1000);
+    })
     _page.long$click$voice$btn = function (e) {
-        console.log('长按', e);
+        if ('send$voice$btn' === e.currentTarget.id) {//长按时需要打开录音功能，开始录音
+            _page.setData({//调出取消弹窗
+                'inputObj.voiceObj.showCancelSendVoicePart': true,
+                'inputObj.voiceObj.timeDownNum': maxVoiceTime - singleVoiceTimeCount,
+                'inputObj.voiceObj.status': 'start',
+                'inputObj.voiceObj.startStatus': 1,
+                'inputObj.voiceObj.moveToCancel': false
+            });
+            typeof startVoiceRecordCbOk === "function" && startVoiceRecordCbOk(status.START);
+            checkRecordAuth(function () {
+                recorderManager.start({duration: 60000, format: 'mp3'});
+            }, function (res) {
+                //录音失败
+                console.error('录音拒绝授权');
+                clearInterval(timer);
+                endRecord();
+                _page.setData({
+                    'inputObj.voiceObj.status': 'end',
+                    'inputObj.voiceObj.showCancelSendVoicePart': false
+                });
+                typeof startVoiceRecordCbOk === "function" && startVoiceRecordCbOk(status.UNAUTH);
+
+                if (!sendVoiceCbError) {
+                    if (wx.openSetting) {
+                        wx.showModal({
+                            title: '您未授权语音功能',
+                            content: '暂时不能使用语音',
+                            confirmText: '去设置',
+                            success: res => {
+                                if (res.confirm) {
+                                    wx.openSetting({
+                                        success: res => {
+                                            if (res.authSetting['scope.record']) {
+                                                _page.setData({
+                                                    'inputObj.extraObj.chatInputShowExtra': false
+                                                });
+                                            }
+                                        }
+                                    });
+                                } else {
+                                    _page.setData({
+                                        'inputObj.inputStatus': 'text',
+                                        'inputObj.extraObj.chatInputShowExtra': false
+                                    });
+                                }
+                            }
+                        });
+
+                    } else {
+                        wx.showModal({
+                            title: '无法使用语音',
+                            content: '请将微信升级至最新版本才可使用语音功能',
+                            success: res => {
+                                if (res.confirm) {
+
+                                }
+                            }
+                        })
+                    }
+                } else {
+                    typeof sendVoiceCbError === "function" && sendVoiceCbError(res);
+                }
+            });
+        }
+    };
+}
+
+function dealVoiceLongClickEventWithLowVersion() {
+    _page.long$click$voice$btn = function (e) {
         if ('send$voice$btn' === e.currentTarget.id) {//长按时需要打开录音功能，开始录音
             singleVoiceTimeCount = 0;
             _page.setData({//调出取消弹窗
@@ -228,9 +340,7 @@ function dealVoiceMoveEvent() {
 
 function dealVoiceMoveEndEvent() {
     _page.send$voice$move$end$event = function (e) {
-        console.log('离开', e);
         if ('send$voice$btn' === e.currentTarget.id) {
-            console.log('时间短', singleVoiceTimeCount, minVoiceTime);
             if (singleVoiceTimeCount < minVoiceTime) {//语音时间太短
                 _page.setData({
                     'inputObj.voiceObj.status': 'short'
@@ -312,7 +422,11 @@ function endRecord() {
     _page.setData({
         'inputObj.voiceObj.startStatus': 0
     });
-    wx.stopRecord();
+    if (!recorderManager) {
+        wx.stopRecord();
+    } else {
+        recorderManager.stop();
+    }
 }
 
 function setTextMessageListener(cb) {
