@@ -19,7 +19,7 @@ input{
     background-color: white;
     width: 100%;
     align-items: center;
-    heigth:100rpx;
+    height:100rpx;
 }
 .input-flex-column{
     width:100%;
