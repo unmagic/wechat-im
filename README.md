@@ -4,6 +4,17 @@
 
 更新日志：
 
+2018-07-04
+ - 新增右下角发送按钮，在输入框获取焦点时，会自动切换到发送按钮。点击发送按钮事件和点击键盘右下角发送按钮事件均为一个事件。
+ - 新增发送按钮样式，如下：
+ ```
+ chatInput.init(pageContext, {
+             sendButtonBgColor: 'mediumseagreen',
+             sendButtonTextColor: 'white'
+         });
+ ```
+ - 修复在自定义菜单弹出时，切换到文本输入并发送文本后，自定义弹窗依旧存在的问题。
+
 2018-06-29
  - 加入`wx.getRecorderManager()`以支持小程序基础库1.6.0以上。
  - 兼容长按事件，根据版本调用`longpress`或`longtap`。
