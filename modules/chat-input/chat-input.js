@@ -445,14 +445,14 @@ function setTextMessageListener(cb) {
         _page.chatInputBindFocusEvent = function () {
             _page.setData({
                 'inputObj.inputType': 'text'
+
             })
         };
         _page.chatInputBindBlurEvent = function () {
-            if (!inputObj.inputValueEventTemp) {
-                _page.setData({
-                    'inputObj.inputType': 'none'
-                });
-            }
+            _page.setData({
+                'inputObj.inputType': 'none',
+                'inputObj.extraObj.chatInputShowExtra': false
+            });
         };
         _page.chatInputSendTextMessage = function (e) {
             _page.setData({
