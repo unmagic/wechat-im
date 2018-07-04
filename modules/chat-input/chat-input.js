@@ -448,7 +448,7 @@ function setTextMessageListener(cb) {
             })
         };
         _page.chatInputBindBlurEvent = function () {
-            if (!_page.data.inputObj.inputValueTemp) {
+            if (!inputObj.inputValueEventTemp) {
                 _page.setData({
                     'inputObj.inputType': 'none'
                 });
@@ -461,19 +461,19 @@ function setTextMessageListener(cb) {
             typeof cb === "function" && cb(e);
         };
         _page.chatInputSendTextMessage02 = function () {
-            if (!!_page.data.inputObj.inputValueEventTemp && !!_page.data.inputObj.inputValueEventTemp.detail.value) {
-                typeof cb === "function" && cb(JSON.parse(JSON.stringify(_page.data.inputObj.inputValueEventTemp)));
+            if (!!inputObj.inputValueEventTemp && !!inputObj.inputValueEventTemp.detail.value) {
+                typeof cb === "function" && cb(JSON.parse(JSON.stringify(inputObj.inputValueEventTemp)));
             }
 
             _page.setData({
                 textMessage: '',
                 'inputObj.inputType': 'none'
             });
-            _page.data.inputObj.inputValueEventTemp = null;
+            inputObj.inputValueEventTemp = null;
 
         }
         _page.chatInputGetValueEvent = function (e) {
-            _page.data.inputObj.inputValueEventTemp = e;
+            inputObj.inputValueEventTemp = e;
         }
     }
 }
