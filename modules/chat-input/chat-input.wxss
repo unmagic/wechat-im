@@ -45,3 +45,13 @@ input{
     min-height: 51rpx;
     background-color: #EFEFEF;
 }
+
+.chat-input-send-button-style{
+    color: white;
+    width: 100rpx;
+    padding: 15rpx 0;
+    font-size: 30rpx;
+    text-align: center;
+    margin: 0 10rpx;
+    border-radius: 10rpx;
+}

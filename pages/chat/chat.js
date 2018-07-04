@@ -55,6 +55,7 @@ Page({
     textButton: function () {
         chatInput.setTextMessageListener(function (e) {
             let content = e.detail.value;
+            console.log(content);
         });
     },
     voiceButton: function () {

@@ -35,7 +35,7 @@ function init(page, opt) {
         return;
     }
     _page = page;
-    initData();
+    initData(opt);
     initVoiceData();
     initExtraData(opt.extraArr);
 
@@ -94,6 +94,7 @@ function initChangeInputWayEvent() {
 function initVoiceData() {
     let width = windowWidth / 2.6;
     _page.setData({
+        'inputObj.inputStyle.sendButtonBg':_page.data.inputObj.inputStyle.sendButtonBg,
         'inputObj.canUsePress': canUsePress,
         'inputObj.inputStatus': 'text',
         'inputObj.windowHeight': windowHeight,
@@ -418,8 +419,11 @@ function delayDismissCancelView() {
     }, 1000)
 }
 
-function initData() {
-    _page.data.inputObj = inputObj = {voiceObj: {}};
+function initData(opt) {
+    _page.data.inputObj = inputObj = {
+        voiceObj: {},
+        inputStyle: {sendButtonBg: !!opt.sendBtnBgColor ? opt.sendBtnBgColor : 'mediumseagreen'}
+    };
 }
 
 function endRecord() {
@@ -435,11 +439,36 @@ function endRecord() {
 
 function setTextMessageListener(cb) {
     if (_page) {
+        _page.chatInputBindFocusEvent = function () {
+            _page.setData({
+                'inputObj.inputType': 'text'
+            })
+        };
+        _page.chatInputBindBlurEvent = function () {
+            if (!_page.data.inputObj.inputValueTemp) {
+                _page.setData({
+                    'inputObj.inputType': 'none'
+                });
+            }
+        };
         _page.chatInputSendTextMessage = function (e) {
             _page.setData({
                 textMessage: ''
             });
             typeof cb === "function" && cb(e);
+        };
+        _page.chatInputSendTextMessage02 = function () {
+            typeof cb === "function" && cb(JSON.parse(JSON.stringify(_page.data.inputObj.inputValueEventTemp)));
+
+            _page.setData({
+                textMessage: '',
+                'inputObj.inputType': 'none'
+            });
+            _page.data.inputObj.inputValueEventTemp = null;
+
+        }
+        _page.chatInputGetValueEvent = function (e) {
+            _page.data.inputObj.inputValueEventTemp = e;
         }
     }
 }

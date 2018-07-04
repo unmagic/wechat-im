@@ -12,9 +12,10 @@
             </block>
             <input wx:if="{{inputObj.inputStatus==='text'}}"
                    class="chat-input-style" style="margin-left:{{showVoicePart?0:16}}rpx;"
-                   maxlength="500" confirm-type="send" value="{{textMessage}}" bindconfirm="chatInputSendTextMessage" />
+                   maxlength="500" confirm-type="send" value="{{textMessage}}" bindconfirm="chatInputSendTextMessage" bindfocus="chatInputBindFocusEvent" bindblur="chatInputBindBlurEvent" bindinput="chatInputGetValueEvent"/>
             <view hover-class="press-style-opacity">
-                <image class="extra-btn-style"
+                <view wx:if="{{inputObj.inputType==='text'}}" class="chat-input-send-button-style" style="background-color: {{inputObj.inputStyle.sendButtonBg}};" catchtap="chatInputSendTextMessage02">发送</view>
+                <image wx:else class="extra-btn-style"
                        src="../../image/chat/extra.png" catchtap="chatInputExtraClickEvent" />
             </view>
 
