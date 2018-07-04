@@ -461,7 +461,9 @@ function setTextMessageListener(cb) {
             typeof cb === "function" && cb(e);
         };
         _page.chatInputSendTextMessage02 = function () {
-            typeof cb === "function" && cb(JSON.parse(JSON.stringify(_page.data.inputObj.inputValueEventTemp)));
+            if (!!_page.data.inputObj.inputValueEventTemp && !!_page.data.inputObj.inputValueEventTemp.detail.value) {
+                typeof cb === "function" && cb(JSON.parse(JSON.stringify(_page.data.inputObj.inputValueEventTemp)));
+            }
 
             _page.setData({
                 textMessage: '',
