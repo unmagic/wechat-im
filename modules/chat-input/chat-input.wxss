@@ -47,7 +47,6 @@ input{
 }
 
 .chat-input-send-button-style{
-    color: white;
     width: 100rpx;
     padding: 15rpx 0;
     font-size: 30rpx;

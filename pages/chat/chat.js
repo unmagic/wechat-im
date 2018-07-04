@@ -29,6 +29,8 @@ Page({
             maxVoiceTime: 60,
             startTimeDown: 56,
             format: 'mp3',//aac/mp3
+            sendButtonBgColor: 'mediumseagreen',
+            sendButtonTextColor: 'white',
             extraArr: [{
                 picName: 'choose_picture',
                 description: '照片'

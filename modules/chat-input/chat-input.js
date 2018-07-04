@@ -94,7 +94,7 @@ function initChangeInputWayEvent() {
 function initVoiceData() {
     let width = windowWidth / 2.6;
     _page.setData({
-        'inputObj.inputStyle.sendButtonBg':_page.data.inputObj.inputStyle.sendButtonBg,
+        'inputObj.inputStyle': _page.data.inputObj.inputStyle,
         'inputObj.canUsePress': canUsePress,
         'inputObj.inputStatus': 'text',
         'inputObj.windowHeight': windowHeight,
@@ -422,7 +422,10 @@ function delayDismissCancelView() {
 function initData(opt) {
     _page.data.inputObj = inputObj = {
         voiceObj: {},
-        inputStyle: {sendButtonBg: !!opt.sendBtnBgColor ? opt.sendBtnBgColor : 'mediumseagreen'}
+        inputStyle: {
+            sendButtonBgColor: opt.sendButtonBgColor || 'mediumseagreen',
+            sendButtonTextColor: opt.sendButtonTextColor || 'white'
+        }
     };
 }
 
