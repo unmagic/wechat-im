@@ -16,15 +16,15 @@
         </block>
 
         <block wx:if="{{itemType==='image'}}">
-            <image wx:if="{{itemType==='image'}}" class="chat-list-pic-style" src="{{picUrl}}"
-                   mode="aspectFill" bindtap="imageClickEvent" data-url="{{picUrl}}"/>
+            <image wx:if="{{itemType==='image'}}" class="chat-list-pic-style" src="{{word}}"
+                   mode="aspectFill" bindtap="imageClickEvent" data-url="{{word}}"/>
         </block>
 
         <block wx:if="{{itemType==='voice'}}">
             <view style="width: {{(voiceDuration-1)*0.6+10}}%;border-radius: 10rpx;padding: 20rpx;font-size: 30rpx;max-width: 60%;display: flex;justify-content: {{isMy?'flex-end':'flex-start'}}"
                   class="{{isMy?'isMyWordStyle':'isOtherWordStyle'}}"
                   bindtap="chatVoiceItemClickEvent"
-                  data-voice-path="{{voicePath}}"
+                  data-voice-path="{{word}}"
                   data-voice-duration="{{voiceDuration}}"
                   data-is-send="{{isMy}}"
                   data-index="{{index}}">
