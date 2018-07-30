@@ -1,4 +1,4 @@
-<import src="./loading/common.wxml" />
+<import src="../loading/common.wxml" />
 
 <template name="chat-send-status">
     <view class="sendStatusStyle" wx:if="{{sendStatus!=='success'}}">
@@ -6,7 +6,7 @@
             <template is="common-loading" />
         </block>
         <block wx:if="{{sendStatus==='failed'}}">
-            <image src="./../../image/chat/send_fail.png" class="icon-common" bindtap="resendMsgEvent" data-resend-index="{{index}}" />
+            <image src="./../../image/chat/send_fail.png" class="chat-loading-common" bindtap="resendMsgEvent" data-resend-index="{{index}}" />
         </block>
     </view>
 </template>

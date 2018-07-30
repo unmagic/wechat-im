@@ -1,5 +1,8 @@
 // pages/list/list.js
 import * as chatInput from "../../modules/chat-input/chat-input";
+import {saveFileRule} from "../../utils/file";
+import * as toast from "../../utils/toast";
+import IMOperator from "./im-operator";
 
 Page({
 
@@ -22,19 +25,7 @@ Page({
         wx.setNavigationBarTitle({
             title: '呵呵哒的好朋友'
         });
-        const item = {};
-        const item1 =
-            {
-                isMy: item.isMy,
-                showTime: item.showTime,//是否显示该次发送时间
-                time: item.time,//发送时间 如 09:15
-                itemType: item.itemType,//内容的类型，目前有这几种类型： text/voice/image 文本/语音/图片
-                content: item.content,// 显示的内容，根据不同的类型，在这里填充不同的信息。
-                itemHeadUrl: item.itemHeadUrl,//显示的头像，你可以填充不同的头像，来满足群聊的需求
-                sendStatus: item.sendStatus,//发送状态，目前有这几种状态：sending/success/failed 发送中/发送成功/发送失败
-                voiceDuration: item.voiceDuration,//
-                isPlaying: item.isPlaying
-            };
+        this.imOperator = new IMOperator();
         this.data.chatItems.push();
 
     },
@@ -73,43 +64,61 @@ Page({
         that.voiceButton();
     },
     textButton: function () {
-        chatInput.setTextMessageListener(function (e) {
+        chatInput.setTextMessageListener((e) => {
             let content = e.detail.value;
+            const temp = this.imOperator.createChatItem(IMOperator.TextType, this.imOperator.createChatItemContent({
+                type: IMOperator.TextType,
+                content
+            }));
 
-            console.log(content);
+            this.showItemForMoment(temp, (itemIndex) => {
+                this.sendMsg(content, itemIndex);
+            });
         });
     },
     voiceButton: function () {
-        chatInput.recordVoiceListener(function (res, duration) {
+        chatInput.recordVoiceListener((res, duration) => {
             let tempFilePath = res.tempFilePath;
             console.log(tempFilePath, duration);
+            saveFileRule(tempFilePath, (savedFilePath) => {
+                const temp = this.imOperator.createChatItem(IMOperator.TextType, this.imOperator.createChatItemContent({
+                    type: IMOperator.VoiceType,
+                    content: savedFilePath,
+                    duration
+                }));
+                this.showItemForMoment(temp, (itemIndex) => {
+                    this.simulateUploadFile({savedFilePath, duration, itemIndex}, (content) => {
+                        this.sendMsg(content, itemIndex);
+                    });
+                });
+            });
+
         });
         chatInput.setVoiceRecordStatusListener(function (status) {
-            switch (status) {
-                case chatInput.VRStatus.START://开始录音
-
-                    break;
-                case chatInput.VRStatus.SUCCESS://录音成功
-
-                    break;
-                case chatInput.VRStatus.CANCEL://取消录音
-
-                    break;
-                case chatInput.VRStatus.SHORT://录音时长太短
-
-                    break;
-                case chatInput.VRStatus.UNAUTH://未授权录音功能
-
-                    break;
-                case chatInput.VRStatus.FAIL://录音失败(已经授权了)
-
-                    break;
+            if (this.data.isVoicePlaying) {
+                let that = this;
+                wx.stopVoice();
+                that.data.chatItems.forEach(item => {
+                    if ('voice' === item.itemType) {
+                        item.isPlaying = false
+                    }
+                });
+                that.setData({
+                    chatItems: that.data.chatItems,
+                    isVoicePlaying: false
+                })
             }
         })
     },
+    //模拟上传文件
+    simulateUploadFile: function ({savedFilePath, duration, itemIndex}, cbOk) {
+        setTimeout(() => {
+            cbOk && cbOk('http://xxxxxx/xx.com/image/' + savedFilePath);
+        }, 2000);
+    },
     extraButton: function () {
         let that = this;
-        chatInput.clickExtraListener(function (e) {
+        chatInput.clickExtraListener((e) => {
             console.log(e);
             let itemIndex = parseInt(e.currentTarget.dataset.index);
             if (itemIndex === 2) {
@@ -120,17 +129,24 @@ Page({
                 count: 1, // 默认9
                 sizeType: ['compressed'],
                 sourceType: itemIndex === 0 ? ['album'] : ['camera'],
-                success: function (res) {
-                    let tempFilePath = res.tempFilePaths[0];
-
+                success: (res) => {
+                    saveFileRule(res.tempFilePaths[0], (savedFilePath) => {
+                        const temp = this.imOperator.createChatItem(IMOperator.TextType, this.imOperator.createChatItemContent({
+                            type: IMOperator.ImageType,
+                            content: savedFilePath
+                        }));
+                        that.showItemForMoment(temp, (itemIndex) => {
+                            this.simulateUploadFile({savedFilePath, itemIndex}, (content) => {
+                                this.sendMsg(content, itemIndex);
+                            });
+                        });
+                    });
 
                 }
             });
         });
-        chatInput.setExtraButtonClickListener(function (dismiss) {
-            console.log('Extra弹窗是否消失', dismiss);
-        })
     },
+
     myFun: function () {
         wx.showModal({
             title: '小贴士',
@@ -147,6 +163,54 @@ Page({
 
     resetInputStatus: function () {
         chatInput.closeExtraView();
+    },
+
+    showItemForMoment: function (sendMsg, cbOk) {
+        if (!sendMsg) return;
+        this.updateDataWhenStartSending(sendMsg);
+        cbOk && cbOk(this.data.chatItems.length - 1);
+    },
+    sendMsg: function (content, itemIndex) {
+        this.imOperator.onSimulateSendMsg(content, (content) => {
+            this.updateViewWhenSendSuccess(content, itemIndex);
+        }, () => {
+            this.updateViewWhenSendFailed(itemIndex);
+        })
+    },
+    resendMsgEvent: function (e) {
+        const itemIndex = parseInt(e.currentTarget.dataset.resendIndex);
+        const item = this.data.chatItems[itemIndex];
+        this.updateDataWhenStartSending(item, false);
+        this.sendMsg(item.content, itemIndex);
+    },
+    updateDataWhenStartSending: function (sendMsg, addToArr = true) {
+        chatInput.closeExtraView();
+        sendMsg.sendStatus = 'sending';
+        addToArr && this.data.chatItems.push(sendMsg);
+        let updateViewData = {
+            textMessage: "",
+            chatItems: this.data.chatItems,
+            scrollTopVal: this.data.scrollTopVal + 999,
+        };
+        this.setData(updateViewData);
+    },
+    updateViewWhenSendSuccess: function (sendMsg, itemIndex) {
+        let that = this;
+        let item = that.data.chatItems[itemIndex];
+        item.timeStamp = sendMsg.timeStamp;
+        this.updateSendStatusView('success', itemIndex);
+
+    },
+    updateViewWhenSendFailed: function (itemIndex) {
+        this.updateSendStatusView('failed', itemIndex);
+    },
+    updateSendStatusView: function (status, itemIndex) {
+        let that = this;
+        that.data.chatItems[itemIndex].sendStatus = status;
+        let obj = {};
+        obj[`chatItems[${itemIndex}].sendStatus`] = status;
+        obj['scrollTopVal'] = that.data.scrollTopVal + 999;
+        that.setData(obj);
     },
     /**
      * 生命周期函数--监听页面初次渲染完成
