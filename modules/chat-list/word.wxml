@@ -1,0 +1,43 @@
+<import src="./chat-send-status.wxml" />
+<import src="./voice.wxml" />
+<template name="chat-word">
+    <view style="width: 100%;display: flex;flex-direction: {{isMyWord?'row-reverse':'row'}};margin-bottom: {{index===length-1?150:20}}rpx;margin-top: 20rpx;">
+        <image wx:if="{{chatType!=='askStatus'}}"
+               style="width: 70rpx;height: 70rpx;border-radius: 50%;margin-left: 15rpx;margin-right: 15rpx;"
+               src="{{headUrl}}" />
+        <image wx:if="{{chatType==='text'||chatType==='voice'}}" class="arrow-style"
+               src="./../../image/chat/popu_{{isMyWord?'blue':'white'}}.png" />
+
+        <block wx:if="{{chatType==='text'}}">
+            <view wx:if="{{chatType==='text'}}" class="{{isMyWord?'isMyWordStyle':'isOtherWordStyle'}}"
+                  style="border-radius: 10rpx;padding: 20rpx;font-size: 30rpx;max-width: 60%;"
+                  bindtap="chatTextItemClickEvent"
+                  data-is-finished="{{isFinished}}"
+                  data-index="{{index}}">{{!isFinished?words:words[0]}}<mark style="color:#40c9ff">{{!isFinished?'':words[1]}}</mark>{{!isFinished?'':words[2]}}</view>
+        </block>
+
+        <block wx:if="{{chatType==='image'}}">
+            <image wx:if="{{chatType==='image'}}" class="picStyle" src="{{picUrl}}"
+                   mode="aspectFill" bindtap="imageClickEvent" data-url="{{picUrl}}" />
+        </block>
+
+        <block wx:if="{{chatType==='voice'}}">
+            <view style="width: {{(voiceDuration-1)*0.6+10}}%;border-radius: 10rpx;padding: 20rpx;font-size: 30rpx;max-width: 60%;display: flex;justify-content: {{isMyWord?'flex-end':'flex-start'}}"
+                  class="{{isMyWord?'isMyWordStyle':'isOtherWordStyle'}}"
+                  bindtap="chatVoiceItemClickEvent"
+                  data-voice-path="{{voicePath}}"
+                  data-voice-duration="{{voiceDuration}}"
+                  data-is-send="{{isMyWord}}"
+                  data-index="{{index}}">
+                <template is="voice-item" data="{{isMyWord:isMyWord,isPlaying:isPlaying}}" />
+            </view>
+            <view class="voice-duration-style">{{voiceDuration}}"
+            </view>
+        </block>
+
+        <block wx:if="{{isMyWord}}">
+            <template is="chat-send-status" data="{{sendStatus:sendStatus,index:index}}" />
+        </block>
+
+    </view>
+</template>

@@ -1,0 +1,11 @@
+<import src="./time.wxml"/>
+<import src="./word.wxml"/>
+<template name="chat-item">
+    <view style="width: 100%;display: flex;flex-direction: column;align-items: center">
+        <template is="chat-time" data="{{showTime:item.showTime,time:item.time}}"/>
+        <block wx:if="{{chatType!=='askStatus'}}">
+            <template is="chat-word"
+                      data="{{length:length,index:index,headUrl:headUrl,isMyWord:item.isMyWord,showTime:item.showTime,time:item.time,words:item.content,chatType:item.chatType,itemHeadUrl:item.isMyWord?userInfo.head_url:friendHeadUrl,isFinished:item.isFinished||item.isTimeoutFinished,voiceDuration:item.voiceDuration,isPlaying:item.isPlaying,voicePath:item.voicePath,sendStatus:item.sendStatus,picUrl:item.picUrl}}"/>
+        </block>
+    </view>
+</template>

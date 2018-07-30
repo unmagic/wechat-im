@@ -1,0 +1,5 @@
+<template name="chat-page-status">
+    <view style="background-color: {{canChat?'#40c9ff':'#888888'}};" class="chat-page-status-style">
+        {{canChat?((remainTime?remainTime:'')+'后咨询结束'):(finishedType===4?'咨询达时间上限，已关闭':'咨询完成，已关闭')}}
+    </view>
+</template>
