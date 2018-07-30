@@ -1,6 +1,7 @@
 {
   "pages":[
-    "pages/chat/chat"
+    "pages/chat/chat",
+    "pages/list/list"
   ],
   "window":{
     "backgroundTextStyle":"light",
