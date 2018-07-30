@@ -16,10 +16,8 @@ export default class IMOperator {
     onSimulateSendMsg(content, cbOk, cbError) {
         //这里content即为要发送的数据
         setTimeout(() => {
-            console.log(content);
             const item = this.createChatItem(JSON.parse(content));
             this._latestTImestamp = item.timestamp;
-            console.log(item);
             cbOk && cbOk(item);
         }, 300)
     }
@@ -39,7 +37,7 @@ export default class IMOperator {
             showTime: true,//是否显示该次发送时间
             time: '09:15',//发送时间 如 09:15,
             timestamp: Date.now(),//该条数据的时间戳，一般用于排序
-            itemType: type,//内容的类型，目前有这几种类型： text/voice/image | 文本/语音/图片
+            type: type,//内容的类型，目前有这几种类型： text/voice/image | 文本/语音/图片
             content: content,// 显示的内容，根据不同的类型，在这里填充不同的信息。
             headUrl: this._myHeadUrl,//显示的头像，你可以填充不同的头像，来满足群聊的需求
             sendStatus: 'success',//发送状态，目前有这几种状态：sending/success/failed | 发送中/发送成功/发送失败

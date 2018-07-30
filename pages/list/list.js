@@ -66,7 +66,7 @@ Page({
     textButton: function () {
         chatInput.setTextMessageListener((e) => {
             let content = e.detail.value;
-            console.log('刚刚开始',content);
+            console.log('刚刚开始', content);
             this.showItemForMoment(this.imOperator.createChatItem({
                 type: IMOperator.TextType,
                 content
@@ -97,12 +97,12 @@ Page({
             });
 
         });
-        chatInput.setVoiceRecordStatusListener(function (status) {
+        chatInput.setVoiceRecordStatusListener((status) => {
             if (this.data.isVoicePlaying) {
                 let that = this;
                 wx.stopVoice();
                 that.data.chatItems.forEach(item => {
-                    if ('voice' === item.itemType) {
+                    if ('voice' === item.type) {
                         item.isPlaying = false
                     }
                 });
@@ -116,8 +116,8 @@ Page({
     //模拟上传文件
     simulateUploadFile: function ({savedFilePath, duration, itemIndex}, cbOk) {
         setTimeout(() => {
-            cbOk && cbOk('http://xxxxxx/xx.com/image/' + savedFilePath);
-        }, 2000);
+            cbOk && cbOk(savedFilePath);
+        }, 1000);
     },
     extraButton: function () {
         let that = this;
@@ -177,7 +177,7 @@ Page({
         cbOk && cbOk(this.data.chatItems.length - 1);
     },
     sendMsg: function (content, itemIndex) {
-        console.log('即将发送',content);
+        console.log('即将发送', content);
         this.imOperator.onSimulateSendMsg(content, (content) => {
             this.updateViewWhenSendSuccess(content, itemIndex);
         }, () => {
@@ -202,7 +202,10 @@ Page({
         this.setData(updateViewData);
     },
     updateViewWhenSendSuccess: function (sendMsg, itemIndex) {
-        console.log('发送成功',sendMsg);
+        console.log('发送成功', sendMsg);
+        let that = this;
+        let item = that.data.chatItems[itemIndex];
+        item.timeStamp = sendMsg.timeStamp;
         this.updateSendStatusView('success', itemIndex);
 
     },
