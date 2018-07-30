@@ -1,7 +1,7 @@
 <import src="voice.wxml" />
 <import src="extra.wxml" />
 <template name="chat-input">
-    <view class="input-flex-column" catchtap="null">
+    <view class="input-flex-column" catchtap="">
         <view class="input-text-voice-super">
             <block wx:if="{{showVoicePart}}">
                 <image src="../../image/chat/voice/{{inputObj.inputStatus==='voice'?'keyboard':'voice'}}.png"
