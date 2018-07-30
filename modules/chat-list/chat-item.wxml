@@ -5,7 +5,7 @@
         <template is="chat-time" data="{{showTime:item.showTime,time:item.time}}"/>
         <block wx:if="{{chatType!=='askStatus'}}">
             <template is="chat-word"
-                      data="{{length:length,index:index,headUrl:headUrl,isMy:item.isMy,showTime:item.showTime,time:item.time,words:item.content,itemType:item.itemType,itemHeadUrl:item.itemHeadUrl,voiceDuration:item.voiceDuration,isPlaying:item.isPlaying,sendStatus:item.sendStatus}}"/>
+                      data="{{length:length,index:index,headUrl:item.headUrl,isMy:item.isMy,showTime:item.showTime,time:item.time,words:item.content,itemType:item.itemType,itemHeadUrl:item.itemHeadUrl,voiceDuration:item.voiceDuration,isPlaying:item.isPlaying,sendStatus:item.sendStatus}}"/>
         </block>
     </view>
 </template>

@@ -38,7 +38,7 @@ export default class IMOperator {
             timestamp: Date.now(),//该条数据的时间戳，一般用于排序
             itemType: type,//内容的类型，目前有这几种类型： text/voice/image | 文本/语音/图片
             content: content,// 显示的内容，根据不同的类型，在这里填充不同的信息。
-            itemHeadUrl: this._myHeadUrl,//显示的头像，你可以填充不同的头像，来满足群聊的需求
+            headUrl: this._myHeadUrl,//显示的头像，你可以填充不同的头像，来满足群聊的需求
             sendStatus: 'success',//发送状态，目前有这几种状态：sending/success/failed | 发送中/发送成功/发送失败
             voiceDuration: 0,//语音时长 单位秒
             isPlaying: false//语音是否正在播放
