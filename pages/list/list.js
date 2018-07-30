@@ -66,13 +66,12 @@ Page({
     textButton: function () {
         chatInput.setTextMessageListener((e) => {
             let content = e.detail.value;
-            const temp = this.imOperator.createChatItem(IMOperator.TextType, this.imOperator.createChatItemContent({
+            console.log('刚刚开始',content);
+            this.showItemForMoment(this.imOperator.createChatItem({
                 type: IMOperator.TextType,
                 content
-            }));
-
-            this.showItemForMoment(temp, (itemIndex) => {
-                this.sendMsg(content, itemIndex);
+            }), (itemIndex) => {
+                this.sendMsg(IMOperator.createChatItemContent({type: IMOperator.TextType, content}), itemIndex);
             });
         });
     },
@@ -81,14 +80,18 @@ Page({
             let tempFilePath = res.tempFilePath;
             console.log(tempFilePath, duration);
             saveFileRule(tempFilePath, (savedFilePath) => {
-                const temp = this.imOperator.createChatItem(IMOperator.TextType, this.imOperator.createChatItemContent({
+                const temp = this.imOperator.createChatItem({
                     type: IMOperator.VoiceType,
                     content: savedFilePath,
                     duration
-                }));
+                });
                 this.showItemForMoment(temp, (itemIndex) => {
                     this.simulateUploadFile({savedFilePath, duration, itemIndex}, (content) => {
-                        this.sendMsg(content, itemIndex);
+                        this.sendMsg(IMOperator.createChatItemContent({
+                            type: IMOperator.VoiceType,
+                            content: content,
+                            duration
+                        }), itemIndex);
                     });
                 });
             });
@@ -131,13 +134,16 @@ Page({
                 sourceType: itemIndex === 0 ? ['album'] : ['camera'],
                 success: (res) => {
                     saveFileRule(res.tempFilePaths[0], (savedFilePath) => {
-                        const temp = this.imOperator.createChatItem(IMOperator.TextType, this.imOperator.createChatItemContent({
+                        const temp = this.imOperator.createChatItem({
                             type: IMOperator.ImageType,
                             content: savedFilePath
-                        }));
+                        });
                         that.showItemForMoment(temp, (itemIndex) => {
                             this.simulateUploadFile({savedFilePath, itemIndex}, (content) => {
-                                this.sendMsg(content, itemIndex);
+                                this.sendMsg(IMOperator.createChatItemContent({
+                                    type: IMOperator.ImageType,
+                                    content
+                                }), itemIndex);
                             });
                         });
                     });
@@ -171,6 +177,7 @@ Page({
         cbOk && cbOk(this.data.chatItems.length - 1);
     },
     sendMsg: function (content, itemIndex) {
+        console.log('即将发送',content);
         this.imOperator.onSimulateSendMsg(content, (content) => {
             this.updateViewWhenSendSuccess(content, itemIndex);
         }, () => {
@@ -195,9 +202,7 @@ Page({
         this.setData(updateViewData);
     },
     updateViewWhenSendSuccess: function (sendMsg, itemIndex) {
-        let that = this;
-        let item = that.data.chatItems[itemIndex];
-        item.timeStamp = sendMsg.timeStamp;
+        console.log('发送成功',sendMsg);
         this.updateSendStatusView('success', itemIndex);
 
     },

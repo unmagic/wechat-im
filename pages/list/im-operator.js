@@ -14,14 +14,17 @@ export default class IMOperator {
     }
 
     onSimulateSendMsg(content, cbOk, cbError) {
+        //这里content即为要发送的数据
         setTimeout(() => {
-            const item = this.createChatItem(content);
+            console.log(content);
+            const item = this.createChatItem(JSON.parse(content));
             this._latestTImestamp = item.timestamp;
+            console.log(item);
             cbOk && cbOk(item);
         }, 300)
     }
 
-    createChatItemContent({type = 'text', content = '', duration} = {}) {
+    static createChatItemContent({type = 'text', content = '', duration} = {}) {
         if (!content.replace(/^\s*|\s*$/g, '')) return;
         return JSON.stringify({content, type, duration});
     }
@@ -30,7 +33,7 @@ export default class IMOperator {
 
     }
 
-    createChatItem(type, content) {
+    createChatItem({type = 'text', content = '', duration} = {}) {
         return {
             isMy: true,
             showTime: true,//是否显示该次发送时间
@@ -40,7 +43,7 @@ export default class IMOperator {
             content: content,// 显示的内容，根据不同的类型，在这里填充不同的信息。
             headUrl: this._myHeadUrl,//显示的头像，你可以填充不同的头像，来满足群聊的需求
             sendStatus: 'success',//发送状态，目前有这几种状态：sending/success/failed | 发送中/发送成功/发送失败
-            voiceDuration: 0,//语音时长 单位秒
+            voiceDuration: duration,//语音时长 单位秒
             isPlaying: false//语音是否正在播放
         };
 
