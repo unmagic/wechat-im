@@ -106,7 +106,7 @@ Page({
             });
         });
         chatInput.setExtraButtonClickListener(function (dismiss) {
-            console.log('Extra弹窗是否消息', dismiss);
+            console.log('Extra弹窗是否消失', dismiss);
         })
     },
     myFun: function () {
