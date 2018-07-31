@@ -5,6 +5,7 @@ import IMOperator from "./im-operator";
 import VoiceManager from "./voice-manager";
 import UI from "./ui";
 import TextManager from "./text-manager";
+import ImageManager from "./image-manager";
 
 Page({
 
@@ -33,6 +34,7 @@ Page({
         this.UI = new UI(this);
         this.voiceManager = new VoiceManager(this);
         this.textManager = new TextManager(this);
+        this.imageManager = new ImageManager(this);
         this.imOperator.onSimulateReceiveMsg((msg) => {
             this.data.chatItems.push(msg);
             this.setData({
@@ -119,28 +121,8 @@ Page({
                 that.myFun();
                 return;
             }
-            wx.chooseImage({
-                count: 1, // 默认9
-                sizeType: ['compressed'],
-                sourceType: itemIndex === 0 ? ['album'] : ['camera'],
-                success: (res) => {
-                    saveFileRule(res.tempFilePaths[0], (savedFilePath) => {
-                        const temp = this.imOperator.createNormalChatItem({
-                            type: IMOperator.ImageType,
-                            content: savedFilePath
-                        });
-                        that.showItemForMoment(temp, (itemIndex) => {
-                            this.simulateUploadFile({savedFilePath, itemIndex}, (content) => {
-                                this.sendMsg(IMOperator.createChatItemContent({
-                                    type: IMOperator.ImageType,
-                                    content
-                                }), itemIndex);
-                            });
-                        });
-                    });
+            this.imageManager.sendImage({itemIndex})
 
-                }
-            });
         });
     },
     chatVoiceItemClickEvent: function (e) {
