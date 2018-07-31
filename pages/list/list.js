@@ -170,7 +170,7 @@ Page({
 
             that.myPlayVoice(localPath, dataset, function () {
                 console.log('成功读取了本地语音');
-            },  ()=> {
+            }, () => {
                 wx.downloadFile({
                     url: dataset.voicePath,
                     success: res => {
@@ -195,7 +195,6 @@ Page({
             this.voiceManager.playVoice({
                 filePath: filePath,
                 success: () => {
-                    console.log('回调');
                     that.stopAllVoicePlay();
                     typeof cbOk === "function" && cbOk();
                 },
@@ -229,6 +228,7 @@ Page({
         let that = this;
         let chatItems = that.data.chatItems;
         chatItems[dataset.index].isPlaying = true;
+        console.log('最新的路径',that.data.latestPlayVoicePath, '选中的单项',chatItems[dataset.index]);
         if (that.data.latestPlayVoicePath && that.data.latestPlayVoicePath !== chatItems[dataset.index].content) {//如果重复点击同一个，则不将该isPlaying置为false
             for (let i = 0, len = chatItems.length; i < len; i++) {
                 if ('voice' === chatItems[i].type && that.data.latestPlayVoicePath === chatItems[i].content) {
@@ -241,7 +241,7 @@ Page({
             chatItems: chatItems,
             isVoicePlaying: true
         });
-        that.data.latestPlayVoicePath = dataset.content;
+        that.data.latestPlayVoicePath = dataset.voicePath;
     },
     stopAllVoicePlay: function () {
         if (this.data.isVoicePlaying) {
