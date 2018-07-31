@@ -14,7 +14,7 @@
         bindscrolltoupper="scrollToTop">
     <block wx:for="{{chatItems}}" wx:key="{{index}}">
         <template is="chat-item"
-                  data="{{length:chatItems.length,index:index,headUrl:item.isMy?userInfo.myHeadUrl:friendHeadUrl,item:item}}"/>
+                  data="{{length:chatItems.length,index:index,item:item}}"/>
     </block>
 
 </scroll-view>

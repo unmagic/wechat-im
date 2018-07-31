@@ -312,12 +312,11 @@ Page({
         chatInput.closeExtraView();
         sendMsg.sendStatus = 'sending';
         addToArr && this.data.chatItems.push(sendMsg);
-        let updateViewData = {
+        this.setData({
             textMessage: "",
             chatItems: this.data.chatItems,
             scrollTopVal: this.data.scrollTopVal + 999,
-        };
-        this.setData(updateViewData);
+        });
     },
     updateViewWhenSendSuccess: function (sendMsg, itemIndex) {
         console.log('发送成功', sendMsg);

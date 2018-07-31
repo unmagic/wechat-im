@@ -33,6 +33,7 @@ export default class IMOperator {
     }
 
     createNormalChatItem({type = IMOperator.TextType, content = '', duration} = {}) {
+        if (!content) return;
         return {
             isMy: true,
             showTime: true,//是否显示该次发送时间
@@ -52,7 +53,7 @@ export default class IMOperator {
         return {
             timestamp: Date.now(),
             type: IMOperator.CustomType,
-            content: '这是用于拓展的自定义功能'
+            content: '自定义气泡展示'
         }
     }
 
