@@ -1,7 +1,6 @@
 // pages/list/list.js
 import * as chatInput from "../../modules/chat-input/chat-input";
 import {saveFileRule} from "../../utils/file";
-import * as toast from "../../utils/toast";
 import IMOperator from "./im-operator";
 import VoiceManager from "./voice-manager";
 
@@ -13,11 +12,11 @@ Page({
     data: {
         textMessage: '',
         chatItems: [],
-        showPageStatus: true,
         my: {},
         other: {},
         latestPlayVoicePath: '',
-        isAndroid: true
+        isAndroid: true,
+        chatStatue: 'open'
     },
 
     /**
@@ -28,7 +27,7 @@ Page({
         wx.setNavigationBarTitle({
             title: '呵呵哒的好朋友'
         });
-        this.imOperator = new IMOperator();
+        this.imOperator = new IMOperator(this);
         this.voiceManager = new VoiceManager(chatInput.isVoiceRecordUseLatestVersion());
         this.imOperator.onSimulateReceiveMsg((msg) => {
             this.data.chatItems.push(msg);
@@ -36,7 +35,8 @@ Page({
                 chatItems: this.data.chatItems,
                 scrollTopVal: this.data.scrollTopVal + 999,
             });
-        })
+        });
+        this.updateChatStatus('正在聊天中...');
     },
     initData: function () {
         let that = this;
@@ -119,6 +119,12 @@ Page({
                     isVoicePlaying: false
                 })
             }
+        })
+    },
+    updateChatStatus: function (content, open = true) {
+        this.setData({
+            chatStatue: open ? 'open' : 'close',
+            chatStatusContent: content
         })
     },
     //模拟上传文件
@@ -270,7 +276,7 @@ Page({
     myFun: function () {
         wx.showModal({
             title: '小贴士',
-            content: '这是用于拓展的自定义功能！',
+            content: '演示更新会话状态',
             confirmText: '确认',
             showCancel: true,
             success: (res) => {
@@ -280,7 +286,8 @@ Page({
                         this.sendMsg(IMOperator.createChatItemContent({
                             type: IMOperator.CustomType,
                             content: temp.content
-                        }), itemIndex)
+                        }), itemIndex);
+                        this.updateChatStatus('会话已关闭', false);
                     });
                 }
             }

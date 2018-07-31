@@ -6,7 +6,8 @@ export default class IMOperator {
     static ImageType = 'image';
     static CustomType = 'custom';
 
-    constructor() {
+    constructor(page) {
+        this._page = page;
         this._latestTImestamp = 0;
         this._myHeadUrl = '../../image/my_head.jpeg';
         this._otherHeadUrl = '../../image/other_head.jpg';
@@ -23,6 +24,7 @@ export default class IMOperator {
             const item = this.createNormalChatItem(JSON.parse(content));
             this._latestTImestamp = item.timestamp;
             cbOk && cbOk(item);
+            if (this._page.data.chatStatue === 'close') return;
             setTimeout(() => {
                 const item = this.createNormalChatItem({type: 'text', content: '我是自动回复的好友文本消息', isMy: false});
                 this._latestTImestamp = item.timestamp;
@@ -59,7 +61,7 @@ export default class IMOperator {
         return {
             timestamp: Date.now(),
             type: IMOperator.CustomType,
-            content: '自定义气泡展示'
+            content: '会话已关闭'
         }
     }
 

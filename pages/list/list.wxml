@@ -2,9 +2,8 @@
 <import src="../../modules/chat-list/chat-item.wxml"/>
 <import src="../../modules/chat-input/chat-input.wxml"/>
 <import src="../../modules/chat-list/chat-page-status.wxml"/>
-<block wx:if="{{showPageStatus}}">
-    <template is="chat-page-status" data="{{canChat,remainTime,finishedType}}"/>
-</block>
+
+<template is="chat-page-status" data="{{chatStatue,chatStatusContent}}"/>
 
 <scroll-view
         style="height:{{pageHeight}}px;width: 100%;display: flex;flex-direction: column;margin-top: 54rpx;"
