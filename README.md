@@ -2,15 +2,15 @@
 ### 微信小程序即时通讯组件
 #### 集成方式 请看 http://blog.csdn.net/sinat_27612147/article/details/78456363
 
-#小程序即时通讯——文本、语音输入控件（一）集成
+# 小程序即时通讯——文本、语音输入控件（一）集成
 
 [TOC]
 
-##转载请注明出处：https://blog.csdn.net/sinat_27612147/article/details/78456363
+## 转载请注明出处：https://blog.csdn.net/sinat_27612147/article/details/78456363
 
 <font color=red>2018-07-31 作者公告：现在拥有聊天列表UI的项目已经在当前的github仓库中更新了！！！目前还需要一段时间来将多个模块从业务上拆分，现在可以在stage-1.0分支预览。点击前往：[聊天列表地址](https://github.com/unmagic/wechat-im) 如需了解集成方式，请见下方，还没写完。。。</font>
 
-##聊天UI组件功能：
+## 聊天UI组件功能：
 
 - [x] 支持发送文本、图片、语音
 - [x] 支持拍照，图库选择图片、图片预览
@@ -26,11 +26,11 @@
 - [x] 播放语音时，停止播放其他语音。
 - [ ] 如果要使用群聊，目前的UI中，头像旁并没有展示成员昵称。
 
-##聊天输入组件
+## 聊天输入组件
 
 近期一直在做微信小程序，业务上要求在小程序里实现即时通讯的功能。这部分功能需要用到文本和语音输入及一些语音相关的手势操作。所以我写了一个控件来处理这些操作。
 
-###控件样式
+### 控件样式
 ![文本语音输入控件](http://img.blog.csdn.net/20171107101340228?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvc2luYXRfMjc2MTIxNDc=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast)
 
 我们先来看下效果 (现在新增了右下角发送按钮！！在输入框获取到焦点后，右下角会显示发送按钮！！只不过没有更新图片。。。)
@@ -45,9 +45,9 @@
 ----------
 
 
-###集成
+### 集成
 
-####一、导入SDK相关文件
+#### 一、导入SDK相关文件
 ![SDK所有文件](http://img.blog.csdn.net/20171107170921077?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvc2luYXRfMjc2MTIxNDc=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast)
 
 
@@ -59,9 +59,9 @@
 ----------
 
 
-####二、集成到聊天页面
+#### 二、集成到聊天页面
 
-#####1.	在聊天页面中导入chat-input文件
+##### 1.	在聊天页面中导入chat-input文件
 
  - 在聊天页的js文件中导入 `let chatInput = require('../../modules/chat-input/chat-input');`
  - 在聊天页的wxml文件中引入布局
@@ -72,7 +72,7 @@
  - 在聊天页的wxss文件中引入样式表`@import "../../modules/chat-input/chat-input.wxss";`
 **<font color=red>根据你的路径来导入这些内容</>**
 
-#####2. 初始化`chatInput`
+##### 2. 初始化`chatInput`
 
 ```
 chatInput.init(page, {
@@ -109,10 +109,10 @@ chatInput.init(page, {
  - `sendButtonBgColor`: 发送按钮的背景色
  - `sendButtonTextColor`: 发送按钮的文本颜色
 
-#####3. 监听获取输入的信息
+##### 3. 监听获取输入的信息
 在初始化控件之后，监听信息的输入，即可获取到指定类型的信息
 
-######文本信息：
+###### 文本信息：
 
 ```
 //文本信息的输入监听
@@ -122,7 +122,7 @@ chatInput.setTextMessageListener(function (e) {
         });  
 ```
 
-######语音信息：
+###### 语音信息：
 
 ```
 //获取录音之后的音频临时文件
@@ -156,7 +156,7 @@ chatInput.recordVoiceListener(function (res, duration) {
 ```
 
 
-######自定义功能：
+###### 自定义功能：
 
 ```
 //收起自定义功能窗口
@@ -185,9 +185,9 @@ chatInput.setExtraButtonClickListener(function (dismiss) {
         })
 
 ```
-###至此，输入组件SDK的集成就完成了！
+### 至此，输入组件SDK的集成就完成了！
 
-##聊天列表UI
+## 聊天列表UI
 
 ![聊天列表相关文件](https://img-blog.csdn.net/20180731171922957?watermark/2/text/aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3NpbmF0XzI3NjEyMTQ3/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70)
 关于聊天列表，我将UI封装成了多个`template`，最后统一使用`chat-item.wxml`，放到了`chat-list`中；加载方面的UI放到了`loading`文件夹中；也新增了几张图片。
