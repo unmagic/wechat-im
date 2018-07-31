@@ -1,6 +1,6 @@
 @import "chat-send-status.wxss";
 @import "voice.wxss";
-
+@import "time.wxss";
 .isMyWordStyle {
     background-color: #8fcbf7;
     color: #213d52;

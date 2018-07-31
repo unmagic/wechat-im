@@ -1,11 +1,16 @@
 <import src="./time.wxml"/>
+<import src="./custom.wxml"/>
 <import src="./word.wxml"/>
 <template name="chat-item">
     <view style="width: 100%;display: flex;flex-direction: column;align-items: center">
-        <template is="chat-time" data="{{showTime:item.showTime,time:item.time}}"/>
-        <block wx:if="{{chatType!=='askStatus'}}">
+        <block wx:if="{{type!=='custom'}}">
+            <template is="chat-time" data="{{showTime:item.showTime,time:item.time}}"/>
             <template is="chat-word"
-                      data="{{length:length,index:index,headUrl:item.headUrl,isMy:item.isMy,showTime:item.showTime,time:item.time,words:item.content,itemType:item.type,itemHeadUrl:item.itemHeadUrl,voiceDuration:item.voiceDuration,isPlaying:item.isPlaying,sendStatus:item.sendStatus}}"/>
+                      data="{{length:length,index:index,headUrl:item.headUrl,isMy:item.isMy,showTime:item.showTime,time:item.time,content:item.content,type:item.type,voiceDuration:item.voiceDuration,isPlaying:item.isPlaying,sendStatus:item.sendStatus}}"/>
         </block>
+        <block wx:else>
+            <template is="chat-custom" data="{{content:item.content}}"/>
+        </block>
+
     </view>
 </template>

@@ -2,29 +2,28 @@
 <import src="./voice.wxml"/>
 <template name="chat-word">
     <view style="width: 100%;display: flex;flex-direction: {{isMy?'row-reverse':'row'}};margin-bottom: {{index===length-1?150:20}}rpx;margin-top: 20rpx;">
-        <image wx:if="{{itemType!=='askStatus'}}"
-               style="width: 70rpx;height: 70rpx;border-radius: 50%;margin-left: 15rpx;margin-right: 15rpx;"
+        <image style="width: 70rpx;height: 70rpx;border-radius: 50%;margin-left: 15rpx;margin-right: 15rpx;"
                src="{{headUrl}}"/>
-        <image wx:if="{{itemType==='text'||itemType==='voice'}}" class="chat-list-arrow-style"
+        <image wx:if="{{type==='text'||type==='voice'}}" class="chat-list-arrow-style"
                src="./../../image/chat/popu_{{isMy?'blue':'white'}}.png"/>
 
-        <block wx:if="{{itemType==='text'}}">
-            <view wx:if="{{itemType==='text'}}" class="{{isMy?'isMyWordStyle':'isOtherWordStyle'}}"
+        <block wx:if="{{type==='text'}}">
+            <view wx:if="{{type==='text'}}" class="{{isMy?'isMyWordStyle':'isOtherWordStyle'}}"
                   style="border-radius: 10rpx;padding: 20rpx;font-size: 30rpx;max-width: 60%;"
                   bindtap="chatTextItemClickEvent"
-                  data-index="{{index}}">{{words}}</view>
+                  data-index="{{index}}">{{content}}</view>
         </block>
 
-        <block wx:if="{{itemType==='image'}}">
-            <image wx:if="{{itemType==='image'}}" class="chat-list-pic-style" src="{{words}}"
-                   mode="aspectFill" bindtap="imageClickEvent" data-url="{{words}}"/>
+        <block wx:if="{{type==='image'}}">
+            <image wx:if="{{type==='image'}}" class="chat-list-pic-style" src="{{content}}"
+                   mode="aspectFill" bindtap="imageClickEvent" data-url="{{content}}"/>
         </block>
 
-        <block wx:if="{{itemType==='voice'}}">
+        <block wx:if="{{type==='voice'}}">
             <view style="width: {{(voiceDuration-1)*0.6+10}}%;border-radius: 10rpx;padding: 20rpx;font-size: 30rpx;max-width: 60%;display: flex;justify-content: {{isMy?'flex-end':'flex-start'}}"
                   class="{{isMy?'isMyWordStyle':'isOtherWordStyle'}}"
                   bindtap="chatVoiceItemClickEvent"
-                  data-voice-path="{{words}}"
+                  data-voice-path="{{content}}"
                   data-voice-duration="{{voiceDuration}}"
                   data-is-send="{{isMy}}"
                   data-index="{{index}}">

@@ -78,8 +78,8 @@ function sendVoiceListener(cbOk, cbError) {
     }
 }
 
-function setVoiceRecordStatusListener() {
-    startVoiceRecordCbOk = arguments[0];
+function setVoiceRecordStatusListener(cb) {
+    startVoiceRecordCbOk = cb;
 }
 
 function initChangeInputWayEvent() {

@@ -72,7 +72,7 @@ Page({
         chatInput.setTextMessageListener((e) => {
             let content = e.detail.value;
             console.log('刚刚开始', content);
-            this.showItemForMoment(this.imOperator.createChatItem({
+            this.showItemForMoment(this.imOperator.createNormalChatItem({
                 type: IMOperator.TextType,
                 content
             }), (itemIndex) => {
@@ -85,7 +85,7 @@ Page({
             let tempFilePath = res.tempFilePath;
             console.log(tempFilePath, duration);
             saveFileRule(tempFilePath, (savedFilePath) => {
-                const temp = this.imOperator.createChatItem({
+                const temp = this.imOperator.createNormalChatItem({
                     type: IMOperator.VoiceType,
                     content: savedFilePath,
                     duration
@@ -105,7 +105,7 @@ Page({
         chatInput.setVoiceRecordStatusListener((status) => {
             if (this.data.isVoicePlaying) {
                 let that = this;
-                wx.stopVoice();
+                this.voiceManager.stopVoice();
                 that.data.chatItems.forEach(item => {
                     if ('voice' === item.type) {
                         item.isPlaying = false
@@ -139,7 +139,7 @@ Page({
                 sourceType: itemIndex === 0 ? ['album'] : ['camera'],
                 success: (res) => {
                     saveFileRule(res.tempFilePaths[0], (savedFilePath) => {
-                        const temp = this.imOperator.createChatItem({
+                        const temp = this.imOperator.createNormalChatItem({
                             type: IMOperator.ImageType,
                             content: savedFilePath
                         });
@@ -228,7 +228,6 @@ Page({
         let that = this;
         let chatItems = that.data.chatItems;
         chatItems[dataset.index].isPlaying = true;
-        console.log('最新的路径',that.data.latestPlayVoicePath, '选中的单项',chatItems[dataset.index]);
         if (that.data.latestPlayVoicePath && that.data.latestPlayVoicePath !== chatItems[dataset.index].content) {//如果重复点击同一个，则不将该isPlaying置为false
             for (let i = 0, len = chatItems.length; i < len; i++) {
                 if ('voice' === chatItems[i].type && that.data.latestPlayVoicePath === chatItems[i].content) {
@@ -272,9 +271,15 @@ Page({
             content: '这是用于拓展的自定义功能！',
             confirmText: '确认',
             showCancel: true,
-            success: function (res) {
+            success: (res) => {
                 if (res.confirm) {
-                    toast.show('success', '自定义功能')
+                    const temp = IMOperator.createCustomChatItem();
+                    this.showItemForMoment(temp, (itemIndex) => {
+                        this.sendMsg(IMOperator.createChatItemContent({
+                            type: IMOperator.CustomType,
+                            content: temp.content
+                        }), itemIndex)
+                    });
                 }
             }
         })
