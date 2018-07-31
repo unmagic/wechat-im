@@ -1,5 +1,6 @@
-import * as chatInput from "../../modules/chat-input/chat-input";
 import {isVoiceRecordUseLatestVersion} from "../../modules/chat-input/chat-input";
+import {saveFileRule} from "../../utils/file";
+import IMOperator from "./im-operator";
 
 export default class VoiceManager {
     constructor(page) {
@@ -10,7 +11,56 @@ export default class VoiceManager {
         }
     }
 
-    playVoice({filePath, success, fail}) {
+    sendVoice({tempFilePath, duration}) {
+        saveFileRule(tempFilePath, (savedFilePath) => {
+            const temp = this._page.imOperator.createNormalChatItem({
+                type: IMOperator.VoiceType,
+                content: savedFilePath,
+                duration
+            });
+            this._page.UI.showItemForMoment(temp, (itemIndex) => {
+                this._page.simulateUploadFile({savedFilePath, duration, itemIndex}, (content) => {
+                    this._page.sendMsg(IMOperator.createChatItemContent({
+                        type: IMOperator.VoiceType,
+                        content: content,
+                        duration
+                    }), itemIndex);
+                });
+            });
+        });
+    }
+
+    playVoice({dataset}) {
+        let that = this._page;
+        if (dataset.voicePath === that.data.latestPlayVoicePath && that.data.chatItems[dataset.index].isPlaying) {
+            this.stopAllVoicePlay();
+        } else {
+            this.startPlayVoice(dataset);
+            let localPath = dataset.voicePath;//优先读取本地路径，可能不存在此文件
+
+            this.myPlayVoice(localPath, dataset, function () {
+                console.log('成功读取了本地语音');
+            }, () => {
+                wx.downloadFile({
+                    url: dataset.voicePath,
+                    success: res => {
+                        console.log('下载语音成功', res);
+                        this._playVoice({
+                            filePath: res.tempFilePath,
+                            success: () => {
+                                this.stopAllVoicePlay();
+                            },
+                            fail: (res) => {
+                                console.log('播放失败了', res);
+                            }
+                        });
+                    }
+                });
+            });
+        }
+    }
+
+    _playVoice({filePath, success, fail}) {
         if (this.isLatestVersion) {
             this.innerAudioContext.src = filePath;
             this.innerAudioContext.startTime = 0;
@@ -39,10 +89,10 @@ export default class VoiceManager {
     myPlayVoice(filePath, dataset, cbOk, cbError) {
         let that = this._page;
         if (dataset.isSend || that.data.isAndroid) {
-            this.playVoice({
+            this._playVoice({
                 filePath: filePath,
                 success: () => {
-                    that.stopAllVoicePlay();
+                    this.stopAllVoicePlay();
                     typeof cbOk === "function" && cbOk();
                 },
                 fail: (res) => {
@@ -55,10 +105,10 @@ export default class VoiceManager {
                 url: dataset.voicePath,
                 success: res => {
                     console.log('下载语音成功', res);
-                    this.playVoice({
+                    this._playVoice({
                         filePath: res.tempFilePath,
                         success: () => {
-                            that.stopAllVoicePlay();
+                            this.stopAllVoicePlay();
                             typeof cbOk === "function" && cbOk();
                         },
                         fail: (res) => {

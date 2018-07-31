@@ -4,6 +4,7 @@ import {saveFileRule} from "../../utils/file";
 import IMOperator from "./im-operator";
 import VoiceManager from "./voice-manager";
 import UI from "./ui";
+import TextManager from "./text-manager";
 
 Page({
 
@@ -31,6 +32,7 @@ Page({
         this.imOperator = new IMOperator(this);
         this.UI = new UI(this);
         this.voiceManager = new VoiceManager(this);
+        this.textManager = new TextManager(this);
         this.imOperator.onSimulateReceiveMsg((msg) => {
             this.data.chatItems.push(msg);
             this.setData({
@@ -78,34 +80,13 @@ Page({
     textButton: function () {
         chatInput.setTextMessageListener((e) => {
             let content = e.detail.value;
-            this.UI.showItemForMoment(this.imOperator.createNormalChatItem({
-                type: IMOperator.TextType,
-                content
-            }), (itemIndex) => {
-                this.sendMsg(IMOperator.createChatItemContent({type: IMOperator.TextType, content}), itemIndex);
-            });
+            this.textManager.sendText({content});
         });
     },
     voiceButton: function () {
         chatInput.recordVoiceListener((res, duration) => {
             let tempFilePath = res.tempFilePath;
-            saveFileRule(tempFilePath, (savedFilePath) => {
-                const temp = this.imOperator.createNormalChatItem({
-                    type: IMOperator.VoiceType,
-                    content: savedFilePath,
-                    duration
-                });
-                this.UI.showItemForMoment(temp, (itemIndex) => {
-                    this.simulateUploadFile({savedFilePath, duration, itemIndex}, (content) => {
-                        this.sendMsg(IMOperator.createChatItemContent({
-                            type: IMOperator.VoiceType,
-                            content: content,
-                            duration
-                        }), itemIndex);
-                    });
-                });
-            });
-
+            this.voiceManager.sendVoice({tempFilePath, duration});
         });
         chatInput.setVoiceRecordStatusListener((status) => {
             if (this.data.isVoicePlaying) {
@@ -165,34 +146,7 @@ Page({
     chatVoiceItemClickEvent: function (e) {
         let dataset = e.currentTarget.dataset;
         console.log('语音Item', dataset);
-        let that = this;
-
-        if (dataset.voicePath === this.data.latestPlayVoicePath && that.data.chatItems[dataset.index].isPlaying) {
-            that.voiceManager.stopAllVoicePlay();
-        } else {
-            that.voiceManager.startPlayVoice(dataset);
-            let localPath = dataset.voicePath;//优先读取本地路径，可能不存在此文件
-
-            that.voiceManager.myPlayVoice(localPath, dataset, function () {
-                console.log('成功读取了本地语音');
-            }, () => {
-                wx.downloadFile({
-                    url: dataset.voicePath,
-                    success: res => {
-                        console.log('下载语音成功', res);
-                        this.voiceManager.playVoice({
-                            filePath: res.tempFilePath,
-                            success: () => {
-                                that.voiceManager.stopAllVoicePlay();
-                            },
-                            fail: (res) => {
-                                console.log('播放失败了', res);
-                            }
-                        });
-                    }
-                });
-            });
-        }
+        this.voiceManager.playVoice({dataset})
     },
 
 
