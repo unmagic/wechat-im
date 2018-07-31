@@ -23,14 +23,24 @@ export default class IMOperator {
         setTimeout(() => {
             const item = this.createNormalChatItem(JSON.parse(content));
             this._latestTImestamp = item.timestamp;
-            cbOk && cbOk(item);
-            if (this._page.data.chatStatue === 'close') return;
+
+            //使用随机数来模拟数据发送失败情况
+            const isSendSuccess = parseInt(Math.random() * 100) > 35;
+            console.log('随机数模拟是否发送成功', isSendSuccess);
+            const isChatClose = this._page.data.chatStatue === 'close';
+            if (isSendSuccess || isChatClose) {
+                cbOk && cbOk(item);
+            } else {
+                cbError && cbError();
+            }
+            if (isChatClose || !isSendSuccess) return;
             setTimeout(() => {
                 const item = this.createNormalChatItem({type: 'text', content: '我是自动回复的好友文本消息', isMy: false});
                 this._latestTImestamp = item.timestamp;
                 this.onSimulateReceiveMsgCb && this.onSimulateReceiveMsgCb(item);
             }, 1000);
-        }, 300)
+        }, 300);
+
     }
 
     static createChatItemContent({type = IMOperator.TextType, content = '', duration} = {}) {

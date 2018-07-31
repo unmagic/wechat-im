@@ -304,8 +304,8 @@ Page({
         cbOk && cbOk(this.data.chatItems.length - 1);
     },
     sendMsg: function (content, itemIndex) {
-        this.imOperator.onSimulateSendMsg(content, (content) => {
-            this.updateViewWhenSendSuccess(content, itemIndex);
+        this.imOperator.onSimulateSendMsg(content, (msg) => {
+            this.updateViewWhenSendSuccess(msg, itemIndex);
         }, () => {
             this.updateViewWhenSendFailed(itemIndex);
         })
@@ -314,7 +314,11 @@ Page({
         const itemIndex = parseInt(e.currentTarget.dataset.resendIndex);
         const item = this.data.chatItems[itemIndex];
         this.updateDataWhenStartSending(item, false);
-        this.sendMsg(item.content, itemIndex);
+        this.sendMsg(IMOperator.createChatItemContent({
+            type: item.type,
+            content: item.content,
+            duration: item.voiceDuration
+        }), itemIndex);
     },
     updateDataWhenStartSending: function (sendMsg, addToArr = true) {
         chatInput.closeExtraView();
