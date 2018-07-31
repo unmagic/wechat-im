@@ -30,8 +30,13 @@ Page({
         });
         this.imOperator = new IMOperator();
         this.voiceManager = new VoiceManager(chatInput.isVoiceRecordUseLatestVersion());
-        this.data.chatItems.push();
-
+        this.imOperator.onSimulateReceiveMsg((msg) => {
+            this.data.chatItems.push(msg);
+            this.setData({
+                chatItems: this.data.chatItems,
+                scrollTopVal: this.data.scrollTopVal + 999,
+            });
+        })
     },
     initData: function () {
         let that = this;
@@ -71,7 +76,6 @@ Page({
     textButton: function () {
         chatInput.setTextMessageListener((e) => {
             let content = e.detail.value;
-            console.log('刚刚开始', content);
             this.showItemForMoment(this.imOperator.createNormalChatItem({
                 type: IMOperator.TextType,
                 content
@@ -83,7 +87,6 @@ Page({
     voiceButton: function () {
         chatInput.recordVoiceListener((res, duration) => {
             let tempFilePath = res.tempFilePath;
-            console.log(tempFilePath, duration);
             saveFileRule(tempFilePath, (savedFilePath) => {
                 const temp = this.imOperator.createNormalChatItem({
                     type: IMOperator.VoiceType,
@@ -127,7 +130,6 @@ Page({
     extraButton: function () {
         let that = this;
         chatInput.clickExtraListener((e) => {
-            console.log(e);
             let itemIndex = parseInt(e.currentTarget.dataset.index);
             if (itemIndex === 2) {
                 that.myFun();
@@ -295,7 +297,6 @@ Page({
         cbOk && cbOk(this.data.chatItems.length - 1);
     },
     sendMsg: function (content, itemIndex) {
-        console.log('即将发送', content);
         this.imOperator.onSimulateSendMsg(content, (content) => {
             this.updateViewWhenSendSuccess(content, itemIndex);
         }, () => {
@@ -336,47 +337,5 @@ Page({
         obj[`chatItems[${itemIndex}].sendStatus`] = status;
         obj['scrollTopVal'] = that.data.scrollTopVal + 999;
         that.setData(obj);
-    },
-    /**
-     * 生命周期函数--监听页面初次渲染完成
-     */
-    onReady: function () {
-
-    },
-
-    /**
-     * 生命周期函数--监听页面显示
-     */
-    onShow: function () {
-
-    },
-
-    /**
-     * 生命周期函数--监听页面隐藏
-     */
-    onHide: function () {
-
-    },
-
-    /**
-     * 生命周期函数--监听页面卸载
-     */
-    onUnload: function () {
-
-    },
-
-    /**
-     * 页面相关事件处理函数--监听用户下拉动作
-     */
-    onPullDownRefresh: function () {
-
-    },
-
-    /**
-     * 页面上拉触底事件的处理函数
-     */
-    onReachBottom: function () {
-
-    },
-
+    }
 });
