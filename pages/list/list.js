@@ -3,6 +3,7 @@ import * as chatInput from "../../modules/chat-input/chat-input";
 import {saveFileRule} from "../../utils/file";
 import * as toast from "../../utils/toast";
 import IMOperator from "./im-operator";
+import VoiceManager from "./voice-manager";
 
 Page({
 
@@ -14,7 +15,9 @@ Page({
         chatItems: [],
         showPageStatus: true,
         my: {},
-        other: {}
+        other: {},
+        latestPlayVoicePath: '',
+        isAndroid: true
     },
 
     /**
@@ -26,6 +29,7 @@ Page({
             title: '呵呵哒的好朋友'
         });
         this.imOperator = new IMOperator();
+        this.voiceManager = new VoiceManager(chatInput.isVoiceRecordUseLatestVersion());
         this.data.chatItems.push();
 
     },
@@ -55,6 +59,7 @@ Page({
 
         that.setData({
             pageHeight: systemInfo.windowHeight,
+            isAndroid: systemInfo.system.indexOf("Android") !== -1,
         });
         wx.setNavigationBarTitle({
             title: '好友'
@@ -152,7 +157,115 @@ Page({
             });
         });
     },
+    chatVoiceItemClickEvent: function (e) {
+        let dataset = e.currentTarget.dataset;
+        console.log('语音Item', dataset);
+        let that = this;
 
+        if (dataset.voicePath === this.data.latestPlayVoicePath && that.data.chatItems[dataset.index].isPlaying) {
+            that.stopAllVoicePlay();
+        } else {
+            that.startPlayVoice(dataset);
+            let localPath = dataset.voicePath;//优先读取本地路径，可能不存在此文件
+
+            that.myPlayVoice(localPath, dataset, function () {
+                console.log('成功读取了本地语音');
+            },  ()=> {
+                wx.downloadFile({
+                    url: dataset.voicePath,
+                    success: res => {
+                        console.log('下载语音成功', res);
+                        this.voiceManager.playVoice({
+                            filePath: res.tempFilePath,
+                            success: () => {
+                                that.stopAllVoicePlay();
+                            },
+                            fail: (res) => {
+                                console.log('播放失败了', res);
+                            }
+                        });
+                    }
+                });
+            });
+        }
+    },
+    myPlayVoice: function (filePath, dataset, cbOk, cbError) {
+        let that = this;
+        if (dataset.isSend || that.data.isAndroid) {
+            this.voiceManager.playVoice({
+                filePath: filePath,
+                success: () => {
+                    console.log('回调');
+                    that.stopAllVoicePlay();
+                    typeof cbOk === "function" && cbOk();
+                },
+                fail: (res) => {
+                    console.log('播放失败了1', res);
+                    typeof cbError === "function" && cbError(res);
+                }
+            });
+        } else {
+            wx.downloadFile({
+                url: dataset.voicePath,
+                success: res => {
+                    console.log('下载语音成功', res);
+                    this.voiceManager.playVoice({
+                        filePath: res.tempFilePath,
+                        success: () => {
+                            that.stopAllVoicePlay();
+                            typeof cbOk === "function" && cbOk();
+                        },
+                        fail: (res) => {
+                            console.log('播放失败了', res);
+                            typeof cbError === "function" && cbError(res);
+                        }
+                    });
+                }
+            });
+        }
+
+    },
+    startPlayVoice: function (dataset) {
+        let that = this;
+        let chatItems = that.data.chatItems;
+        chatItems[dataset.index].isPlaying = true;
+        if (that.data.latestPlayVoicePath && that.data.latestPlayVoicePath !== chatItems[dataset.index].content) {//如果重复点击同一个，则不将该isPlaying置为false
+            for (let i = 0, len = chatItems.length; i < len; i++) {
+                if ('voice' === chatItems[i].type && that.data.latestPlayVoicePath === chatItems[i].content) {
+                    chatItems[i].isPlaying = false;
+                    break;
+                }
+            }
+        }
+        that.setData({
+            chatItems: chatItems,
+            isVoicePlaying: true
+        });
+        that.data.latestPlayVoicePath = dataset.content;
+    },
+    stopAllVoicePlay: function () {
+        if (this.data.isVoicePlaying) {
+            let that = this;
+            this.voiceManager.stopVoice();
+            that.data.chatItems.forEach(item => {
+                if ('voice' === item.type) {
+                    item.isPlaying = false
+                }
+            });
+            that.setData({
+                chatItems: that.data.chatItems,
+                isVoicePlaying: false
+            })
+        }
+    },
+
+
+    imageClickEvent: function (e) {
+        wx.previewImage({
+            current: e.currentTarget.dataset.url, // 当前显示图片的http链接
+            urls: [e.currentTarget.dataset.url] // 需要预览的图片http链接列表
+        })
+    },
     myFun: function () {
         wx.showModal({
             title: '小贴士',

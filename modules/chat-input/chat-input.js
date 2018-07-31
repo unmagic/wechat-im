@@ -478,6 +478,10 @@ function setTextMessageListener(cb) {
     }
 }
 
+function isVoiceRecordUseLatestVersion() {
+    return !!recorderManager;
+}
+
 module.exports = {
     init: init,
     clickExtraListener: clickExtraItemListener,
@@ -486,5 +490,6 @@ module.exports = {
     setVoiceRecordStatusListener: setVoiceRecordStatusListener,
     setTextMessageListener: setTextMessageListener,
     setExtraButtonClickListener: setExtraButtonClickListener,
+    isVoiceRecordUseLatestVersion: isVoiceRecordUseLatestVersion,
     VRStatus: status
 };
