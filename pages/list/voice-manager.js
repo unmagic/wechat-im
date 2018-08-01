@@ -38,13 +38,22 @@ export default class VoiceManager {
         });
     }
 
-    _stopVoice() {
-        if (this.isLatestVersion) {
-            this.innerAudioContext.stop();
-        } else {
-            wx.stopVoice();
+    stopAllVoicePlay() {
+        let that = this._page;
+        if (this._page.data.isVoicePlaying) {
+            this._stopVoice();
+            that.data.chatItems.forEach(item => {
+                if (IMOperator.VoiceType === item.type) {
+                    item.isPlaying = false
+                }
+            });
+            that.setData({
+                chatItems: that.data.chatItems,
+                isVoicePlaying: false
+            })
         }
     }
+
 
     showMsg({msg}) {
         const url = msg.content;
@@ -69,10 +78,18 @@ export default class VoiceManager {
         }
     }
 
+    _stopVoice() {
+        if (this.isLatestVersion) {
+            this.innerAudioContext.stop();
+        } else {
+            wx.stopVoice();
+        }
+    }
+
     _playVoice({dataset}) {
         let that = this._page;
         if (dataset.voicePath === that.data.latestPlayVoicePath && that.data.chatItems[dataset.index].isPlaying) {
-            this._stopAllVoicePlay();
+            this.stopAllVoicePlay();
         } else {
             this._startPlayVoice(dataset);
             let localPath = dataset.voicePath;//优先读取本地路径，可能不存在此文件
@@ -88,7 +105,7 @@ export default class VoiceManager {
                         this.__playVoice({
                             filePath: res.tempFilePath,
                             success: () => {
-                                this._stopAllVoicePlay();
+                                this.stopAllVoicePlay();
                             },
                             fail: (res) => {
                                 console.log('播放失败了', res);
@@ -124,7 +141,7 @@ export default class VoiceManager {
             this.__playVoice({
                 filePath: filePath,
                 success: () => {
-                    this._stopAllVoicePlay();
+                    this.stopAllVoicePlay();
                     typeof cbOk === "function" && cbOk();
                 },
                 fail: (res) => {
@@ -140,7 +157,7 @@ export default class VoiceManager {
                     this.__playVoice({
                         filePath: res.tempFilePath,
                         success: () => {
-                            this._stopAllVoicePlay();
+                            this.stopAllVoicePlay();
                             typeof cbOk === "function" && cbOk();
                         },
                         fail: (res) => {
@@ -171,22 +188,6 @@ export default class VoiceManager {
             isVoicePlaying: true
         });
         that.data.latestPlayVoicePath = dataset.voicePath;
-    }
-
-    _stopAllVoicePlay() {
-        let that = this._page;
-        if (this._page.data.isVoicePlaying) {
-            this._stopVoice();
-            that.data.chatItems.forEach(item => {
-                if (IMOperator.VoiceType === item.type) {
-                    item.isPlaying = false
-                }
-            });
-            that.setData({
-                chatItems: that.data.chatItems,
-                isVoicePlaying: false
-            })
-        }
     }
 
 }

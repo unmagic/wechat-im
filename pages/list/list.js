@@ -100,7 +100,7 @@ Page({
             this.voiceManager.sendVoice({tempFilePath, duration});
         });
         chatInput.setVoiceRecordStatusListener((status) => {
-            this.voiceManager._stopAllVoicePlay();
+            this.voiceManager.stopAllVoicePlay();
         })
     },
 
