@@ -7,9 +7,11 @@ export default class VoiceManager {
     constructor(page) {
         this._page = page;
         this.isLatestVersion = isVoiceRecordUseLatestVersion();
+        //判断是否需要使用高版本语音播放接口
         if (this.isLatestVersion) {
             this.innerAudioContext = wx.createInnerAudioContext();
         }
+        //在该类被初始化时，绑定语音点击播放事件
         this._page.chatVoiceItemClickEvent = (e) => {
             let dataset = e.currentTarget.dataset;
             console.log('语音Item', dataset);
@@ -17,6 +19,11 @@ export default class VoiceManager {
         }
     }
 
+    /**
+     * 发送语音消息
+     * @param tempFilePath 由输入组件接收到的临时文件路径
+     * @param duration 由输入组件接收到的录音时间
+     */
     sendVoice({tempFilePath, duration}) {
         saveFileRule(tempFilePath, (savedFilePath) => {
             const temp = this._page.imOperator.createNormalChatItem({
@@ -38,6 +45,9 @@ export default class VoiceManager {
         });
     }
 
+    /**
+     * 停止播放所有语音
+     */
     stopAllVoicePlay() {
         let that = this._page;
         if (this._page.data.isVoicePlaying) {
@@ -54,7 +64,10 @@ export default class VoiceManager {
         }
     }
 
-
+    /**
+     * 接收到消息时，通过UI类的管理进行渲染
+     * @param msg 接收到的消息，这个对象应是由 im-operator.js 中的createNormalChatItem()方法生成的。
+     */
     showMsg({msg}) {
         const url = msg.content;
         const localVoicePath = FileManager.get(url);
@@ -78,6 +91,10 @@ export default class VoiceManager {
         }
     }
 
+    /**
+     * 停止播放 兼容低版本语音播放
+     * @private
+     */
     _stopVoice() {
         if (this.isLatestVersion) {
             this.innerAudioContext.stop();
@@ -117,6 +134,13 @@ export default class VoiceManager {
         }
     }
 
+    /**
+     * 播放语音 兼容低版本语音播放
+     * @param filePath
+     * @param success
+     * @param fail
+     * @private
+     */
     __playVoice({filePath, success, fail}) {
         if (this.isLatestVersion) {
             this.innerAudioContext.src = filePath;

@@ -53,6 +53,7 @@ export default class ImageManager {
                             content: savedFilePath
                         });
                         this._page.UI.updateViewWhenReceive(temp);
+                        //以消息的content为key，建立消息和本地存储路径的映射关系
                         FileManager.set(url, savedFilePath);
                     });
                 }

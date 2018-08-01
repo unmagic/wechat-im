@@ -7,7 +7,7 @@ export default class TextManager {
 
     /**
      * 接收到消息时，通过UI类的管理进行渲染
-     * @param msg
+     * @param msg 接收到的消息，这个对象应是由 im-operator.js 中的createNormalChatItem()方法生成的。
      */
     showMsg({msg}) {
         //UI类是用于管理UI展示的类。
