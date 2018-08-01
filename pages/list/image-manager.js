@@ -1,6 +1,5 @@
 import {saveFileRule} from "../../utils/file";
 import IMOperator from "./im-operator";
-import ChatConfig from "./config";
 import FileManager from "./file-manager";
 
 export default class ImageManager {

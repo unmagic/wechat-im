@@ -1,7 +1,6 @@
 import {isVoiceRecordUseLatestVersion} from "../../modules/chat-input/chat-input";
 import {saveFileRule} from "../../utils/file";
 import IMOperator from "./im-operator";
-import ChatConfig from "./config";
 import FileManager from "./file-manager";
 
 export default class VoiceManager {
@@ -47,7 +46,7 @@ export default class VoiceManager {
             }, () => {
                 console.log('读取本地语音文件失败，一般情况下是本地没有该文件，需要从服务器下载');
                 wx.downloadFile({
-                    url: ChatConfig.MyServerVoiceUrl + dataset.voicePath,
+                    url: dataset.voicePath,
                     success: res => {
                         console.log('下载语音成功', res);
                         this._playVoice({
@@ -107,7 +106,7 @@ export default class VoiceManager {
             });
         } else {
             wx.downloadFile({
-                url: ChatConfig.MyServerVoiceUrl + dataset.voicePath,
+                url: dataset.voicePath,
                 success: res => {
                     console.log('下载语音成功', res);
                     this._playVoice({
