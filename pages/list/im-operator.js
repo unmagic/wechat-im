@@ -1,5 +1,9 @@
 import {dealChatTime} from "../../utils/time";
+import FileManager from "./file-manager";
 
+/**
+ * 这个类是IM模拟类，作为示例仅供参考。
+ */
 export default class IMOperator {
     static VoiceType = 'voice';
     static TextType = 'text';
@@ -35,8 +39,10 @@ export default class IMOperator {
             }
             if (isChatClose || !isSendSuccess) return;
             setTimeout(() => {
-                const item = this.createNormalChatItem({type: 'text', content: '我是自动回复的好友文本消息', isMy: false});
+
+                const item = this.createNormalChatItem({type: 'text', content: '这是模拟好友回复的消息', isMy: false});
                 this._latestTImestamp = item.timestamp;
+                //这里是收到好友消息的回调函数，建议传入的item是 由 createNormalChatItem 方法生成的。
                 this.onSimulateReceiveMsgCb && this.onSimulateReceiveMsgCb(item);
             }, 1000);
         }, 300);

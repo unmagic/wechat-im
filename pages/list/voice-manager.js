@@ -2,6 +2,7 @@ import {isVoiceRecordUseLatestVersion} from "../../modules/chat-input/chat-input
 import {saveFileRule} from "../../utils/file";
 import IMOperator from "./im-operator";
 import ChatConfig from "./config";
+import FileManager from "./file-manager";
 
 export default class VoiceManager {
     constructor(page) {
@@ -159,4 +160,26 @@ export default class VoiceManager {
         }
     }
 
+    showReceiveMsg(msg) {
+        const url = msg.content;
+        const localVoicePath = FileManager.get(url);
+        console.log('本地语音路径', localVoicePath);
+        if (!localVoicePath) {
+            wx.downloadFile({
+                url,
+                success: res => {
+                    saveFileRule(res.tempFilePath, (savedFilePath) => {
+                        const temp = this._page.imOperator.createNormalChatItem({
+                            type: IMOperator.VoiceType,
+                            content: savedFilePath
+                        });
+                        this._page.UI.updateViewWhenReceive(temp);
+                        FileManager.set({msgPath: url, localPath: savedFilePath});
+                    });
+                }
+            });
+        } else {
+            this._page.UI.updateViewWhenReceive(msg);
+        }
+    }
 }

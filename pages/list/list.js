@@ -35,12 +35,21 @@ Page({
         this.voiceManager = new VoiceManager(this);
         this.textManager = new TextManager(this);
         this.imageManager = new ImageManager(this);
+
         this.imOperator.onSimulateReceiveMsg((msg) => {
-            this.data.chatItems.push(msg);
-            this.setData({
-                chatItems: this.data.chatItems,
-                scrollTopVal: this.data.scrollTopVal + 999,
-            });
+            let tempManager = null;
+            switch (msg.type) {
+                case IMOperator.VoiceType:
+                    tempManager = this.voiceManager;
+                    break;
+                case IMOperator.ImageType:
+                    tempManager = this.imageManager;
+                    break;
+                case IMOperator.TextType:
+                case IMOperator.CustomType:
+                    tempManager = this.textManager;
+            }
+            tempManager.showReceiveMsg(msg);
         });
         this.UI.updateChatStatus('正在聊天中...');
     },

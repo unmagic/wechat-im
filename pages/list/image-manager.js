@@ -1,5 +1,7 @@
 import {saveFileRule} from "../../utils/file";
 import IMOperator from "./im-operator";
+import ChatConfig from "./config";
+import FileManager from "./file-manager";
 
 export default class ImageManager {
     constructor(page) {
@@ -32,8 +34,31 @@ export default class ImageManager {
                         });
                     });
                 });
-
             }
         });
     }
+
+    showReceiveMsg(msg) {
+        const url = msg.content;
+        const localImagePath = FileManager.get(url);
+        console.log('本地图片路径', localImagePath);
+        if (!localImagePath) {
+            wx.downloadFile({
+                url,
+                success: res => {
+                    saveFileRule(res.tempFilePath, (savedFilePath) => {
+                        const temp = this._page.imOperator.createNormalChatItem({
+                            type: IMOperator.ImageType,
+                            content: savedFilePath
+                        });
+                        this._page.UI.updateViewWhenReceive(temp);
+                        FileManager.set({msgPath: url, localPath: savedFilePath});
+                    });
+                }
+            });
+        } else {
+            this._page.UI.updateViewWhenReceive(msg);
+        }
+    }
+
 }

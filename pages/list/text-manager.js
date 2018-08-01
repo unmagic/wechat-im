@@ -1,8 +1,12 @@
 import IMOperator from "./im-operator";
 
-export default class TextManager{
+export default class TextManager {
     constructor(page) {
         this._page = page;
+    }
+
+    showReceiveMsg(msg) {
+        this._page.UI.updateViewWhenReceive(msg);
     }
 
     sendText({content}) {

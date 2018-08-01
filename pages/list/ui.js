@@ -5,6 +5,14 @@ export default class UI {
         this._page = page;
     }
 
+    updateViewWhenReceive(msg) {
+        this._page.data.chatItems.push(msg);
+        this._page.setData({
+            chatItems: this._page.data.chatItems,
+            scrollTopVal: this._page.data.scrollTopVal + 999,
+        });
+    }
+
     showItemForMoment(sendMsg, cbOk) {
         if (!sendMsg) return;
         this.updateDataWhenStartSending(sendMsg);
