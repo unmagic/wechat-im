@@ -4,9 +4,9 @@
 
 # 小程序即时通讯——文本、语音输入控件（一）集成
 
-[TOC]
+转载请注明出处：https://blog.csdn.net/sinat_27612147/article/details/78456363
 
-## 转载请注明出处：https://blog.csdn.net/sinat_27612147/article/details/78456363
+[TOC]
 
 <font color=red>2018-07-31 作者公告：现在拥有聊天列表UI的项目已经在当前的github仓库中更新了！！！目前还需要一段时间来将多个模块从业务上拆分，现在可以在stage-1.0分支预览。点击前往：[聊天列表地址](https://github.com/unmagic/wechat-im) 如需了解集成方式，请见下方，还没写完。。。</font>
 
@@ -24,8 +24,9 @@
 - [x] 优化时间气泡显示逻辑，相邻信息大于5分钟显示后者信息的时间
 - [x] 在页面最上方增加了会话状态的UI展示
 - [x] 自定义功能，显示自定义气泡。
-- [x] 播放语音时，停止播放其他语音。
-- [ ] 如果要使用群聊，目前的UI中，头像旁并没有展示成员昵称。
+- [x] 实现了文件存储算法，保证10M存储空间内的语音和图片文件均为最新。
+- [x] 通过解析语音或图片消息信息，优先读取本地文件。
+- 目前未实现功能：如果要使用群聊，目前的UI中，头像旁并没有展示成员昵称。
 
 ## 聊天输入组件
 
@@ -201,7 +202,6 @@ chatInput.setExtraButtonClickListener(function (dismiss) {
 
 
 
-
 github地址https://github.com/unmagic/wechat-im
 
 ----------
@@ -211,11 +211,14 @@ github地址https://github.com/unmagic/wechat-im
 
 
 更新日志：
+2018-08-01
+- 封装文本、图片、语音三部分功能
 
 2018-07-31
  - 新建了`pages/list/list`聊天UI页面，集成了输入组件。
  - 输入组件新增`isVoiceRecordUseLatestVersion`接口，用以判断录音接口是否使用了最新的。
  - 聊天UI页面修复bug：正在录音时，停止语音播放。
+ - 聊天UI页面修复bug：播放语音时，停止播放其他语音。
 
 2018-07-04
  - 新增右下角发送按钮，在输入框获取焦点时，会自动切换到发送按钮。点击发送按钮事件和点击键盘右下角发送按钮事件均为一个事件`setTextMessageListener`。
