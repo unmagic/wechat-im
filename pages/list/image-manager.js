@@ -38,7 +38,7 @@ export default class ImageManager {
         });
     }
 
-    showReceiveMsg(msg) {
+    showMsg(msg) {
         const url = msg.content;
         const localImagePath = FileManager.get(url);
         console.log('本地图片路径', localImagePath);

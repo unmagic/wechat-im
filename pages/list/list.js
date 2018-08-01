@@ -49,7 +49,7 @@ Page({
                 case IMOperator.CustomType:
                     tempManager = this.textManager;
             }
-            tempManager.showReceiveMsg(msg);
+            tempManager.showMsg(msg);
         });
         this.UI.updateChatStatus('正在聊天中...');
     },

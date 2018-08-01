@@ -160,7 +160,7 @@ export default class VoiceManager {
         }
     }
 
-    showReceiveMsg(msg) {
+    showMsg(msg) {
         const url = msg.content;
         const localVoicePath = FileManager.get(url);
         console.log('本地语音路径', localVoicePath);
