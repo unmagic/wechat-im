@@ -61,6 +61,7 @@ export default class IMOperator {
         const currentTimestamp = Date.now();
         const time = dealChatTime(currentTimestamp, this._latestTImestamp);
         return {
+            msgId: 0,
             isMy: isMy,
             showTime: time.ifShowTime,//是否显示该次发送时间
             time: time.timeStr,//发送时间 如 09:15,
