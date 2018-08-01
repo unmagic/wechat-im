@@ -3,7 +3,7 @@ export default class FileManager {
 
     }
 
-    static set({msgPath, localPath}) {
+    static set(msgPath, localPath) {
         wx.setStorage({key: msgPath, data: localPath})
     }
 

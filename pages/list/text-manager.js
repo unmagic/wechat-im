@@ -5,7 +5,7 @@ export default class TextManager {
         this._page = page;
     }
 
-    showMsg(msg) {
+    showMsg({msg}) {
         this._page.UI.updateViewWhenReceive(msg);
     }
 

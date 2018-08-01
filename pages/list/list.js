@@ -49,7 +49,7 @@ Page({
                 case IMOperator.CustomType:
                     tempManager = this.textManager;
             }
-            tempManager.showMsg(msg);
+            tempManager.showMsg({msg});
         });
         this.UI.updateChatStatus('正在聊天中...');
     },
@@ -100,19 +100,7 @@ Page({
             this.voiceManager.sendVoice({tempFilePath, duration});
         });
         chatInput.setVoiceRecordStatusListener((status) => {
-            if (this.data.isVoicePlaying) {
-                let that = this;
-                this.voiceManager.stopVoice();
-                that.data.chatItems.forEach(item => {
-                    if ('voice' === item.type) {
-                        item.isPlaying = false
-                    }
-                });
-                that.setData({
-                    chatItems: that.data.chatItems,
-                    isVoicePlaying: false
-                })
-            }
+            this.voiceManager._stopAllVoicePlay();
         })
     },
 
@@ -135,12 +123,9 @@ Page({
 
         });
     },
-    chatVoiceItemClickEvent: function (e) {
-        let dataset = e.currentTarget.dataset;
-        console.log('语音Item', dataset);
-        this.voiceManager.playVoice({dataset})
-    },
-
+    /**
+     * 自定义事件
+     */
     myFun: function () {
         wx.showModal({
             title: '小贴士',
@@ -167,13 +152,21 @@ Page({
     },
 
     sendMsg: function (content, itemIndex, cbOk) {
-        this.imOperator.onSimulateSendMsg(content, (msg) => {
-            this.UI.updateViewWhenSendSuccess(msg, itemIndex);
-            cbOk && cbOk(msg.content);
-        }, () => {
-            this.UI.updateViewWhenSendFailed(itemIndex);
+        this.imOperator.onSimulateSendMsg({
+            content,
+            success: (msg) => {
+                this.UI.updateViewWhenSendSuccess(msg, itemIndex);
+                cbOk && cbOk(msg.content);
+            },
+            fail: () => {
+                this.UI.updateViewWhenSendFailed(itemIndex);
+            }
         })
     },
+    /**
+     * 重发消息
+     * @param e
+     */
     resendMsgEvent: function (e) {
         const itemIndex = parseInt(e.currentTarget.dataset.resendIndex);
         const item = this.data.chatItems[itemIndex];

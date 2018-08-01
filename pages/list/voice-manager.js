@@ -10,6 +10,11 @@ export default class VoiceManager {
         if (this.isLatestVersion) {
             this.innerAudioContext = wx.createInnerAudioContext();
         }
+        this._page.chatVoiceItemClickEvent = (e) => {
+            let dataset = e.currentTarget.dataset;
+            console.log('语音Item', dataset);
+            this._playVoice({dataset})
+        }
     }
 
     sendVoice({tempFilePath, duration}) {
@@ -26,22 +31,53 @@ export default class VoiceManager {
                         content: content,
                         duration
                     }), itemIndex, (msgPath) => {
-                        FileManager.set({msgPath, localPath: savedFilePath})
+                        FileManager.set(msgPath, savedFilePath);
                     });
                 });
             });
         });
     }
 
-    playVoice({dataset}) {
+    _stopVoice() {
+        if (this.isLatestVersion) {
+            this.innerAudioContext.stop();
+        } else {
+            wx.stopVoice();
+        }
+    }
+
+    showMsg({msg}) {
+        const url = msg.content;
+        const localVoicePath = FileManager.get(url);
+        console.log('本地语音路径', localVoicePath);
+        if (!localVoicePath) {
+            wx.downloadFile({
+                url,
+                success: res => {
+                    saveFileRule(res.tempFilePath, (savedFilePath) => {
+                        const temp = this._page.imOperator.createNormalChatItem({
+                            type: IMOperator.VoiceType,
+                            content: savedFilePath
+                        });
+                        this._page.UI.updateViewWhenReceive(temp);
+                        FileManager.set(url, savedFilePath);
+                    });
+                }
+            });
+        } else {
+            this._page.UI.updateViewWhenReceive(msg);
+        }
+    }
+
+    _playVoice({dataset}) {
         let that = this._page;
         if (dataset.voicePath === that.data.latestPlayVoicePath && that.data.chatItems[dataset.index].isPlaying) {
-            this.stopAllVoicePlay();
+            this._stopAllVoicePlay();
         } else {
-            this.startPlayVoice(dataset);
+            this._startPlayVoice(dataset);
             let localPath = dataset.voicePath;//优先读取本地路径，可能不存在此文件
 
-            this.myPlayVoice(localPath, dataset, function () {
+            this._myPlayVoice(localPath, dataset, function () {
                 console.log('成功读取了本地语音');
             }, () => {
                 console.log('读取本地语音文件失败，一般情况下是本地没有该文件，需要从服务器下载');
@@ -49,10 +85,10 @@ export default class VoiceManager {
                     url: dataset.voicePath,
                     success: res => {
                         console.log('下载语音成功', res);
-                        this._playVoice({
+                        this.__playVoice({
                             filePath: res.tempFilePath,
                             success: () => {
-                                this.stopAllVoicePlay();
+                                this._stopAllVoicePlay();
                             },
                             fail: (res) => {
                                 console.log('播放失败了', res);
@@ -64,7 +100,7 @@ export default class VoiceManager {
         }
     }
 
-    _playVoice({filePath, success, fail}) {
+    __playVoice({filePath, success, fail}) {
         if (this.isLatestVersion) {
             this.innerAudioContext.src = filePath;
             this.innerAudioContext.startTime = 0;
@@ -82,21 +118,13 @@ export default class VoiceManager {
         }
     }
 
-    stopVoice() {
-        if (this.isLatestVersion) {
-            this.innerAudioContext.stop();
-        } else {
-            wx.stopVoice();
-        }
-    }
-
-    myPlayVoice(filePath, dataset, cbOk, cbError) {
+    _myPlayVoice(filePath, dataset, cbOk, cbError) {
         let that = this._page;
         if (dataset.isMy || that.data.isAndroid) {
-            this._playVoice({
+            this.__playVoice({
                 filePath: filePath,
                 success: () => {
-                    this.stopAllVoicePlay();
+                    this._stopAllVoicePlay();
                     typeof cbOk === "function" && cbOk();
                 },
                 fail: (res) => {
@@ -109,10 +137,10 @@ export default class VoiceManager {
                 url: dataset.voicePath,
                 success: res => {
                     console.log('下载语音成功', res);
-                    this._playVoice({
+                    this.__playVoice({
                         filePath: res.tempFilePath,
                         success: () => {
-                            this.stopAllVoicePlay();
+                            this._stopAllVoicePlay();
                             typeof cbOk === "function" && cbOk();
                         },
                         fail: (res) => {
@@ -126,7 +154,7 @@ export default class VoiceManager {
 
     }
 
-    startPlayVoice(dataset) {
+    _startPlayVoice(dataset) {
         let that = this._page;
         let chatItems = that.data.chatItems;
         chatItems[dataset.index].isPlaying = true;
@@ -145,12 +173,12 @@ export default class VoiceManager {
         that.data.latestPlayVoicePath = dataset.voicePath;
     }
 
-    stopAllVoicePlay() {
+    _stopAllVoicePlay() {
         let that = this._page;
         if (this._page.data.isVoicePlaying) {
-            this.stopVoice();
+            this._stopVoice();
             that.data.chatItems.forEach(item => {
-                if ('voice' === item.type) {
+                if (IMOperator.VoiceType === item.type) {
                     item.isPlaying = false
                 }
             });
@@ -161,26 +189,4 @@ export default class VoiceManager {
         }
     }
 
-    showMsg(msg) {
-        const url = msg.content;
-        const localVoicePath = FileManager.get(url);
-        console.log('本地语音路径', localVoicePath);
-        if (!localVoicePath) {
-            wx.downloadFile({
-                url,
-                success: res => {
-                    saveFileRule(res.tempFilePath, (savedFilePath) => {
-                        const temp = this._page.imOperator.createNormalChatItem({
-                            type: IMOperator.VoiceType,
-                            content: savedFilePath
-                        });
-                        this._page.UI.updateViewWhenReceive(temp);
-                        FileManager.set({msgPath: url, localPath: savedFilePath});
-                    });
-                }
-            });
-        } else {
-            this._page.UI.updateViewWhenReceive(msg);
-        }
-    }
 }

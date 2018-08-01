@@ -30,7 +30,7 @@ export default class ImageManager {
                                 type: IMOperator.ImageType,
                                 content
                             }), itemIndex, (msgPath) => {
-                                FileManager.set({msgPath, localPath: savedFilePath})
+                                FileManager.set(msgPath, savedFilePath)
                             });
                         });
                     });
@@ -39,7 +39,7 @@ export default class ImageManager {
         });
     }
 
-    showMsg(msg) {
+    showMsg({msg}) {
         const url = msg.content;
         const localImagePath = FileManager.get(url);
         console.log('本地图片路径', localImagePath);
@@ -53,7 +53,7 @@ export default class ImageManager {
                             content: savedFilePath
                         });
                         this._page.UI.updateViewWhenReceive(temp);
-                        FileManager.set({msgPath: url, localPath: savedFilePath});
+                        FileManager.set(url, savedFilePath);
                     });
                 }
             });

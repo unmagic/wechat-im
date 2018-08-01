@@ -22,7 +22,7 @@ export default class IMOperator {
         this.onSimulateReceiveMsgCb = cbOk;
     }
 
-    onSimulateSendMsg(content, cbOk, cbError) {
+    onSimulateSendMsg({content, success, fail}) {
         //这里content即为要发送的数据
         setTimeout(() => {
             const item = this.createNormalChatItem(JSON.parse(content));
@@ -33,9 +33,9 @@ export default class IMOperator {
             console.log('随机数模拟是否发送成功', isSendSuccess);
             const isChatClose = this._page.data.chatStatue === 'close';
             if (isSendSuccess || isChatClose) {
-                cbOk && cbOk(item);
+                success && success(item);
             } else {
-                cbError && cbError();
+                fail && fail();
             }
             if (isChatClose || !isSendSuccess) return;
             setTimeout(() => {
