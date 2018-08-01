@@ -41,6 +41,8 @@ export default class IMOperator {
             setTimeout(() => {
 
                 const item = this.createNormalChatItem({type: 'text', content: '这是模拟好友回复的消息', isMy: false});
+                // const item = this.createNormalChatItem({type: 'voice', content: '上传文件返回的语音文件路径', isMy: false});
+                // const item = this.createNormalChatItem({type: 'image', content: '上传文件返回的图片文件路径', isMy: false});
                 this._latestTImestamp = item.timestamp;
                 //这里是收到好友消息的回调函数，建议传入的item是 由 createNormalChatItem 方法生成的。
                 this.onSimulateReceiveMsgCb && this.onSimulateReceiveMsgCb(item);

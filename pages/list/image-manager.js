@@ -30,7 +30,9 @@ export default class ImageManager {
                             this._page.sendMsg(IMOperator.createChatItemContent({
                                 type: IMOperator.ImageType,
                                 content
-                            }), itemIndex);
+                            }), itemIndex, (msgPath) => {
+                                FileManager.set({msgPath, localPath: savedFilePath})
+                            });
                         });
                     });
                 });

@@ -116,10 +116,11 @@ Page({
         })
     },
 
-    //模拟上传文件
+    //模拟上传文件，注意这里的cbOk回调函数传入的参数应该是上传文件成功时返回的文件url，这里因为模拟，我直接用的savedFilePath
     simulateUploadFile: function ({savedFilePath, duration, itemIndex}, cbOk) {
         setTimeout(() => {
-            cbOk && cbOk(savedFilePath);
+            let urlFromServerWhenUploadSuccess = savedFilePath;
+            cbOk && cbOk(urlFromServerWhenUploadSuccess);
         }, 1000);
     },
     extraButton: function () {
@@ -165,9 +166,10 @@ Page({
         chatInput.closeExtraView();
     },
 
-    sendMsg: function (content, itemIndex) {
+    sendMsg: function (content, itemIndex, cbOk) {
         this.imOperator.onSimulateSendMsg(content, (msg) => {
             this.UI.updateViewWhenSendSuccess(msg, itemIndex);
+            cbOk && cbOk(msg.content);
         }, () => {
             this.UI.updateViewWhenSendFailed(itemIndex);
         })

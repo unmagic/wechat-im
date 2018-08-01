@@ -26,7 +26,9 @@ export default class VoiceManager {
                         type: IMOperator.VoiceType,
                         content: content,
                         duration
-                    }), itemIndex);
+                    }), itemIndex, (msgPath) => {
+                        FileManager.set({msgPath, localPath: savedFilePath})
+                    });
                 });
             });
         });
