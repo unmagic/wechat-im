@@ -1,5 +1,4 @@
 import {dealChatTime} from "../../utils/time";
-import FileManager from "./file-manager";
 
 /**
  * 这个类是IM模拟类，作为示例仅供参考。
@@ -25,6 +24,7 @@ export default class IMOperator {
     onSimulateSendMsg({content, success, fail}) {
         //这里content即为要发送的数据
         setTimeout(() => {
+            //这里的content是一个JSON格式的字符串，类似于：{"content":"233","type":"text"}
             const item = this.createNormalChatItem(JSON.parse(content));
             this._latestTImestamp = item.timestamp;
 

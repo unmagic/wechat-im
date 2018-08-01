@@ -196,8 +196,449 @@ chatInput.setExtraButtonClickListener(function (dismiss) {
 
 对于即时通讯方面的sdk，我是用`setTimeout`来模拟的。你可以引入常见的sdk，比如腾讯的、网易的。当然你也可以使用webSocket来自己实现。
 
+这部分的东西写完之后发现，并没有很多难点，所以我只说下集成时要注意的几点。
 
+### 示例文件
 
+示例页面是`pages/list/list`，可以在微信开发工具直接打开。
+
+在`list`文件夹下，我封装了多个类，用于管理消息类型的收发和展示。
+
+### 文本消息管理类
+先看个最简单的，文本类型消息的收发和展示`text-manager.js`：
+
+```
+import IMOperator from "./im-operator";
+
+export default class TextManager {
+    constructor(page) {
+        this._page = page;
+    }
+
+    /**
+     * 接收到消息时，通过UI类的管理进行渲染
+     * @param msg 接收到的消息，这个对象应是由 im-operator.js 中的createNormalChatItem()方法生成的。
+     */
+    showMsg({msg}) {
+        //UI类是用于管理UI展示的类。
+        this._page.UI.updateViewWhenReceive(msg);
+    }
+
+    /**
+     * 发送消息时，通过UI类来管理发送状态的切换和消息的渲染
+     * @param content 输入组件获取到的原始文本信息
+     */
+    sendText({content}) {
+        this._page.UI.showItemForMoment(this._page.imOperator.createNormalChatItem({
+            type: IMOperator.TextType,
+            content
+        }), (itemIndex) => {
+            this._page.sendMsg(IMOperator.createChatItemContent({type: IMOperator.TextType, content}), itemIndex);
+        });
+    }
+}
+```
+### 语音消息管理类
+再来看个比较复杂的，语音消息的收发和展示`voice-manager.js`:
+
+```
+import {isVoiceRecordUseLatestVersion} from "../../modules/chat-input/chat-input";
+import {saveFileRule} from "../../utils/file";
+import IMOperator from "./im-operator";
+import FileManager from "./file-manager";
+
+export default class VoiceManager {
+    constructor(page) {
+        this._page = page;
+        this.isLatestVersion = isVoiceRecordUseLatestVersion();
+        //判断是否需要使用高版本语音播放接口
+        if (this.isLatestVersion) {
+            this.innerAudioContext = wx.createInnerAudioContext();
+        }
+        //在该类被初始化时，绑定语音点击播放事件
+        this._page.chatVoiceItemClickEvent = (e) => {
+            let dataset = e.currentTarget.dataset;
+            console.log('语音Item', dataset);
+            this._playVoice({dataset})
+        }
+    }
+
+    /**
+     * 发送语音消息
+     * @param tempFilePath 由输入组件接收到的临时文件路径
+     * @param duration 由输入组件接收到的录音时间
+     */
+    sendVoice({tempFilePath, duration}) {
+        saveFileRule(tempFilePath, (savedFilePath) => {
+            const temp = this._page.imOperator.createNormalChatItem({
+                type: IMOperator.VoiceType,
+                content: savedFilePath,
+                duration
+            });
+            this._page.UI.showItemForMoment(temp, (itemIndex) => {
+                this._page.simulateUploadFile({savedFilePath, duration, itemIndex}, (content) => {
+                    this._page.sendMsg(IMOperator.createChatItemContent({
+                        type: IMOperator.VoiceType,
+                        content: content,
+                        duration
+                    }), itemIndex, (msg) => {
+                        FileManager.set(msg, savedFilePath);
+                    });
+                });
+            });
+        });
+    }
+
+    /**
+     * 停止播放所有语音
+     */
+    stopAllVoicePlay() {
+        let that = this._page;
+        if (this._page.data.isVoicePlaying) {
+            this._stopVoice();
+            that.data.chatItems.forEach(item => {
+                if (IMOperator.VoiceType === item.type) {
+                    item.isPlaying = false
+                }
+            });
+            that.setData({
+                chatItems: that.data.chatItems,
+                isVoicePlaying: false
+            })
+        }
+    }
+
+    /**
+     * 接收到消息时，通过UI类的管理进行渲染
+     * @param msg 接收到的消息，这个对象应是由 im-operator.js 中的createNormalChatItem()方法生成的。
+     */
+    showMsg({msg}) {
+        const url = msg.content;
+        const localVoicePath = FileManager.get(msg);
+        console.log('本地语音路径', localVoicePath);
+        if (!localVoicePath) {
+            wx.downloadFile({
+                url,
+                success: res => {
+                    saveFileRule(res.tempFilePath, (savedFilePath) => {
+                        const temp = this._page.imOperator.createNormalChatItem({
+                            type: IMOperator.VoiceType,
+                            content: savedFilePath
+                        });
+                        this._page.UI.updateViewWhenReceive(temp);
+                        FileManager.set(msg, savedFilePath);
+                    });
+                }
+            });
+        } else {
+            this._page.UI.updateViewWhenReceive(msg);
+        }
+    }
+
+    /**
+     * 停止播放 兼容低版本语音播放
+     * @private
+     */
+    _stopVoice() {
+        if (this.isLatestVersion) {
+            this.innerAudioContext.stop();
+        } else {
+            wx.stopVoice();
+        }
+    }
+
+    _playVoice({dataset}) {
+        let that = this._page;
+        if (dataset.voicePath === that.data.latestPlayVoicePath && that.data.chatItems[dataset.index].isPlaying) {
+            this.stopAllVoicePlay();
+        } else {
+            this._startPlayVoice(dataset);
+            let localPath = dataset.voicePath;//优先读取本地路径，可能不存在此文件
+
+            this._myPlayVoice(localPath, dataset, function () {
+                console.log('成功读取了本地语音');
+            }, () => {
+                console.log('读取本地语音文件失败，一般情况下是本地没有该文件，需要从服务器下载');
+                wx.downloadFile({
+                    url: dataset.voicePath,
+                    success: res => {
+                        console.log('下载语音成功', res);
+                        this.__playVoice({
+                            filePath: res.tempFilePath,
+                            success: () => {
+                                this.stopAllVoicePlay();
+                            },
+                            fail: (res) => {
+                                console.log('播放失败了', res);
+                            }
+                        });
+                    }
+                });
+            });
+        }
+    }
+
+    /**
+     * 播放语音 兼容低版本语音播放
+     * @param filePath
+     * @param success
+     * @param fail
+     * @private
+     */
+    __playVoice({filePath, success, fail}) {
+        if (this.isLatestVersion) {
+            this.innerAudioContext.src = filePath;
+            this.innerAudioContext.startTime = 0;
+            this.innerAudioContext.play();
+            this.innerAudioContext.onError((error) => {
+                this.innerAudioContext.offError();
+                fail && fail(error);
+            });
+            this.innerAudioContext.onEnded(() => {
+                this.innerAudioContext.offEnded();
+                success && success();
+            });
+        } else {
+            wx.playVoice({filePath, success, fail});
+        }
+    }
+
+    _myPlayVoice(filePath, dataset, cbOk, cbError) {
+        let that = this._page;
+        if (dataset.isMy || that.data.isAndroid) {
+            this.__playVoice({
+                filePath: filePath,
+                success: () => {
+                    this.stopAllVoicePlay();
+                    typeof cbOk === "function" && cbOk();
+                },
+                fail: (res) => {
+                    console.log('播放失败了1', res);
+                    typeof cbError === "function" && cbError(res);
+                }
+            });
+        } else {
+            wx.downloadFile({
+                url: dataset.voicePath,
+                success: res => {
+                    console.log('下载语音成功', res);
+                    this.__playVoice({
+                        filePath: res.tempFilePath,
+                        success: () => {
+                            this.stopAllVoicePlay();
+                            typeof cbOk === "function" && cbOk();
+                        },
+                        fail: (res) => {
+                            console.log('播放失败了', res);
+                            typeof cbError === "function" && cbError(res);
+                        }
+                    });
+                }
+            });
+        }
+
+    }
+
+    _startPlayVoice(dataset) {
+        let that = this._page;
+        let chatItems = that.data.chatItems;
+        chatItems[dataset.index].isPlaying = true;
+        if (that.data.latestPlayVoicePath && that.data.latestPlayVoicePath !== chatItems[dataset.index].content) {//如果重复点击同一个，则不将该isPlaying置为false
+            for (let i = 0, len = chatItems.length; i < len; i++) {
+                if ('voice' === chatItems[i].type && that.data.latestPlayVoicePath === chatItems[i].content) {
+                    chatItems[i].isPlaying = false;
+                    break;
+                }
+            }
+        }
+        that.setData({
+            chatItems: chatItems,
+            isVoicePlaying: true
+        });
+        that.data.latestPlayVoicePath = dataset.voicePath;
+    }
+
+}
+
+```
+对于微信我也是无话可说，接口动不动就废弃。小程序基础库1.6.0以后不再维护的语音播放和录制接口，我进行了兼容处理。
+图片类型的管理类与语音类型，就不上代码了。
+
+### 缓存机制和文件类型消息的展示机制
+- 缓存和展示机制：在展示语音或图片类型的消息时，我会优先加载已经存储在本地的文件。可以看到`showMsg()`方法中先是取`const localVoicePath = FileManager.get(msg)`，来获取本地路径。
+那取到的值是什么时候设置的呢？是在发送或接收消息成功后（此时文件已下载成功），以消息的`saveKey`为key，存储成功返回的`savedFilePath`为data，建立消息和本地存储路径的映射关系，如：`FileManager.set(msg, savedFilePath)`;
+这里的`saveKey`是以消息id `msgId` 和好友id `friendId`，拼接而成的。
+
+- 存储溢出算法：在存储文件时，我参考了Android LruCache的思想编写了算法，保证在小程序10M存储限制的前提下，存储新的文件，如果溢出了，就移除最旧的文件(跟LruCache溢出时去除不常用文件的思想不太一样)。如下`file.js`
+
+```
+const MAX_SIZE = 95000000;
+
+function saveFileRule(tempFilePath, cbOk, cbError) {
+    wx.getFileInfo({
+        filePath: tempFilePath,
+        success: tempFailInfo => {
+            let tempFileSize = tempFailInfo.size;
+            // console.log('本地临时文件大小', tempFileSize);
+            if (tempFileSize > MAX_SIZE) {
+                typeof cbError === "function" && cbError('文件过大');
+                return;
+            }
+            wx.getSavedFileList({
+                success: savedFileInfo => {
+                    // console.log('查看已存储的文件列表', savedFileInfo);
+                    let fileList = savedFileInfo.fileList;
+                    let wholeSize = 0;
+                    fileList.forEach(item => {
+                        wholeSize += item.size;
+                    });
+                    //这里计算需要移除的总文件大小
+                    let sizeNeedRemove = wholeSize + tempFileSize - MAX_SIZE;
+                    if (sizeNeedRemove >= 0) {
+                        //按时间戳排序，方便后续移除文件
+                        fileList.sort(function (item1, item2) {
+                            return item1.createTime - item2.createTime;
+                        });
+                        let sizeCount = 0;
+                        for (let i = 0, len = fileList.length; i < len; i++) {
+                            sizeCount += fileList[i].size;
+                            if (sizeCount >= sizeNeedRemove) {
+                                for (let j = 0; j < i; j++) {
+                                    wx.removeSavedFile({
+                                        filePath: fileList[j].filePath,
+                                        success: function (res) {
+                                            // console.log('移除文件', res);
+                                        }
+                                    });
+                                }
+                                break;
+                            }
+                        }
+                    }
+
+                    wx.saveFile({
+                        tempFilePath: tempFilePath,
+                        success: res => {
+                            typeof cbOk === "function" && cbOk(res.savedFilePath);
+                        },
+                        fail: cbError
+                    });
+                },
+                fail: cbError
+            });
+        }
+    });
+}
+```
+### IM模拟类 `im-operator.js`
+最后重点说下IM的模拟类 IMOperator。
+
+#### 生成发送数据的文本
+<font color=red>记住，你所有发送的消息，都是以文本消息的形式发出的，只是在渲染的时候解析，生成不同的消息类型来展示！！！</font>
+
+```
+ static createChatItemContent({type = IMOperator.TextType, content = '', duration} = {}) {
+        if (!content.replace(/^\s*|\s*$/g, '')) return;
+        return JSON.stringify({content, type, duration});
+    }
+
+```
+
+这是生成发送数据的文本的方法。它会返回一个JSON格式的字符串。类似于：`{"content":"233","type":"text"}`。
+- type: 消息类型 TextType/VoiceType/ImageType/CustomType
+- content: 需要发送的原始文本信息。可以是文字、语音文件路径、图片文件路径。
+- duration: 语音时长。如果是语音类型，则需要传这个字段。
+
+#### 生成消息对象
+
+```
+createNormalChatItem({type = IMOperator.TextType, content = '', isMy = true, duration} = {}) {
+        if (!content) return;
+        const currentTimestamp = Date.now();
+        const time = dealChatTime(currentTimestamp, this._latestTImestamp);
+        let obj = {
+            msgId: 0,
+            friendId: 0,
+            isMy: isMy,
+            showTime: time.ifShowTime,//是否显示该次发送时间
+            time: time.timeStr,//发送时间 如 09:15,
+            timestamp: currentTimestamp,//该条数据的时间戳，一般用于排序
+            type: type,//内容的类型，目前有这几种类型： text/voice/image/custom | 文本/语音/图片/自定义
+            content: content,// 显示的内容，根据不同的类型，在这里填充不同的信息。
+            headUrl: isMy ? this._myHeadUrl : this._otherHeadUrl,//显示的头像，你可以填充不同的头像，来满足群聊的需求
+            sendStatus: 'success',//发送状态，目前有这几种状态：sending/success/failed | 发送中/发送成功/发送失败
+            voiceDuration: duration,//语音时长 单位秒
+            isPlaying: false,//语音是否正在播放
+        };
+        obj.saveKey = obj.friendId + '_' + obj.msgId;
+        return obj;
+
+    }
+```
+- type：消息类型 
+- content：需要发送的IM消息，是由`createChatItemContent`生成的JSON格式字符串。
+- isMy：是否是我自己的消息。
+- duration：语音时长。如果是语音类型，则需要传这个字段。
+
+#### 发送数据接口 
+
+```
+onSimulateSendMsg({content, success, fail}) {
+        //这里content即为要发送的数据
+        setTimeout(() => {
+            //这里的content是一个JSON格式的字符串，类似于：{"content":"233","type":"text"}
+            const item = this.createNormalChatItem(JSON.parse(content));
+            this._latestTImestamp = item.timestamp;
+
+            //使用随机数来模拟数据发送失败情况
+            const isSendSuccess = parseInt(Math.random() * 100) > 35;
+            console.log('随机数模拟是否发送成功', isSendSuccess);
+            const isChatClose = this._page.data.chatStatue === 'close';
+            if (isSendSuccess || isChatClose) {
+                success && success(item);
+            } else {
+                fail && fail();
+            }
+            if (isChatClose || !isSendSuccess) return;
+            setTimeout(() => {
+
+                const item = this.createNormalChatItem({type: 'text', content: '这是模拟好友回复的消息', isMy: false});
+                // const item = this.createNormalChatItem({type: 'voice', content: '上传文件返回的语音文件路径', isMy: false});
+                // const item = this.createNormalChatItem({type: 'image', content: '上传文件返回的图片文件路径', isMy: false});
+                this._latestTImestamp = item.timestamp;
+                //这里是收到好友消息的回调函数，建议传入的item是 由 createNormalChatItem 方法生成的。
+                this.onSimulateReceiveMsgCb && this.onSimulateReceiveMsgCb(item);
+            }, 1000);
+        }, 300);
+
+    }
+```
+
+- content：这里的content是一个JSON格式的字符串，类似于：{"content":"233","type":"text"}，是由该类中`createChatItemContent`方法生成的
+- success：发送成功回调，我这里返回了`createNormalChatItem`生成的消息对象，模拟发送成功后IMSDK返回的消息对象。
+- fail：发送失败回调，你可以自行传参。
+
+#### 接收数据接口 
+
+```
+onSimulateReceiveMsg(cbOk) {
+        this.onSimulateReceiveMsgCb = cbOk;
+    }
+```
+- cbOk：接收到消息的回调，这里我也是模拟的，返回了由`this.createNormalChatItem({type: 'text', content: '这是模拟好友回复的消息', isMy: false})`生成的消息对象
+
+### 生成自定义消息类型对象
+自定义消息类型的UI类似于聊天列表中的展示聊天时间的UI。
+
+```
+static createCustomChatItem() {
+        return {
+            timestamp: Date.now(),
+            type: IMOperator.CustomType,
+            content: '会话已关闭'
+        }
+    }
+```
 
 
 
