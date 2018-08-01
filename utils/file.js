@@ -5,14 +5,14 @@ function saveFileRule(tempFilePath, cbOk, cbError) {
         filePath: tempFilePath,
         success: tempFailInfo => {
             let tempFileSize = tempFailInfo.size;
-            console.log('本地临时文件大小', tempFileSize);
+            // console.log('本地临时文件大小', tempFileSize);
             if (tempFileSize > MAX_SIZE) {
                 typeof cbError === "function" && cbError('文件过大');
                 return;
             }
             wx.getSavedFileList({
                 success: savedFileInfo => {
-                    console.log('查看已存储的文件列表', savedFileInfo);
+                    // console.log('查看已存储的文件列表', savedFileInfo);
                     let fileList = savedFileInfo.fileList;
                     let wholeSize = 0;
                     fileList.forEach(item => {
@@ -31,7 +31,7 @@ function saveFileRule(tempFilePath, cbOk, cbError) {
                                     wx.removeSavedFile({
                                         filePath: fileList[j].filePath,
                                         success: function (res) {
-                                            console.log('移除文件', res);
+                                            // console.log('移除文件', res);
                                         }
                                     });
                                 }
