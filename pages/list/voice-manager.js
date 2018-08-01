@@ -37,8 +37,8 @@ export default class VoiceManager {
                         type: IMOperator.VoiceType,
                         content: content,
                         duration
-                    }), itemIndex, (msgPath) => {
-                        FileManager.set(msgPath, savedFilePath);
+                    }), itemIndex, (msg) => {
+                        FileManager.set(msg, savedFilePath);
                     });
                 });
             });
@@ -70,7 +70,7 @@ export default class VoiceManager {
      */
     showMsg({msg}) {
         const url = msg.content;
-        const localVoicePath = FileManager.get(url);
+        const localVoicePath = FileManager.get(msg);
         console.log('本地语音路径', localVoicePath);
         if (!localVoicePath) {
             wx.downloadFile({
@@ -82,7 +82,7 @@ export default class VoiceManager {
                             content: savedFilePath
                         });
                         this._page.UI.updateViewWhenReceive(temp);
-                        FileManager.set(url, savedFilePath);
+                        FileManager.set(msg, savedFilePath);
                     });
                 }
             });

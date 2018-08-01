@@ -60,8 +60,9 @@ export default class IMOperator {
         if (!content) return;
         const currentTimestamp = Date.now();
         const time = dealChatTime(currentTimestamp, this._latestTImestamp);
-        return {
+        let obj = {
             msgId: 0,
+            friendId: 0,
             isMy: isMy,
             showTime: time.ifShowTime,//是否显示该次发送时间
             time: time.timeStr,//发送时间 如 09:15,
@@ -71,8 +72,10 @@ export default class IMOperator {
             headUrl: isMy ? this._myHeadUrl : this._otherHeadUrl,//显示的头像，你可以填充不同的头像，来满足群聊的需求
             sendStatus: 'success',//发送状态，目前有这几种状态：sending/success/failed | 发送中/发送成功/发送失败
             voiceDuration: duration,//语音时长 单位秒
-            isPlaying: false//语音是否正在播放
+            isPlaying: false,//语音是否正在播放
         };
+        obj.saveKey = obj.friendId + '_' + obj.msgId;
+        return obj;
 
     }
 

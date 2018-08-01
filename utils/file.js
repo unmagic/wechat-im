@@ -18,8 +18,10 @@ function saveFileRule(tempFilePath, cbOk, cbError) {
                     fileList.forEach(item => {
                         wholeSize += item.size;
                     });
+                    //这里计算需要移除的总文件大小
                     let sizeNeedRemove = wholeSize + tempFileSize - MAX_SIZE;
                     if (sizeNeedRemove >= 0) {
+                        //按时间戳排序，方便后续移除文件
                         fileList.sort(function (item1, item2) {
                             return item1.createTime - item2.createTime;
                         });

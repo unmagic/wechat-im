@@ -29,8 +29,8 @@ export default class ImageManager {
                             this._page.sendMsg(IMOperator.createChatItemContent({
                                 type: IMOperator.ImageType,
                                 content
-                            }), itemIndex, (msgPath) => {
-                                FileManager.set(msgPath, savedFilePath)
+                            }), itemIndex, (msg) => {
+                                FileManager.set(msg, savedFilePath)
                             });
                         });
                     });
@@ -38,10 +38,13 @@ export default class ImageManager {
             }
         });
     }
-
+    /**
+     * 接收到消息时，通过UI类的管理进行渲染
+     * @param msg 接收到的消息，这个对象应是由 im-operator.js 中的createNormalChatItem()方法生成的。
+     */
     showMsg({msg}) {
         const url = msg.content;
-        const localImagePath = FileManager.get(url);
+        const localImagePath = FileManager.get(msg);
         console.log('本地图片路径', localImagePath);
         if (!localImagePath) {
             wx.downloadFile({
@@ -54,7 +57,7 @@ export default class ImageManager {
                         });
                         this._page.UI.updateViewWhenReceive(temp);
                         //以消息的content为key，建立消息和本地存储路径的映射关系
-                        FileManager.set(url, savedFilePath);
+                        FileManager.set(msg, savedFilePath);
                     });
                 }
             });

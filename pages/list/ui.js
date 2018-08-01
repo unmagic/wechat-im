@@ -1,10 +1,17 @@
 import * as chatInput from "../../modules/chat-input/chat-input";
 
+/**
+ * 用户处理消息的收发UI更新
+ */
 export default class UI {
     constructor(page) {
         this._page = page;
     }
 
+    /**
+     * 接收到消息时，更新UI
+     * @param msg
+     */
     updateViewWhenReceive(msg) {
         this._page.data.chatItems.push(msg);
         this._page.setData({
@@ -13,12 +20,22 @@ export default class UI {
         });
     }
 
+    /**
+     * 发送消息时，渲染消息的发送状态为 发送中
+     * @param sendMsg
+     * @param cbOk
+     */
     showItemForMoment(sendMsg, cbOk) {
         if (!sendMsg) return;
         this.updateDataWhenStartSending(sendMsg);
         cbOk && cbOk(this._page.data.chatItems.length - 1);
     }
 
+    /**
+     * 设置消息发送状态为 发送中
+     * @param sendMsg
+     * @param addToArr
+     */
     updateDataWhenStartSending(sendMsg, addToArr = true) {
         chatInput.closeExtraView();
         sendMsg.sendStatus = 'sending';
@@ -30,6 +47,11 @@ export default class UI {
         });
     }
 
+    /**
+     * 设置消息发送状态为 发送成功
+     * @param sendMsg
+     * @param itemIndex
+     */
     updateViewWhenSendSuccess(sendMsg, itemIndex) {
         console.log('发送成功', sendMsg);
         let that = this._page;
@@ -39,6 +61,10 @@ export default class UI {
 
     }
 
+    /**
+     * 设置消息发送状态为 发送失败
+     * @param itemIndex
+     */
     updateViewWhenSendFailed(itemIndex) {
         this.updateSendStatusView('failed', itemIndex);
     }

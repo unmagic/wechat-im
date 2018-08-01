@@ -3,11 +3,11 @@ export default class FileManager {
 
     }
 
-    static set(msgPath, localPath) {
-        wx.setStorage({key: msgPath, data: localPath})
+    static set(msg, localPath) {
+        wx.setStorage({key: msg.saveKey, data: localPath})
     }
 
-    static get(msgPath) {
-        return wx.getStorageSync(msgPath);
+    static get(msg) {
+        return wx.getStorageSync(msg.saveKey);
     }
 }

@@ -156,7 +156,7 @@ Page({
             content,
             success: (msg) => {
                 this.UI.updateViewWhenSendSuccess(msg, itemIndex);
-                cbOk && cbOk(msg.content);
+                cbOk && cbOk(msg);
             },
             fail: () => {
                 this.UI.updateViewWhenSendFailed(itemIndex);
