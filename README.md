@@ -38,9 +38,9 @@
 ### 整体效果图（加载有些慢）
 我们先来看下效果 (现在已经重新录制了动图，但因录制软件问题，图中的一些按钮的变色了，线条也少了很多像素。。。)
 
-<img src="https://github.com/unmagic/wechat-im/blob/master/.gif/发送图片和图片预览.gif" width="30%" alt="发送图片和图片预览"/>发送图片和图片预览
-<img src="https://github.com/unmagic/wechat-im/blob/master/.gif/消息重发和发送自定义消息.gif" width="30%" alt="消息重发和发送自定义消息"/>消息重发和发送自定义消息
-<img src="https://github.com/unmagic/wechat-im/blob/master/.gif/语音.gif" width="30%" alt="发送语音消息"/>发送语音消息
+<img src="https://github.com/unmagic/wechat-im/blob/master/.gif/发送图片和图片预览.gif" width="30%" alt="发送图片和图片预览"/> 发送图片和图片预览
+<img src="https://github.com/unmagic/wechat-im/blob/master/.gif/消息重发和发送自定义消息.gif" width="30%" alt="消息重发和发送自定义消息"/> 消息重发和发送自定义消息
+<img src="https://github.com/unmagic/wechat-im/blob/master/.gif/语音.gif" width="30%" alt="发送语音消息"/> 发送语音消息
 
 ## 聊天输入组件
 
@@ -90,7 +90,8 @@
 ##### 2. 初始化`chatInput`
 
 ```
-chatInput.init(page, {
+chatInput.init(page, 
+        {
 			systemInfo: wx.getSystemInfoSync(),
 			minVoiceTime: 1,//秒，最小录音时长，小于该值则弹出‘说话时间太短’
             maxVoiceTime: 60,//秒，最大录音时长，大于该值则按60秒处理
@@ -203,6 +204,10 @@ chatInput.setExtraButtonClickListener(function (dismiss) {
 ### 至此，输入组件SDK的集成就完成了！
 
 ## 聊天列表UI
+
+### 效果图
+
+
 
 聊天列表，我将UI封装成了多个`template`，最后使用`chat-item.wxml`即可，UI相关的代码都放到了`chat-list`文件夹中；加载方面的UI放到了`loading`文件夹中；`image`文件夹中也新增了几张图片。
 
