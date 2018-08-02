@@ -673,9 +673,7 @@ static createCustomChatItem() {
 #### 发送数据接口 
 这里是模拟的数据发送。我计划将来集成webSocket，实现完整的一套小程序IM体系，这部分还在研究。
 
-首先，我在`list.js`中先初始化了`this.msgManager = new MsgManager(this);`
-
-然后在输入组件的录音监听回调接口中调用`this.msgManager`的发送方法`sendMsg()`
+我是在输入组件的录音监听回调接口中调用`this.msgManager`的发送消息方法`sendMsg()`
 
 ```
 chatInput.recordVoiceListener((res, duration) => {
