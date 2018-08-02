@@ -44,7 +44,7 @@
 ![文本语音输入控件](http://img.blog.csdn.net/20171107101340228?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvc2luYXRfMjc2MTIxNDc=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast)
 
 我们先来看下效果 (现在已经重新录制了动图，但因录制软件问题，图中的一些按钮的变色了，线条也少了很多像素。。。)
-![小程序IM输入控件](https://github.com/unmagic/wechat-im/blob/stage-1.0/.gif/发送图片和图片预览.gif)
+<img src="https://github.com/unmagic/wechat-im/blob/master/.gif/发送图片和图片预览.gif" width="60%" alt=""/>
  
 目前的功能就是动态图中展示的，我们可以使用这个控件来切换输入方式（文本或语音）、获取到输入的信息、取消语音输入、语音消息录制过短过长的判断（该接口暂时还未开放），支持发送图片和其他自定义拓展内容。（语音和图片发送失败是因为小程序新版模拟器的问题，真机上没事）。
 
