@@ -151,11 +151,14 @@ Page({
     resendMsgEvent: function (e) {
         const itemIndex = parseInt(e.currentTarget.dataset.resendIndex);
         const item = this.data.chatItems[itemIndex];
-        this.UI.updateDataWhenStartSending(item, false);
+        this.UI.updateDataWhenStartSending(item, false, false);
         this.sendMsg(IMOperator.createChatItemContent({
             type: item.type,
             content: item.content,
             duration: item.voiceDuration
-        }), itemIndex);
+        }), itemIndex, () => {
+
+            this.UI.updateListViewBySort();
+        });
     },
 });

@@ -15,8 +15,8 @@ export default class UI {
     updateViewWhenReceive(msg) {
         this._page.data.chatItems.push(msg);
         this._page.setData({
-            chatItems: this._page.data.chatItems.sort(this._sortMsgsByTimestamp),
-            scrollTopVal: this._page.data.scrollTopVal + 999,
+            chatItems: this._page.data.chatItems.sort(UI._sortMsgListByTimestamp),
+            scrollTopVal: this._page.data.chatItems.length * 999,
         });
     }
 
@@ -35,18 +35,23 @@ export default class UI {
      * 设置消息发送状态为 发送中
      * @param sendMsg
      * @param addToArr
+     * @param needScroll
      */
-    updateDataWhenStartSending(sendMsg, addToArr = true) {
+    updateDataWhenStartSending(sendMsg, addToArr = true, needScroll = true) {
         chatInput.closeExtraView();
         sendMsg.sendStatus = 'sending';
         addToArr && this._page.data.chatItems.push(sendMsg);
-        this._page.setData({
-            textMessage: "",
-            chatItems: this._page.data.chatItems.sort(this._sortMsgsByTimestamp),
-            scrollTopVal: this._page.data.scrollTopVal + 999,
-        });
+        let obj = {};
+        obj['textMessage'] = '';
+        obj['chatItems'] = this._page.data.chatItems;
+        needScroll && (obj['scrollTopVal'] = this._page.data.chatItems.length * 999);
+        this._page.setData(obj);
     }
 
+    // wx.pageScrollTo({
+    //                     scrollTop: 0,
+    //                     duration: 300
+    //                 })
     /**
      * 设置消息发送状态为 发送成功
      * @param sendMsg
@@ -58,7 +63,12 @@ export default class UI {
         let item = that.data.chatItems[itemIndex];
         item.timeStamp = sendMsg.timeStamp;
         this.updateSendStatusView('success', itemIndex);
+    }
 
+    updateListViewBySort() {
+        this._page.setData({
+            chatItems: this._page.data.chatItems.sort(UI._sortMsgListByTimestamp)
+        })
     }
 
     /**
@@ -74,7 +84,6 @@ export default class UI {
         that.data.chatItems[itemIndex].sendStatus = status;
         let obj = {};
         obj[`chatItems[${itemIndex}].sendStatus`] = status;
-        obj['scrollTopVal'] = that.data.scrollTopVal + 999;
         that.setData(obj);
     }
 
@@ -85,7 +94,7 @@ export default class UI {
         })
     }
 
-    _sortMsgsByTimestamp(timestamp1, timestamp2) {
-        return timestamp2 - timestamp1;
+    static _sortMsgListByTimestamp(item1, item2) {
+        return item1.timestamp - item2.timestamp;
     }
 }
