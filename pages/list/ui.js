@@ -48,10 +48,6 @@ export default class UI {
         this._page.setData(obj);
     }
 
-    // wx.pageScrollTo({
-    //                     scrollTop: 0,
-    //                     duration: 300
-    //                 })
     /**
      * 设置消息发送状态为 发送成功
      * @param sendMsg
