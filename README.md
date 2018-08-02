@@ -67,10 +67,8 @@
 ### 集成
 
 #### 一、导入SDK相关文件
-![SDK所有文件](http://img.blog.csdn.net/20171107170921077?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvc2luYXRfMjc2MTIxNDc=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast)
 
-
-导入SDK时一定要用图中所示的路径，不然的话你就自己挨个修改wxml和wxss里面的文件路径哈。
+输入组件相关文件在`modules/chat-input`和`image`文件夹下，示例页面是`pages/chat/chat`。
 
 <font color=red>聊天输入组件和聊天列表组件所有你需要集成的文件，打包后大小在65kb左右，已经很小了。需要注意的是，项目中的`.gif`文件夹是很多大的效果图，这个可以删除掉。`image`文件夹中有两张用于测试的用户头像，也可以删除掉。</font>。
 
@@ -206,13 +204,13 @@ chatInput.setExtraButtonClickListener(function (dismiss) {
 
 ## 聊天列表UI
 
-对于聊天列表，我将UI封装成了多个`template`，最后使用`chat-item.wxml`即可，UI相关的代码都放到了`chat-list`文件夹中；加载方面的UI放到了`loading`文件夹中；`image`文件夹中也新增了几张图片。
+聊天列表，我将UI封装成了多个`template`，最后使用`chat-item.wxml`即可，UI相关的代码都放到了`chat-list`文件夹中；加载方面的UI放到了`loading`文件夹中；`image`文件夹中也新增了几张图片。
 
 对于即时通讯方面的sdk，我是用`setTimeout`来模拟的。你可以引入常见的sdk，比如腾讯的、网易的。当然你也可以使用webSocket来自己实现。
 
 这部分的东西写完之后发现，并没有很多难点，所以我只说下集成时要注意的几点。
 
-### 示例文件
+### 示例页面
 
 示例页面是`pages/list/list`，可以在微信开发工具直接打开。
 
