@@ -38,7 +38,9 @@
 ### 整体效果图（加载有些慢）
 我们先来看下效果 (现在已经重新录制了动图，但因录制软件问题，图中的一些按钮的变色了，线条也少了很多像素。。。)
 
-<img src="https://github.com/unmagic/wechat-im/blob/master/.gif/发送图片和图片预览.gif" width="30%" alt=""/><img src="https://github.com/unmagic/wechat-im/blob/master/.gif/消息重发和发送自定义消息.gif" width="30%" alt=""/><img src="https://github.com/unmagic/wechat-im/blob/master/.gif/语音.gif" width="30%" alt=""/>
+<img src="https://github.com/unmagic/wechat-im/blob/master/.gif/发送图片和图片预览.gif" width="30%" alt="发送图片和图片预览"/>
+<img src="https://github.com/unmagic/wechat-im/blob/master/.gif/消息重发和发送自定义消息.gif" width="30%" alt="消息重发和发送自定义消息"/>
+<img src="https://github.com/unmagic/wechat-im/blob/master/.gif/语音.gif" width="30%" alt="发送语音消息"/>
 
 ## 聊天输入组件
 
@@ -200,8 +202,7 @@ chatInput.setExtraButtonClickListener(function (dismiss) {
 
 ## 聊天列表UI
 
-![聊天列表相关文件](https://img-blog.csdn.net/20180731171922957?watermark/2/text/aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3NpbmF0XzI3NjEyMTQ3/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70)
-关于聊天列表，我将UI封装成了多个`template`，最后统一使用`chat-item.wxml`，放到了`chat-list`中；加载方面的UI放到了`loading`文件夹中；也新增了几张图片。
+对于聊天列表，我将UI封装成了多个`template`，最后使用`chat-item.wxml`即可，UI相关的代码都放到了`chat-list`文件夹中；加载方面的UI放到了`loading`文件夹中；`image`文件夹中也新增了几张图片。
 
 对于即时通讯方面的sdk，我是用`setTimeout`来模拟的。你可以引入常见的sdk，比如腾讯的、网易的。当然你也可以使用webSocket来自己实现。
 
@@ -470,8 +471,67 @@ export default class VoiceManager {
 }
 
 ```
-对于微信我也是无话可说，接口动不动就废弃。小程序基础库1.6.0以后不再维护的语音播放和录制接口，我进行了兼容处理。
+对于微信我也是无话可说，接口动不动就废弃或是不维护了。小程序基础库1.6.0以后不再维护的语音播放和录制接口，我进行了兼容处理。
 图片类型的管理类与语音类型，就不上代码了。
+最后我创建一个管理类，来统一管理所有消息类型的收发。见`msg-manager.js`：
+
+```
+import VoiceManager from "./msg-type/voice-manager";
+import TextManager from "./msg-type/text-manager";
+import ImageManager from "./msg-type/image-manager";
+import IMOperator from "./im-operator";
+import CustomManager from "./msg-type/custom-manager";
+
+export default class MsgManager {
+    constructor(page) {
+        this.voiceManager = new VoiceManager(page);
+        this.textManager = new TextManager(page);
+        this.imageManager = new ImageManager(page);
+        this.customManager = new CustomManager(page);
+    }
+
+    showMsg({msg}) {
+        let tempManager = null;
+        switch (msg.type) {
+            case IMOperator.VoiceType:
+                tempManager = this.voiceManager;
+                break;
+            case IMOperator.ImageType:
+                tempManager = this.imageManager;
+                break;
+            case IMOperator.TextType:
+            case IMOperator.CustomType:
+                tempManager = this.textManager;
+        }
+        tempManager.showMsg({msg});
+    }
+
+    sendMsg({type = IMOperator.TextType, content, duration}) {
+        let tempManager = null;
+        switch (type) {
+            case IMOperator.VoiceType:
+                tempManager = this.voiceManager;
+                break;
+            case IMOperator.ImageType:
+                tempManager = this.imageManager;
+                break;
+            case IMOperator.CustomType:
+                tempManager = this.customManager;
+                break;
+            case IMOperator.TextType:
+                tempManager = this.textManager;
+        }
+        tempManager.sendOneMsg(content, duration);
+    }
+
+    stopAllVoice() {
+        this.voiceManager.stopAllVoicePlay();
+    }
+}
+```
+
+
+
 
 ### 缓存机制和文件类型消息的展示机制
 - 缓存和展示机制：在展示语音或图片类型的消息时，我会优先加载已经存储在本地的文件。可以看到`showMsg()`方法中先是取`const localVoicePath = FileManager.get(msg)`，来获取本地路径。
