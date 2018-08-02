@@ -35,17 +35,20 @@
 - 如果要使用群聊，目前的UI中，头像旁并没有展示成员昵称。
 - 没有在本地存储聊天记录。这个原因请看文章结尾。
 
+### 整体效果图（加载有些慢）
+我们先来看下效果 (现在已经重新录制了动图，但因录制软件问题，图中的一些按钮的变色了，线条也少了很多像素。。。)
+
+<img src="https://github.com/unmagic/wechat-im/blob/master/.gif/发送图片和图片预览.gif" width="40%" alt=""/>
+<img src="https://github.com/unmagic/wechat-im/blob/master/.gif/消息重发和发送自定义消息.gif" width="40%" alt=""/>
+<img src="https://github.com/unmagic/wechat-im/blob/master/.gif/语音.gif" width="40%" alt=""/>
 
 ## 聊天输入组件
 
 近期一直在做微信小程序，业务上要求在小程序里实现即时通讯的功能。这部分功能需要用到文本和语音输入及一些语音相关的手势操作。所以我写了一个控件来处理这些操作。
 
 ### 控件样式
-![文本语音输入控件](http://img.blog.csdn.net/20171107101340228?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvc2luYXRfMjc2MTIxNDc=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast)
+<img src="https://github.com/unmagic/wechat-im/blob/master/.gif/输入组件样式图.png" width="40%" alt=""/>
 
-我们先来看下效果 (现在已经重新录制了动图，但因录制软件问题，图中的一些按钮的变色了，线条也少了很多像素。。。)
-<img src="https://github.com/unmagic/wechat-im/blob/master/.gif/发送图片和图片预览.gif" width="60%" alt=""/>
- 
 目前的功能就是动态图中展示的，我们可以使用这个控件来切换输入方式（文本或语音）、获取到输入的信息、取消语音输入、语音消息录制过短过长的判断（该接口暂时还未开放），支持发送图片和其他自定义拓展内容。（语音和图片发送失败是因为小程序新版模拟器的问题，真机上没事）。
 
 **<font color="red">注意：本文所讲的SDK中不包含列表的展示部分及发送状态部分，SDK只测试过微信基础库1.4.0及以上版本。</font>**
