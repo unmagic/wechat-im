@@ -156,8 +156,7 @@ Page({
             type: item.type,
             content: item.content,
             duration: item.voiceDuration
-        }), itemIndex, () => {
-
+        }), itemIndex, (msg) => {
             this.UI.updateListViewBySort();
         });
     },

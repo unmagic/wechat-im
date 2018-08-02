@@ -57,7 +57,7 @@ export default class UI {
         console.log('发送成功', sendMsg);
         let that = this._page;
         let item = that.data.chatItems[itemIndex];
-        item.timeStamp = sendMsg.timeStamp;
+        item.timestamp = sendMsg.timestamp;
         this.updateSendStatusView('success', itemIndex);
     }
 
