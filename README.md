@@ -38,8 +38,7 @@
 ### 整体效果图（加载有些慢）
 我们先来看下效果 (现在已经重新录制了动图，但因录制软件问题，图中的一些按钮的变色了，线条也少了很多像素。。。)
 
-<img src="https://github.com/unmagic/wechat-im/blob/master/.gif/发送图片和图片预览.gif" width="30%" alt="发送图片和图片预览"/>
-<img src="https://github.com/unmagic/wechat-im/blob/master/.gif/消息重发和发送自定义消息.gif" width="30%" alt="消息重发和发送自定义消息"/>
+<img src="https://github.com/unmagic/wechat-im/blob/master/.gif/发送图片和图片预览.gif" width="30%" alt="发送图片和图片预览"/>        <img src="https://github.com/unmagic/wechat-im/blob/master/.gif/消息重发和发送自定义消息.gif" width="30%" alt="消息重发和发送自定义消息"/>
 <img src="https://github.com/unmagic/wechat-im/blob/master/.gif/语音.gif" width="30%" alt="发送语音消息"/>
 
 ## 聊天输入组件
