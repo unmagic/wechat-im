@@ -25,7 +25,7 @@
                   bindtap="chatVoiceItemClickEvent"
                   data-voice-path="{{content}}"
                   data-voice-duration="{{voiceDuration}}"
-                  data-is-send="{{isMy}}"
+                  data-is-my="{{isMy}}"
                   data-index="{{index}}">
                 <template is="voice-item" data="{{isMy:isMy,isPlaying:isPlaying}}"/>
             </view>
