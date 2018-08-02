@@ -18,6 +18,8 @@
 - [x] 支持语音播放及播放动画。
 - [x] 支持配置录制语音的最短及最长时间。
 - [x] 支持配置自定义事件。
+- [x] 支持聊天消息按时间逆向排序。
+- [x] 支持发送消息后，页面回弹到最底部。
 - [x] 使用了最新的语音播放接口，同时兼容了低版本的语音播放接口。
 - [x] 消息发送中、发送成功、发送失败的状态更新
 - [x] 支持消息发送失败情况下，点击重发按钮重新发送
@@ -26,6 +28,8 @@
 - [x] 自定义功能，显示自定义气泡。
 - [x] 通过解析语音或图片消息信息，优先读取本地文件。
 - [x] 实现了文件存储算法，保证10M存储空间内的语音和图片文件均为最新。
+- [x] 各消息类型和各功能均已模块化，让你在浏览代码时愉悦轻松。（其实这算不上组件特性。。。）
+- 注意：内部现使用延迟函数模拟im-sdk消息收发功能，并没有集成真实的im-sdk，将来考虑集成webSocket。
 - 目前未实现功能：如果要使用群聊，目前的UI中，头像旁并没有展示成员昵称。
 
 ## 聊天输入组件
@@ -208,7 +212,7 @@ chatInput.setExtraButtonClickListener(function (dismiss) {
 先看个最简单的，文本类型消息的收发和展示`text-manager.js`：
 
 ```
-import IMOperator from "./im-operator";
+import IMOperator from "../im-operator";
 
 export default class TextManager {
     constructor(page) {
@@ -228,7 +232,7 @@ export default class TextManager {
      * 发送消息时，通过UI类来管理发送状态的切换和消息的渲染
      * @param content 输入组件获取到的原始文本信息
      */
-    sendText({content}) {
+    sendOneMsg(content) {
         this._page.UI.showItemForMoment(this._page.imOperator.createNormalChatItem({
             type: IMOperator.TextType,
             content
@@ -242,10 +246,10 @@ export default class TextManager {
 再来看个比较复杂的，语音消息的收发和展示`voice-manager.js`:
 
 ```
-import {isVoiceRecordUseLatestVersion} from "../../modules/chat-input/chat-input";
-import {saveFileRule} from "../../utils/file";
-import IMOperator from "./im-operator";
-import FileManager from "./file-manager";
+import {isVoiceRecordUseLatestVersion} from "../../../modules/chat-input/chat-input";
+import {saveFileRule} from "../../../utils/file";
+import IMOperator from "../im-operator";
+import FileManager from "../file-manager";
 
 export default class VoiceManager {
     constructor(page) {
@@ -268,7 +272,7 @@ export default class VoiceManager {
      * @param tempFilePath 由输入组件接收到的临时文件路径
      * @param duration 由输入组件接收到的录音时间
      */
-    sendVoice({tempFilePath, duration}) {
+    sendOneMsg(tempFilePath, duration) {
         saveFileRule(tempFilePath, (savedFilePath) => {
             const temp = this._page.imOperator.createNormalChatItem({
                 type: IMOperator.VoiceType,
@@ -533,8 +537,8 @@ function saveFileRule(tempFilePath, cbOk, cbError) {
 ### IM模拟类 `im-operator.js`
 最后重点说下IM的模拟类 IMOperator。
 
-#### 生成发送数据的文本
-<font color=red>记住，你所有发送的消息，都是以文本消息的形式发出的，只是在渲染的时候解析，生成不同的消息类型来展示！！！</font>
+#### 生成发送的数据的文本
+<font color=red>记住，你所有发送的消息和接收到的消息，都是以文本消息的形式，只是在渲染的时候解析，生成不同的消息类型来展示！！！</font>
 
 ```
  static createChatItemContent({type = IMOperator.TextType, content = '', duration} = {}) {
@@ -550,6 +554,7 @@ function saveFileRule(tempFilePath, cbOk, cbError) {
 - duration: 语音时长。如果是语音类型，则需要传这个字段。
 
 #### 生成消息对象
+除自定义消息类型外，其他的无论是自己发送的消息，还是好友的消息，在UI上渲染时，都是以该消息对象的格式来统一的。
 
 ```
 createNormalChatItem({type = IMOperator.TextType, content = '', isMy = true, duration} = {}) {
@@ -557,22 +562,21 @@ createNormalChatItem({type = IMOperator.TextType, content = '', isMy = true, dur
         const currentTimestamp = Date.now();
         const time = dealChatTime(currentTimestamp, this._latestTImestamp);
         let obj = {
-            msgId: 0,
-            friendId: 0,
-            isMy: isMy,
+            msgId: 0,//消息id
+            friendId: 0,//好友id
+            isMy: isMy,//我发送的消息？
             showTime: time.ifShowTime,//是否显示该次发送时间
             time: time.timeStr,//发送时间 如 09:15,
             timestamp: currentTimestamp,//该条数据的时间戳，一般用于排序
-            type: type,//内容的类型，目前有这几种类型： text/voice/image/custom | 文本/语音/图片/自定义
+            type: type,//内容的类型，目前有这几种类型： TextType/VoiceType/ImageType/CustomType | 文本/语音/图片/自定义
             content: content,// 显示的内容，根据不同的类型，在这里填充不同的信息。
-            headUrl: isMy ? this._myHeadUrl : this._otherHeadUrl,//显示的头像，你可以填充不同的头像，来满足群聊的需求
+            headUrl: isMy ? this._myHeadUrl : this._otherHeadUrl,//显示的头像，自己或好友的。
             sendStatus: 'success',//发送状态，目前有这几种状态：sending/success/failed | 发送中/发送成功/发送失败
             voiceDuration: duration,//语音时长 单位秒
             isPlaying: false,//语音是否正在播放
         };
-        obj.saveKey = obj.friendId + '_' + obj.msgId;
+        obj.saveKey = obj.friendId + '_' + obj.msgId;//saveKey是存储文件时的key
         return obj;
-
     }
 ```
 - type：消息类型 
@@ -580,7 +584,21 @@ createNormalChatItem({type = IMOperator.TextType, content = '', isMy = true, dur
 - isMy：是否是我自己的消息。
 - duration：语音时长。如果是语音类型，则需要传这个字段。
 
+#### 生成自定义消息类型对象
+自定义消息类型的UI类似于聊天列表中的展示聊天时间的UI。
+
+```
+static createCustomChatItem() {
+        return {
+            timestamp: Date.now(),
+            type: IMOperator.CustomType,
+            content: '会话已关闭'
+        }
+    }
+```
+
 #### 发送数据接口 
+这里是模拟的数据发送。我计划将来集成webSocket，实现完整的一套小程序IM体系，这部分还在研究。
 
 ```
 onSimulateSendMsg({content, success, fail}) {
@@ -614,9 +632,11 @@ onSimulateSendMsg({content, success, fail}) {
     }
 ```
 
-- content：这里的content是一个JSON格式的字符串，类似于：{"content":"233","type":"text"}，是由该类中`createChatItemContent`方法生成的
-- success：发送成功回调，我这里返回了`createNormalChatItem`生成的消息对象，模拟发送成功后IMSDK返回的消息对象。
+- content：这里的content是一个JSON格式的字符串，类似于：{"content":"233","type":"text"}，是由该类中`createChatItemContent`方法生成的，在发送消息时，必须使用该方法来生成`content`。
+- success：发送成功回调，我这里返回了`createNormalChatItem`生成的消息对象，模拟发送成功后IM-SDK返回的消息对象。
 - fail：发送失败回调，你可以自行传参。
+
+
 
 #### 接收数据接口 
 
@@ -627,20 +647,21 @@ onSimulateReceiveMsg(cbOk) {
 ```
 - cbOk：接收到消息的回调，这里我也是模拟的，返回了由`this.createNormalChatItem({type: 'text', content: '这是模拟好友回复的消息', isMy: false})`生成的消息对象
 
-### 生成自定义消息类型对象
-自定义消息类型的UI类似于聊天列表中的展示聊天时间的UI。
+在上面`发送数据接口`代码中可以看到，在接收到数据时，先使用`createNormalChatItem`来生成消息类型数据，然后回调`onSimulateReceiveMsgCb`函数，即可完成数据的接收。
 
-```
-static createCustomChatItem() {
-        return {
-            timestamp: Date.now(),
-            type: IMOperator.CustomType,
-            content: '会话已关闭'
-        }
-    }
-```
+#### 渲染消息列表
+
+我使用`chatItems`来存储所有的消息类型，包括自定义消息类型。
+布局怎么写的我就不讲了，有关UI渲染的代码，我全部放在了`ui.js`中，自己去看下吧，也都很简单。
 
 
+#### 配合使用输入组件。
+
+最上面说的输入组件，有各种情况下的事件回调，在回调函数中处理对应逻辑即可。这部分的所有代码我都放到了`list.js`中。
+
+### 最后说两句
+
+ 
 
 
 github地址https://github.com/unmagic/wechat-im
