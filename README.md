@@ -673,6 +673,19 @@ static createCustomChatItem() {
 #### 发送数据接口 
 这里是模拟的数据发送。我计划将来集成webSocket，实现完整的一套小程序IM体系，这部分还在研究。
 
+首先，我在`list.js`中先初始化了`this.msgManager = new MsgManager(this);`
+
+然后在输入组件的录音监听回调接口中调用`this.msgManager`的发送方法`sendMsg()`
+
+```
+chatInput.recordVoiceListener((res, duration) => {
+            let tempFilePath = res.tempFilePath;
+            //type：消息类型，content：消息内容，是普通的字符串，duration：语音时长。如果是语音类型的话，需要传这个参数
+            this.msgManager.sendMsg({type: IMOperator.VoiceType, content: tempFilePath, duration});
+        });
+```
+在`sendMsg`方法中会去判断发送的消息类型，最终都会调用下面的IM模拟发送接口。
+
 ```
 onSimulateSendMsg({content, success, fail}) {
         //这里content即为要发送的数据
@@ -709,9 +722,12 @@ onSimulateSendMsg({content, success, fail}) {
 - success：发送成功回调，我这里返回了`createNormalChatItem`生成的消息对象，模拟发送成功后IM-SDK返回的消息对象。
 - fail：发送失败回调，你可以自行传参。
 
-
+其他消息的发送方式都是与之类似的。
 
 #### 接收数据接口 
+很多人问我，消息是怎么接收到的了，如果你问的是业务层的，那这是IM-SDK负责的事情，需要你自己去看你使用的IM-SDK文档。而现在我写的这个组件的IM业务层是使用延迟函数来模拟的！！所以不要再问我怎么接收数据了。
+
+如果你问的是视图层的，那你可以看下下面的调用方法。
 
 ```
 onSimulateReceiveMsg(cbOk) {
@@ -721,6 +737,28 @@ onSimulateReceiveMsg(cbOk) {
 - cbOk：接收到消息的回调，这里我也是模拟的，返回了由`this.createNormalChatItem({type: 'text', content: '这是模拟好友回复的消息', isMy: false})`生成的消息对象
 
 在上面`发送数据接口`代码中可以看到，在接收到数据时，先使用`createNormalChatItem`来生成消息类型数据，然后回调`onSimulateReceiveMsgCb`函数，即可完成数据的接收。
+
+我是在`list.js`的`onLoad`生命周期中注册的监听：
+
+```
+ onLoad: function (options) {
+        this.initData();
+        wx.setNavigationBarTitle({
+            title: '呵呵哒的好朋友'
+        });
+        this.imOperator = new IMOperator(this);
+        this.UI = new UI(this);
+        this.msgManager = new MsgManager(this);
+
+        this.imOperator.onSimulateReceiveMsg((msg) => {
+            //执行到这步时，好友的消息早已经接收到并生成了消息类型数据msg，接下来要做的就是将数据渲染到页面上了
+            //showMsg()是用于渲染消息类型数据的。
+            this.msgManager.showMsg({msg})
+        });
+        this.UI.updateChatStatus('正在聊天中...');
+    },
+```
+
 
 #### 渲染消息列表
 
