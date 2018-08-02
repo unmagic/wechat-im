@@ -1,7 +1,7 @@
-import {isVoiceRecordUseLatestVersion} from "../../modules/chat-input/chat-input";
-import {saveFileRule} from "../../utils/file";
-import IMOperator from "./im-operator";
-import FileManager from "./file-manager";
+import {isVoiceRecordUseLatestVersion} from "../../../modules/chat-input/chat-input";
+import {saveFileRule} from "../../../utils/file";
+import IMOperator from "../im-operator";
+import FileManager from "../file-manager";
 
 export default class VoiceManager {
     constructor(page) {

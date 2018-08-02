@@ -1,6 +1,6 @@
-import {saveFileRule} from "../../utils/file";
-import IMOperator from "./im-operator";
-import FileManager from "./file-manager";
+import {saveFileRule} from "../../../utils/file";
+import IMOperator from "../im-operator";
+import FileManager from "../file-manager";
 
 export default class ImageManager {
     constructor(page) {
@@ -13,11 +13,11 @@ export default class ImageManager {
         }
     }
 
-    sendImage({itemIndex}) {
+    sendImage({chooseIndex}) {
         wx.chooseImage({
             count: 1, // 默认9
             sizeType: ['compressed'],
-            sourceType: itemIndex === 0 ? ['album'] : ['camera'],
+            sourceType: chooseIndex === 0 ? ['album'] : ['camera'],
             success: (res) => {
                 saveFileRule(res.tempFilePaths[0], (savedFilePath) => {
                     const temp = this._page.imOperator.createNormalChatItem({

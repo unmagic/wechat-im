@@ -1,11 +1,10 @@
 // pages/list/list.js
 import * as chatInput from "../../modules/chat-input/chat-input";
-import {saveFileRule} from "../../utils/file";
 import IMOperator from "./im-operator";
-import VoiceManager from "./voice-manager";
+import VoiceManager from "./msg-type/voice-manager";
 import UI from "./ui";
-import TextManager from "./text-manager";
-import ImageManager from "./image-manager";
+import TextManager from "./msg-type/text-manager";
+import ImageManager from "./msg-type/image-manager";
 
 Page({
 
@@ -32,9 +31,7 @@ Page({
         });
         this.imOperator = new IMOperator(this);
         this.UI = new UI(this);
-        this.voiceManager = new VoiceManager(this);
-        this.textManager = new TextManager(this);
-        this.imageManager = new ImageManager(this);
+
 
         this.imOperator.onSimulateReceiveMsg((msg) => {
             let tempManager = null;
@@ -114,12 +111,12 @@ Page({
     extraButton: function () {
         let that = this;
         chatInput.clickExtraListener((e) => {
-            let itemIndex = parseInt(e.currentTarget.dataset.index);
-            if (itemIndex === 2) {
+            let chooseIndex = parseInt(e.currentTarget.dataset.index);
+            if (chooseIndex === 2) {
                 that.myFun();
                 return;
             }
-            this.imageManager.sendImage({itemIndex})
+            this.imageManager.sendImage({chooseIndex})
 
         });
     },

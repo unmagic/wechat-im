@@ -1,4 +1,4 @@
-import IMOperator from "./im-operator";
+import IMOperator from "../im-operator";
 
 export default class TextManager {
     constructor(page) {
