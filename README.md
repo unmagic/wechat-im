@@ -1,8 +1,9 @@
 # wechat-im
 ### 微信小程序即时通讯组件
-#### 如果看不到图片 请看 http://blog.csdn.net/sinat_27612147/article/details/78456363
 
 开发这个项目付出了我很多心血，如果对你有帮助和启发的话，希望在`GitHub`上给个`star`！也是对我工作的支持和肯定！
+
+#### 如果看不到图片 请看 http://blog.csdn.net/sinat_27612147/article/details/78456363
 
 # 小程序即时通讯——文本、语音输入控件（一）集成
 
