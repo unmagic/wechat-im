@@ -1,6 +1,6 @@
 import IMOperator from "../im-operator";
 
-export default class TextManager {
+export default class CustomManager {
     constructor(page) {
         this._page = page;
     }
@@ -16,14 +16,15 @@ export default class TextManager {
 
     /**
      * 发送消息时，通过UI类来管理发送状态的切换和消息的渲染
-     * @param content 输入组件获取到的原始文本信息
      */
-    sendOneMsg(content) {
-        this._page.UI.showItemForMoment(this._page.imOperator.createNormalChatItem({
-            type: IMOperator.TextType,
-            content
-        }), (itemIndex) => {
-            this._page.sendMsg(IMOperator.createChatItemContent({type: IMOperator.TextType, content}), itemIndex);
+    sendOneMsg() {
+        const temp = IMOperator.createCustomChatItem();
+        this._page.UI.showItemForMoment(temp, (itemIndex) => {
+            this._page.sendMsg(IMOperator.createChatItemContent({
+                type: IMOperator.CustomType,
+                content: temp.content
+            }), itemIndex);
+            this._page.UI.updateChatStatus('会话已关闭', false);
         });
     }
 }

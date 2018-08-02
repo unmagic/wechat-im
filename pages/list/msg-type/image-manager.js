@@ -13,31 +13,25 @@ export default class ImageManager {
         }
     }
 
-    sendImage({chooseIndex}) {
-        wx.chooseImage({
-            count: 1, // 默认9
-            sizeType: ['compressed'],
-            sourceType: chooseIndex === 0 ? ['album'] : ['camera'],
-            success: (res) => {
-                saveFileRule(res.tempFilePaths[0], (savedFilePath) => {
-                    const temp = this._page.imOperator.createNormalChatItem({
+    sendOneMsg(tempFilePath) {
+        saveFileRule(tempFilePath, (savedFilePath) => {
+            const temp = this._page.imOperator.createNormalChatItem({
+                type: IMOperator.ImageType,
+                content: savedFilePath
+            });
+            this._page.UI.showItemForMoment(temp, (itemIndex) => {
+                this._page.simulateUploadFile({savedFilePath, itemIndex}, (content) => {
+                    this._page.sendMsg(IMOperator.createChatItemContent({
                         type: IMOperator.ImageType,
-                        content: savedFilePath
-                    });
-                    this._page.UI.showItemForMoment(temp, (itemIndex) => {
-                        this._page.simulateUploadFile({savedFilePath, itemIndex}, (content) => {
-                            this._page.sendMsg(IMOperator.createChatItemContent({
-                                type: IMOperator.ImageType,
-                                content
-                            }), itemIndex, (msg) => {
-                                FileManager.set(msg, savedFilePath)
-                            });
-                        });
+                        content
+                    }), itemIndex, (msg) => {
+                        FileManager.set(msg, savedFilePath)
                     });
                 });
-            }
+            });
         });
     }
+
     /**
      * 接收到消息时，通过UI类的管理进行渲染
      * @param msg 接收到的消息，这个对象应是由 im-operator.js 中的createNormalChatItem()方法生成的。

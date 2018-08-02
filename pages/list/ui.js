@@ -15,7 +15,7 @@ export default class UI {
     updateViewWhenReceive(msg) {
         this._page.data.chatItems.push(msg);
         this._page.setData({
-            chatItems: this._page.data.chatItems,
+            chatItems: this._page.data.chatItems.sort(this._sortMsgsByTimestamp),
             scrollTopVal: this._page.data.scrollTopVal + 999,
         });
     }
@@ -42,7 +42,7 @@ export default class UI {
         addToArr && this._page.data.chatItems.push(sendMsg);
         this._page.setData({
             textMessage: "",
-            chatItems: this._page.data.chatItems,
+            chatItems: this._page.data.chatItems.sort(this._sortMsgsByTimestamp),
             scrollTopVal: this._page.data.scrollTopVal + 999,
         });
     }
@@ -83,5 +83,9 @@ export default class UI {
             chatStatue: open ? 'open' : 'close',
             chatStatusContent: content
         })
+    }
+
+    _sortMsgsByTimestamp(timestamp1, timestamp2) {
+        return timestamp2 - timestamp1;
     }
 }

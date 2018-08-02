@@ -1,10 +1,8 @@
 // pages/list/list.js
 import * as chatInput from "../../modules/chat-input/chat-input";
 import IMOperator from "./im-operator";
-import VoiceManager from "./msg-type/voice-manager";
 import UI from "./ui";
-import TextManager from "./msg-type/text-manager";
-import ImageManager from "./msg-type/image-manager";
+import MsgManager from "./msg-manager";
 
 Page({
 
@@ -14,8 +12,6 @@ Page({
     data: {
         textMessage: '',
         chatItems: [],
-        my: {},
-        other: {},
         latestPlayVoicePath: '',
         isAndroid: true,
         chatStatue: 'open'
@@ -31,22 +27,10 @@ Page({
         });
         this.imOperator = new IMOperator(this);
         this.UI = new UI(this);
-
+        this.msgManager = new MsgManager(this);
 
         this.imOperator.onSimulateReceiveMsg((msg) => {
-            let tempManager = null;
-            switch (msg.type) {
-                case IMOperator.VoiceType:
-                    tempManager = this.voiceManager;
-                    break;
-                case IMOperator.ImageType:
-                    tempManager = this.imageManager;
-                    break;
-                case IMOperator.TextType:
-                case IMOperator.CustomType:
-                    tempManager = this.textManager;
-            }
-            tempManager.showMsg({msg});
+            this.msgManager.showMsg({msg})
         });
         this.UI.updateChatStatus('正在聊天中...');
     },
@@ -88,16 +72,16 @@ Page({
     textButton: function () {
         chatInput.setTextMessageListener((e) => {
             let content = e.detail.value;
-            this.textManager.sendText({content});
+            this.msgManager.sendMsg({type: IMOperator.TextType, content});
         });
     },
     voiceButton: function () {
         chatInput.recordVoiceListener((res, duration) => {
             let tempFilePath = res.tempFilePath;
-            this.voiceManager.sendVoice({tempFilePath, duration});
+            this.msgManager.sendMsg({type: IMOperator.VoiceType, content: tempFilePath, duration});
         });
         chatInput.setVoiceRecordStatusListener((status) => {
-            this.voiceManager.stopAllVoicePlay();
+            this.msgManager.stopAllVoice();
         })
     },
 
@@ -116,7 +100,14 @@ Page({
                 that.myFun();
                 return;
             }
-            this.imageManager.sendImage({chooseIndex})
+            wx.chooseImage({
+                count: 1, // 默认9
+                sizeType: ['compressed'],
+                sourceType: chooseIndex === 0 ? ['album'] : ['camera'],
+                success: (res) => {
+                    this.msgManager.sendMsg({type: IMOperator.ImageType, content: res.tempFilePaths[0]})
+                }
+            });
 
         });
     },
@@ -131,14 +122,7 @@ Page({
             showCancel: true,
             success: (res) => {
                 if (res.confirm) {
-                    const temp = IMOperator.createCustomChatItem();
-                    this.UI.showItemForMoment(temp, (itemIndex) => {
-                        this.sendMsg(IMOperator.createChatItemContent({
-                            type: IMOperator.CustomType,
-                            content: temp.content
-                        }), itemIndex);
-                        this.UI.updateChatStatus('会话已关闭', false);
-                    });
+                    this.msgManager.sendMsg({type: IMOperator.CustomType})
                 }
             }
         })

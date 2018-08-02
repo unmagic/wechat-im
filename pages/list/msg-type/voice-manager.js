@@ -24,7 +24,7 @@ export default class VoiceManager {
      * @param tempFilePath 由输入组件接收到的临时文件路径
      * @param duration 由输入组件接收到的录音时间
      */
-    sendVoice({tempFilePath, duration}) {
+    sendOneMsg(tempFilePath, duration) {
         saveFileRule(tempFilePath, (savedFilePath) => {
             const temp = this._page.imOperator.createNormalChatItem({
                 type: IMOperator.VoiceType,
