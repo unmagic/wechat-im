@@ -1,12 +1,14 @@
 {
-  "pages":[
+  "pages": [
     "pages/chat/chat",
-    "pages/chat-input/chat-input"
+    "pages/chat-input/chat-input",
+    "pages/chat-list/chat-list",
+    "pages/friends/friends"
   ],
-  "window":{
-    "backgroundTextStyle":"light",
+  "window": {
+    "backgroundTextStyle": "light",
     "navigationBarBackgroundColor": "#fff",
     "navigationBarTitleText": "WeChat",
-    "navigationBarTextStyle":"black"
+    "navigationBarTextStyle": "black"
   }
 }
