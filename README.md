@@ -9,7 +9,7 @@
 
 转载请注明出处：https://blog.csdn.net/sinat_27612147/article/details/78456363
 
-<font color=red>2018-08-02 作者公告：现在拥有聊天列表UI的项目已经在当前的github仓库中更新了！！！模块拆分工作也已完成，大家可以在master分支上预览。如需了解聊天列表集成方式，请见下方聊天列表UI部分。</font>
+<font color=red>2018-08-02 作者公告：现在拥有聊天页面UI的项目已经在当前的github仓库中更新了！！！模块拆分工作也已完成，大家可以在master分支上预览。如需了解聊天页面集成方式，请见下方聊天页面UI部分。</font>
 
 ## 聊天UI组件功能：
 
@@ -46,7 +46,7 @@
 ## 聊天输入组件
 
 近期一直在做微信小程序，业务上要求在小程序里实现即时通讯的功能。这部分功能需要用到文本和语音输入及一些语音相关的手势操作。所以我写了一个控件来处理这些操作。
-聊天输入组件和聊天列表组件是两个不同的组件，分别处理不同的业务。
+聊天输入组件和聊天页面组件是两个不同的组件，分别处理不同的业务。
 
 ### 控件样式
 <img src="https://github.com/unmagic/wechat-im/blob/master/.gif/输入组件样式图.png" width="40%" alt=""/>
@@ -71,7 +71,7 @@
 
 输入组件相关文件在`modules/chat-input`和`image`文件夹下，示例页面是`pages/chat-input/chat-input`。
 
-<font color=red>聊天输入组件和聊天列表组件所有你需要集成的文件，打包后大小在65kb左右，已经很小了。需要注意的是，项目中的`.gif`文件夹是很多大的效果图，这个可以删除掉。`image`文件夹中有两张用于测试的用户头像，也可以删除掉。</font>。
+<font color=red>聊天输入组件和聊天页面组件所有你需要集成的文件，打包后大小在65kb左右，已经很小了。需要注意的是，项目中的`.gif`文件夹是很多大的效果图，这个可以删除掉。`image`文件夹中有两张用于测试的用户头像，也可以删除掉。</font>。
 
 ----------
 
@@ -204,13 +204,13 @@ chatInput.setExtraButtonClickListener(function (dismiss) {
 ```
 ### 至此，输入组件SDK的集成就完成了！
 
-## 聊天列表UI
+## 聊天页面UI
 
 ### 效果图
 
 <img src="https://github.com/unmagic/wechat-im/blob/master/.gif/效果图2.png" width="40%"/>
 
-聊天列表，我将UI封装成了多个`template`，最后使用`chat-item.wxml`即可，UI相关的代码都放到了`chat-list`文件夹中；加载方面的UI放到了`loading`文件夹中；`image`文件夹中也新增了几张图片。
+聊天页面，我将UI封装成了多个`template`，最后使用`chat-item.wxml`即可，UI相关的代码都放到了`chat-list`文件夹中；加载方面的UI放到了`loading`文件夹中；`image`文件夹中也新增了几张图片。
 
 对于即时通讯方面的sdk，我是用`setTimeout`来模拟的。你可以引入常见的sdk，比如腾讯的、网易的。当然你也可以使用webSocket来自己实现。
 
@@ -658,7 +658,7 @@ createNormalChatItem({type = IMOperator.TextType, content = '', isMy = true, dur
 - duration：语音时长。如果是语音类型，则需要传这个字段。
 
 #### 生成自定义消息类型对象
-自定义消息类型的UI类似于聊天列表中的展示聊天时间的UI。
+自定义消息类型的UI类似于聊天页面中的展示聊天时间的UI。
 
 ```
 static createCustomChatItem() {
@@ -768,7 +768,7 @@ onSimulateReceiveMsg(cbOk) {
 
 最上面说的输入组件，有各种交互情况下的事件回调，在回调函数中处理对应逻辑即可。这部分的所有代码我都放到了`chat.js`中。
 
-### 以上就是聊天列表的所有难点内容
+### 以上就是聊天页面的所有难点内容
 
 ### 最后说两句
 
