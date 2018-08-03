@@ -4,6 +4,9 @@ import IMOperator from "./im-operator";
 import UI from "./ui";
 import MsgManager from "./msg-manager";
 
+/**
+ * 聊天页面
+ */
 Page({
 
     /**

@@ -1,6 +1,9 @@
 // chat.js
 let toast = require('../../utils/toast.js');
 let chatInput = require('../../modules/chat-input/chat-input');
+/**
+ * 聊天输入组件展示页面
+ */
 Page({
 
     /**
