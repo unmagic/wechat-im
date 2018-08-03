@@ -60,7 +60,7 @@ export default class IMOperator {
             content,
             type,
             conversationId: IMOperator.ConversationId,
-            sessionId: getApp().globalData.sessionId,
+            userId: getApp().globalData.userId,
             socketAction: getApp().globalData.currentSocketAction,
             duration
         });

@@ -59,8 +59,8 @@ export default class IMWebSocket {
     _onSocketMessage() {
         wx.onSocketMessage((res) => {
             let msg = JSON.parse(res.data);
-            if ('sessionId' === msg.type) {
-                getApp().globalData.sessionId = msg.content;
+            if ('userId' === msg.type) {
+                getApp().globalData.userId = msg.content;
             } else {
                 this._socketReceiveListener && this._socketReceiveListener(msg);
             }
