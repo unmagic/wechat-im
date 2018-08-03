@@ -1,6 +1,6 @@
 {
   "pages":[
-    "pages/list/list",
+    "pages/chat/chat",
     "pages/chat-input/chat-input"
   ],
   "window":{
