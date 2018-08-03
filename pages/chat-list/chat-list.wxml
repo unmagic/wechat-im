@@ -1,2 +1,4 @@
-<!--pages/chat-list/chat-list.wxml-->
-<text>pages/chat-list/chat-list.wxml</text>
+<import src="view/chat-item.wxml"/>
+<block wx:for="{{conversations}}" wx:key="conversationId">
+    <template is="chat-item" data="{{item:item}}"/>
+</block>

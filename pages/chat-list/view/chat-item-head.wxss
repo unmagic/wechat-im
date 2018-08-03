@@ -1,0 +1,25 @@
+.unread-style{
+    min-width:32rpx;
+    max-width:40rpx;
+    max-height: 32rpx;
+    line-height:37rpx;
+    text-align: center;
+    border-radius: 50%;
+    background-color: #f64e30;
+    color: white;
+    font-size: 22rpx;
+    position: absolute;
+    top: -3rpx;
+    right: -3rpx;
+}
+.chat-head-style{
+    width: 88rpx;
+    height: 88rpx;
+    border-radius: 50%;
+}
+.chat-item-head-super-style{
+    width: auto;
+    display: flex;
+    margin:31rpx 34rpx 31rpx 34rpx;
+    position: relative;
+}
