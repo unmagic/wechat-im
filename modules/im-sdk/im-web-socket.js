@@ -1,8 +1,8 @@
 export default class IMWebSocket {
     constructor() {
         this._isOpen = false;
-        this.onSocketOpen();
-        this.onSocketMessage();
+        this._onSocketOpen();
+        this._onSocketMessage();
     }
 
     createSocket() {
@@ -26,34 +26,18 @@ export default class IMWebSocket {
         }
     }
 
-    onSocketOpen(cb) {
-        wx.onSocketOpen((res) => {
-            this._isOpen = true;
-            cb && cb();
-            console.log('WebSocket连接已打开！');
-        });
+    setOnSocketReceiveMessageListener(cb) {
+        this._socketReceiveListener = cb;
+    }
+
+    closeSocket() {
+        wx.closeSocket();
     }
 
     onSocketError(cb) {
         wx.onSocketError((res) => {
             this._isOpen = false;
             console.log('WebSocket连接打开失败，请检查！', res);
-        })
-    }
-
-    setOnSocketReceiveMessageListener(cb) {
-        this._socketReceiveListener = cb;
-    }
-
-    onSocketMessage() {
-        wx.onSocketMessage((res) => {
-            let msg = JSON.parse(res.data);
-            if ('sessionId' === msg.type) {
-                getApp().globalData.sessionId = msg.content;
-            } else {
-                this._socketReceiveListener && this._socketReceiveListener(msg);
-            }
-            console.log('收到服务器内容：' + res.data)
         })
     }
 
@@ -65,7 +49,23 @@ export default class IMWebSocket {
         });
     }
 
-    closeSocket() {
-        wx.closeSocket();
+    _onSocketOpen() {
+        wx.onSocketOpen((res) => {
+            this._isOpen = true;
+            console.log('WebSocket连接已打开！');
+        });
     }
+
+    _onSocketMessage() {
+        wx.onSocketMessage((res) => {
+            let msg = JSON.parse(res.data);
+            if ('sessionId' === msg.type) {
+                getApp().globalData.sessionId = msg.content;
+            } else {
+                this._socketReceiveListener && this._socketReceiveListener(msg);
+            }
+            console.log('收到服务器内容：' + res.data)
+        })
+    }
+
 }
