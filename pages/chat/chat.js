@@ -24,11 +24,14 @@ Page({
      * 生命周期函数--监听页面加载
      */
     onLoad: function (options) {
+
+        const friend = JSON.parse(options.friend);
+
         this.initData();
         wx.setNavigationBarTitle({
-            title: '呵呵哒的好朋友'
+            title: friend.nickName
         });
-        this.imOperator = new IMOperator(this);
+        this.imOperator = new IMOperator(this, friend);
         this.UI = new UI(this);
         this.msgManager = new MsgManager(this);
 
@@ -158,7 +161,8 @@ Page({
         this.sendMsg(IMOperator.createChatItemContent({
             type: item.type,
             content: item.content,
-            duration: item.voiceDuration
+            duration: item.voiceDuration,
+            friendId: this.imOperator.getFriendId()
         }), itemIndex, (msg) => {
             this.UI.updateListViewBySort();
         });

@@ -22,7 +22,8 @@ export default class CustomManager {
         this._page.UI.showItemForMoment(temp, (itemIndex) => {
             this._page.sendMsg(IMOperator.createChatItemContent({
                 type: IMOperator.CustomType,
-                content: temp.content
+                content: temp.content,
+                friendId:this._page.imOperator.getFriendId()
             }), itemIndex);
             this._page.UI.updateChatStatus('会话已关闭', false);
         });

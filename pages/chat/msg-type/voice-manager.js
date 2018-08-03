@@ -36,7 +36,8 @@ export default class VoiceManager {
                     this._page.sendMsg(IMOperator.createChatItemContent({
                         type: IMOperator.VoiceType,
                         content: content,
-                        duration
+                        duration,
+                        friendId: this._page.imOperator.getFriendId()
                     }), itemIndex, (msg) => {
                         FileManager.set(msg, savedFilePath);
                     });

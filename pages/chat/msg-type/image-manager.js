@@ -23,7 +23,8 @@ export default class ImageManager {
                 this._page.simulateUploadFile({savedFilePath, itemIndex}, (content) => {
                     this._page.sendMsg(IMOperator.createChatItemContent({
                         type: IMOperator.ImageType,
-                        content
+                        content,
+                        friendId: this._page.imOperator.getFriendId()
                     }), itemIndex, (msg) => {
                         FileManager.set(msg, savedFilePath)
                     });

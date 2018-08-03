@@ -12,11 +12,12 @@ export default class IMOperator {
     static ChatListSocketAction = 'ChatList';
     static ConversationSocketAction = 'Conversation';
 
-    constructor(page) {
+    constructor(page, opts) {
         this._page = page;
+        this._opts = opts;
         this._latestTImestamp = 0;//最新消息的时间戳
         this._myHeadUrl = '../../image/my_head.jpeg';
-        this._otherHeadUrl = '../../image/other_head.jpg';
+        this._otherHeadUrl = this._opts.headUrl;
         if (this._page.route === 'pages/chat/chat') {
             getApp().globalData.currentSocketAction = IMOperator.ConversationSocketAction;
         } else {
@@ -24,6 +25,9 @@ export default class IMOperator {
         }
     }
 
+    getFriendId() {
+        return this._opts.userId;
+    }
     onSimulateReceiveMsg(cbOk) {
         getApp().getIMWebSocket().setOnSocketReceiveMessageListener((msg) => {
             if (!msg) {
@@ -54,7 +58,7 @@ export default class IMOperator {
         });
     }
 
-    static createChatItemContent({type = IMOperator.TextType, content = '', duration} = {}) {
+    static createChatItemContent({type = IMOperator.TextType, content = '', duration, friendId} = {}) {
         if (!content.replace(/^\s*|\s*$/g, '')) return;
         return JSON.stringify({
             content,
@@ -62,9 +66,7 @@ export default class IMOperator {
             conversationId: IMOperator.ConversationId,
             userId: getApp().globalData.userId,
             socketAction: getApp().globalData.currentSocketAction,
-            friendId: getApp().globalData.friendsId.filter(item => {
-                return item !== getApp().globalData.userId;
-            })[0],
+            friendId: friendId,
             duration
         });
     }

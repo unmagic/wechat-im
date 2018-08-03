@@ -23,7 +23,11 @@ export default class TextManager {
             type: IMOperator.TextType,
             content
         }), (itemIndex) => {
-            this._page.sendMsg(IMOperator.createChatItemContent({type: IMOperator.TextType, content}), itemIndex);
+            this._page.sendMsg(IMOperator.createChatItemContent({
+                type: IMOperator.TextType,
+                content,
+                friendId: this._page.imOperator.getFriendId()
+            }), itemIndex);
         });
     }
 }
