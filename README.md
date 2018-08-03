@@ -538,9 +538,6 @@ export default class MsgManager {
 }
 ```
 
-
-
-
 ### 缓存机制和文件类型消息的展示机制
 - 缓存和展示机制：在展示语音或图片类型的消息时，我会优先加载已经存储在本地的文件。可以看到`showMsg()`方法中先是取`const localVoicePath = FileManager.get(msg)`，来获取本地路径。
 那取到的值是什么时候设置的呢？是在发送或接收消息成功后（此时文件已下载成功），以消息的`saveKey`为key，存储成功返回的`savedFilePath`为data，建立消息和本地存储路径的映射关系，如：`FileManager.set(msg, savedFilePath)`;

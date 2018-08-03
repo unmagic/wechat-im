@@ -1,8 +1,8 @@
 {
   "pages": [
+    "pages/chat-list/chat-list",
     "pages/chat/chat",
     "pages/chat-input/chat-input",
-    "pages/chat-list/chat-list",
     "pages/friends/friends"
   ],
   "window": {
@@ -10,5 +10,23 @@
     "navigationBarBackgroundColor": "#fff",
     "navigationBarTitleText": "WeChat",
     "navigationBarTextStyle": "black"
+  },
+  "tabBar": {
+    "selectedColor": "#35c8fb",
+    "color": "#7f8389",
+    "list": [
+      {
+        "pagePath": "pages/chat-list/chat-list",
+        "text": "聊天列表",
+        "iconPath": "image/tabbar/chat_list_unselected.png",
+        "selectedIconPath": "image/tabbar/chat_list.png"
+      },
+      {
+        "pagePath": "pages/friends/friends",
+        "text": "好友列表",
+        "iconPath": "image/tabbar/friend_unselected.png",
+        "selectedIconPath": "image/tabbar/friend.png"
+      }
+    ]
   }
 }
