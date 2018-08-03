@@ -25,6 +25,7 @@ class WebSocketServer {
                     case 'text':
                         callbackMsg = {type: msg.type, content: '你好呀，我是WebSocket服务器自动回复的消息'}
                 }
+                callbackMsg.timestamp = Date.now();
                 conn.sendText(JSON.stringify(callbackMsg));
             })
             conn.on("close", function (code, reason) {
@@ -34,6 +35,9 @@ class WebSocketServer {
                 console.log("异常关闭", code, reason)
             });
         }).listen(8001);
+        this.server.on('connection', function (conn) {
+            conn.sendText(JSON.stringify({type: 'sessionId', content: Date.now()}));
+        });
         console.log("WebSocket服务端建立完毕")
     }
 }

@@ -8,55 +8,62 @@ export default class IMOperator {
     static TextType = 'text';
     static ImageType = 'image';
     static CustomType = 'custom';
+    static ConversationId = 0;
+    static ChatListSocketAction = 'ChatList';
+    static ConversationSocketAction = 'Conversation';
 
     constructor(page) {
         this._page = page;
         this._latestTImestamp = 0;//最新消息的时间戳
         this._myHeadUrl = '../../image/my_head.jpeg';
         this._otherHeadUrl = '../../image/other_head.jpg';
+        if (this._page.route === 'pages/chat/chat') {
+            getApp().globalData.currentSocketAction = IMOperator.ConversationSocketAction;
+        } else {
+            getApp().globalData.currentSocketAction = IMOperator.ChatListSocketAction;
+        }
     }
 
-
     onSimulateReceiveMsg(cbOk) {
-        this.onSimulateReceiveMsgCb = cbOk;
+        getApp().getIMWebSocket().setOnSocketReceiveMessageListener((msg) => {
+            if (!msg) {
+                return;
+            }
+            const item = !(msg.isMy = false) && this.createNormalChatItem(msg);
+            // const item = this.createNormalChatItem({type: 'voice', content: '上传文件返回的语音文件路径', isMy: false});
+            // const item = this.createNormalChatItem({type: 'image', content: '上传文件返回的图片文件路径', isMy: false});
+            this._latestTImestamp = item.timestamp;
+            //这里是收到好友消息的回调函数，建议传入的item是 由 createNormalChatItem 方法生成的。
+            cbOk && cbOk(item);
+        });
+
     }
 
     onSimulateSendMsg({content, success, fail}) {
-
         //这里content即为要发送的数据
-        getApp().getIMWebSocket().sendMsg({content});
-
-        // setTimeout(() => {
-        //     //这里的content是一个JSON格式的字符串，类似于：{"content":"233","type":"text"}
-        //     const item = this.createNormalChatItem(JSON.parse(content));
-        //     this._latestTImestamp = item.timestamp;
-        //
-        //     //使用随机数来模拟数据发送失败情况
-        //     const isSendSuccess = parseInt(Math.random() * 100) > 35;
-        //     console.log('随机数模拟是否发送成功', isSendSuccess);
-        //     const isChatClose = this._page.data.chatStatue === 'close';
-        //     if (isSendSuccess || isChatClose) {
-        //         success && success(item);
-        //     } else {
-        //         fail && fail();
-        //     }
-        //     if (isChatClose || !isSendSuccess) return;
-        //     setTimeout(() => {
-        //
-        //         const item = this.createNormalChatItem({type: 'text', content: '这是模拟好友回复的消息', isMy: false});
-        //         // const item = this.createNormalChatItem({type: 'voice', content: '上传文件返回的语音文件路径', isMy: false});
-        //         // const item = this.createNormalChatItem({type: 'image', content: '上传文件返回的图片文件路径', isMy: false});
-        //         this._latestTImestamp = item.timestamp;
-        //         //这里是收到好友消息的回调函数，建议传入的item是 由 createNormalChatItem 方法生成的。
-        //         this.onSimulateReceiveMsgCb && this.onSimulateReceiveMsgCb(item);
-        //     }, 1000);
-        // }, 300);
-
+        //这里的content是一个JSON格式的字符串，类似于：{"content":"233","type":"text"}
+        getApp().getIMWebSocket().sendMsg({
+            content,
+            success: (content) => {
+                //这个content格式一样
+                const item = this.createNormalChatItem(JSON.parse(content));
+                this._latestTImestamp = item.timestamp;
+                success && success(item);
+            },
+            fail
+        });
     }
 
     static createChatItemContent({type = IMOperator.TextType, content = '', duration} = {}) {
         if (!content.replace(/^\s*|\s*$/g, '')) return;
-        return JSON.stringify({content, type, duration});
+        return JSON.stringify({
+            content,
+            type,
+            conversationId: IMOperator.ConversationId,
+            sessionId: getApp().globalData.sessionId,
+            socketAction: getApp().globalData.currentSocketAction,
+            duration
+        });
     }
 
     createNormalChatItem({type = IMOperator.TextType, content = '', isMy = true, duration} = {}) {

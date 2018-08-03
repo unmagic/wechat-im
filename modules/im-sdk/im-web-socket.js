@@ -1,7 +1,6 @@
 export default class IMWebSocket {
     constructor() {
         this._isOpen = false;
-        this._sockeMsgQueen = [];
     }
 
     createSocket() {
@@ -16,14 +15,12 @@ export default class IMWebSocket {
         }
     }
 
-    sendMsg({content}) {
-        this._sockeMsgQueen.push(content);
-
+    sendMsg({content, success, fail}) {
         if (this._isOpen) {
-            let temp;
-            while (temp = this._sockeMsgQueen.shift()) {
-                wx.sendSocketMessage({data: temp});
-            }
+            wx.sendSocketMessage({data: content});
+            success && success(content);
+        } else {
+            fail && fail();
         }
     }
 
@@ -42,9 +39,18 @@ export default class IMWebSocket {
         })
     }
 
-    onSocketMessage(cb) {
+    setOnSocketReceiveMessageListener(cb) {
+        this._socketReceiveListener = cb;
+    }
+
+    onSocketMessage() {
         wx.onSocketMessage((res) => {
-            cb && cb();
+            let msg = JSON.parse(res.data);
+            if ('sessionId' === msg.type) {
+                getApp().globalData.sessionId = msg.content;
+            } else {
+                this._socketReceiveListener && this._socketReceiveListener(msg);
+            }
             console.log('收到服务器内容：' + res.data)
         })
     }
