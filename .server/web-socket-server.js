@@ -6,9 +6,9 @@ class WebSocketServer {
 
         this.conversations = [{
             userId: 'liubiao001',
-            headUrl: 'http://a.hiphotos.baidu.com/zhidao/pic/item/21a4462309f79052782f28490ff3d7ca7bcbd591.jpg',//好友头像
+            headUrl: 'http://downza.img.zz314.com/edu/pc/wlgj-1008/2016-06-23/64ec0888b15773e3ba5b5f744b9df16c.jpg',//好友头像
             conversationId: -1,//会话id，目前未用到
-            nickName: '万志山',//好友昵称
+            nickName: '柳如月',//好友昵称
             latestMsg: JSON.stringify({type: 'text',content:'周末有时间一起参加社团活动吗？'}),//最新一条消息
             unread: 0,//未读消息计数
             timestamp: 1533294362000,//最新消息的时间戳
@@ -20,8 +20,8 @@ class WebSocketServer {
             nickName: '李恺新',//好友昵称
             latestMsg: JSON.stringify({type: 'text',content:'你好，我是李恺新'}),//最新一条消息
             unread: 0,//未读消息计数
-            timestamp: 1533294362000,//最新消息的时间戳
-            timeStr: '19:06'//最新消息的时间
+            timestamp: 1533296368000,//最新消息的时间戳
+            timeStr: '19:39'//最新消息的时间
         },];
         this.usersId = ['liubiao001', 'liubiao002'];
     }

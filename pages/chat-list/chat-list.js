@@ -27,7 +27,14 @@ Page({
             this.setData({conversations: msg.conversations.map(item => ChatListManager.getConversationsItem(item))})
         })
     },
-
+    toChat: function (e) {
+        let item = e.currentTarget.dataset.item;
+        delete item.latestMsg;
+        delete item.unread;
+        wx.navigateTo({
+            url: `../chat/chat?friend=${JSON.stringify(item)}`
+        });
+    },
     /**
      * 生命周期函数--监听页面显示
      */
