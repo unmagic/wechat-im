@@ -61,6 +61,7 @@ export default class IMWebSocket {
             let msg = JSON.parse(res.data);
             if ('userId' === msg.type) {
                 getApp().globalData.userId = msg.content;
+                getApp().globalData.friendsId = msg.friendsId;
             } else {
                 this._socketReceiveListener && this._socketReceiveListener(msg);
             }

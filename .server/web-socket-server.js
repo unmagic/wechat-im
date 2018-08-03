@@ -10,11 +10,12 @@ class WebSocketServer {
     create() {
         this.server = ws.createServer((conn) => {
             console.log('New connection');
-            conn.on("text", function (str) {
+            conn.on("text", (str) => {
                 console.log("收到的信息为:" + str);
                 let msg = JSON.parse(str);
                 msg.timestamp = Date.now();
-                this.connMap.get(msg.friendId).sendText(JSON.stringify(msg));
+                let connTemp = this.connMap.get(msg.friendId);
+                !!connTemp && connTemp.sendText(JSON.stringify(msg));
             });
             conn.on("close", function (code, reason) {
                 console.log("关闭连接");

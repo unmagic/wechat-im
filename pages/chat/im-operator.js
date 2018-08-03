@@ -62,6 +62,9 @@ export default class IMOperator {
             conversationId: IMOperator.ConversationId,
             userId: getApp().globalData.userId,
             socketAction: getApp().globalData.currentSocketAction,
+            friendId: getApp().globalData.friendsId.filter(item => {
+                return item !== getApp().globalData.userId;
+            })[0],
             duration
         });
     }
