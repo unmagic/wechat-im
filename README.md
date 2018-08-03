@@ -69,7 +69,7 @@
 
 #### 一、导入SDK相关文件
 
-输入组件相关文件在`modules/chat-input`和`image`文件夹下，示例页面是`pages/chat/chat`。
+输入组件相关文件在`modules/chat-input`和`image`文件夹下，示例页面是`pages/chat-input/chat-input`。
 
 <font color=red>聊天输入组件和聊天列表组件所有你需要集成的文件，打包后大小在65kb左右，已经很小了。需要注意的是，项目中的`.gif`文件夹是很多大的效果图，这个可以删除掉。`image`文件夹中有两张用于测试的用户头像，也可以删除掉。</font>。
 
@@ -218,9 +218,9 @@ chatInput.setExtraButtonClickListener(function (dismiss) {
 
 ### 示例页面
 
-示例页面是`pages/list/list`，可以在微信开发工具直接打开。
+示例页面是`pages/chat/chat`，可以在微信开发工具直接打开。
 
-在`list`文件夹下，我封装了多个类，用于管理消息类型的收发和展示。
+在`chat`文件夹下，我封装了多个类，用于管理消息类型的收发和展示。
 
 ### 文本消息管理类
 先看个最简单的，文本类型消息的收发和展示`text-manager.js`：
@@ -736,7 +736,7 @@ onSimulateReceiveMsg(cbOk) {
 
 在上面`发送数据接口`代码中可以看到，在接收到数据时，先使用`createNormalChatItem`来生成消息类型数据，然后回调`onSimulateReceiveMsgCb`函数，即可完成数据的接收。
 
-我是在`list.js`的`onLoad`生命周期中注册的监听：
+我是在`chat.js`的`onLoad`生命周期中注册的监听：
 
 ```
  onLoad: function (options) {
@@ -766,7 +766,7 @@ onSimulateReceiveMsg(cbOk) {
 
 #### 配合使用输入组件。
 
-最上面说的输入组件，有各种交互情况下的事件回调，在回调函数中处理对应逻辑即可。这部分的所有代码我都放到了`list.js`中。
+最上面说的输入组件，有各种交互情况下的事件回调，在回调函数中处理对应逻辑即可。这部分的所有代码我都放到了`chat.js`中。
 
 ### 以上就是聊天列表的所有难点内容
 
@@ -793,7 +793,7 @@ github地址https://github.com/unmagic/wechat-im
 - 封装文本、图片、语音三部分功能
 
 2018-07-31
- - 新建了`pages/list/list`聊天UI页面，集成了输入组件。
+ - 新建了`pages/chat/chat`聊天UI页面，集成了输入组件。
  - 输入组件新增`isVoiceRecordUseLatestVersion`接口，用以判断录音接口是否使用了最新的。
  - 聊天UI页面修复bug：正在录音时，停止语音播放。
  - 聊天UI页面修复bug：播放语音时，停止播放其他语音。
