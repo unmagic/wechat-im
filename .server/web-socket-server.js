@@ -3,7 +3,26 @@ let ws = require("nodejs-websocket");
 class WebSocketServer {
     constructor() {
         this.connMap = new Map();
-        this.all = ['liubiao001', 'liubiao002'];
+
+        this.conversations = [{
+            userId: 'liubiao001',
+            headUrl: 'http://a.hiphotos.baidu.com/zhidao/pic/item/21a4462309f79052782f28490ff3d7ca7bcbd591.jpg',//好友头像
+            conversationId: -1,//会话id，目前未用到
+            nickName: '万志山',//好友昵称
+            latestMsg: JSON.stringify({type: 'text',content:'周末有时间一起参加社团活动吗？'}),//最新一条消息
+            unread: 0,//未读消息计数
+            timestamp: 1533294362000,//最新消息的时间戳
+            timeStr: '19:06'//最新消息的时间
+        }, {
+            userId: 'liubiao002',
+            headUrl: 'http://tx.haiqq.com/uploads/allimg/170504/0641415410-1.jpg',//好友头像
+            conversationId: -1,//会话id，目前未用到
+            nickName: '李恺新',//好友昵称
+            latestMsg: JSON.stringify({type: 'text',content:'你好，我是李恺新'}),//最新一条消息
+            unread: 0,//未读消息计数
+            timestamp: 1533294362000,//最新消息的时间戳
+            timeStr: '19:06'//最新消息的时间
+        },];
         this.usersId = ['liubiao001', 'liubiao002'];
     }
 
@@ -13,6 +32,10 @@ class WebSocketServer {
             conn.on("text", (str) => {
                 console.log("收到的信息为:" + str);
                 let msg = JSON.parse(str);
+                if (msg.type === 'get-conversations') {
+                    conn.sendText(JSON.stringify({type: msg.type, conversations: this.conversations}));
+                    return;
+                }
                 msg.timestamp = Date.now();
                 let connTemp = this.connMap.get(msg.friendId);
                 !!connTemp && connTemp.sendText(JSON.stringify(msg));
@@ -27,7 +50,7 @@ class WebSocketServer {
         this.server.on('connection', (conn) => {
             let userId = this.usersId.shift();
             this.connMap.set(userId, conn);
-            conn.sendText(JSON.stringify({type: 'userId', content: userId, friendsId: this.all}));
+            conn.sendText(JSON.stringify({type: 'login', content: userId}));
         });
         console.log("WebSocket服务端建立完毕")
     }

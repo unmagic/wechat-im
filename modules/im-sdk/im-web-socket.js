@@ -59,7 +59,7 @@ export default class IMWebSocket {
     _onSocketMessage() {
         wx.onSocketMessage((res) => {
             let msg = JSON.parse(res.data);
-            if ('userId' === msg.type) {
+            if ('login' === msg.type) {
                 getApp().globalData.userId = msg.content;
                 getApp().globalData.friendsId = msg.friendsId;
             } else {

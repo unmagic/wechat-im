@@ -1,20 +1,20 @@
-import IMOperator from "../chat/im-operator";
-
 export default class ChatListManager {
     constructor() {
 
     }
 
-    static getConversationsItem() {
-        return {
-            conversationId: 1,//会话id
-            headUrl: '',//好友头像
-            nickName: '万志山',//好友昵称
-            latestMsgType: IMOperator.TextType,//最新消息的类型
-            latestMsg: '周末有时间一起参加社团活动吗？',//最新一条消息
-            unread: 0,//未读消息计数
-            timestamp: 0,//最新消息的时间戳
-            timeStr: '09:03'//最新消息的时间
-        };
+    static getConversationsItem(item) {
+        let {latestMsg, ...msg} = item;
+        return Object.assign(msg, JSON.parse(latestMsg));
+        // return {
+        //     conversationId: item.conversationId,//会话id，目前未用到
+        //     headUrl: item.headUrl,//好友头像
+        //     nickName: item.nickName,//好友昵称
+        //     type: temp.type,//最新消息的类型
+        //     content: temp.content,//最新一条消息
+        //     unread: item.,//未读消息计数
+        //     timestamp: 0,//最新消息的时间戳
+        //     timeStr: '09:03'//最新消息的时间
+        // };
     }
 }

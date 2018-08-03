@@ -1,5 +1,6 @@
 // pages/chat-list/chat-list.js
 import IMOperator from "../chat/im-operator";
+import ChatListManager from "./chat-list-manager";
 
 Page({
 
@@ -21,7 +22,10 @@ Page({
      * 生命周期函数--监听页面初次渲染完成
      */
     onReady: function () {
-
+        getApp().getIMWebSocket().sendMsg({content: JSON.stringify({type: 'get-conversations'})});
+        getApp().getIMWebSocket().setOnSocketReceiveMessageListener((msg) => {
+            this.setData({conversations: msg.conversations.map(item => ChatListManager.getConversationsItem(item))})
+        })
     },
 
     /**
