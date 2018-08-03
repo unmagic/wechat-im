@@ -17,10 +17,10 @@ class WebSocketServer {
                         callbackMsg = {type: msg.type, content: '这是来自服务器的自定义消息'};
                         break;
                     case 'image':
-                        callbackMsg = {type: msg.type, content: '.gif/效果图2.png'};
+                        callbackMsg = {type: msg.type, content: 'https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1533299767768&di=8df0bf650dcba15aa2a238c00df0f74a&imgtype=0&src=http%3A%2F%2Fpic.58pic.com%2F58pic%2F13%2F19%2F80%2F77H58PICYGD_1024.jpg'};
                         break;
                     case 'voice':
-                        callbackMsg = {type: 'text', content: '这里可以配置图片url来模拟回复图片消息'};
+                        callbackMsg = {type: 'text', content: '这里可以配置语音url来模拟回复图片消息'};
                         break;
                     case 'text':
                         callbackMsg = {type: msg.type, content: '你好呀，我是WebSocket服务器自动回复的消息'}
