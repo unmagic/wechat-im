@@ -1,6 +1,8 @@
 export default class IMWebSocket {
     constructor() {
         this._isOpen = false;
+        this.onSocketOpen();
+        this.onSocketMessage();
     }
 
     createSocket() {

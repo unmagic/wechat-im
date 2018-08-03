@@ -11,8 +11,6 @@ App({
     },
     onLaunch() {
         this.imWebSocket = new IMWebSocket();
-        this.imWebSocket.onSocketOpen();
-        this.imWebSocket.onSocketMessage();
     },
     onHide() {
         // this.imWebSocket.closeSocket();
