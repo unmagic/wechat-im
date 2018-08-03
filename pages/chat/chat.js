@@ -1,6 +1,9 @@
-// chat.js
-let toast = require('../../utils/toast.js');
-let chatInput = require('../../modules/chat-input/chat-input');
+// pages/list/list.js
+import * as chatInput from "../../modules/chat-input/chat-input";
+import IMOperator from "./im-operator";
+import UI from "./ui";
+import MsgManager from "./msg-manager";
+
 Page({
 
     /**
@@ -9,14 +12,27 @@ Page({
     data: {
         textMessage: '',
         chatItems: [],
+        latestPlayVoicePath: '',
+        isAndroid: true,
+        chatStatue: 'open'
     },
-
 
     /**
      * 生命周期函数--监听页面加载
      */
     onLoad: function (options) {
         this.initData();
+        wx.setNavigationBarTitle({
+            title: '呵呵哒的好朋友'
+        });
+        this.imOperator = new IMOperator(this);
+        this.UI = new UI(this);
+        this.msgManager = new MsgManager(this);
+
+        this.imOperator.onSimulateReceiveMsg((msg) => {
+            this.msgManager.showMsg({msg})
+        });
+        this.UI.updateChatStatus('正在聊天中...');
     },
     initData: function () {
         let that = this;
@@ -44,6 +60,7 @@ Page({
 
         that.setData({
             pageHeight: systemInfo.windowHeight,
+            isAndroid: systemInfo.system.indexOf("Android") !== -1,
         });
         wx.setNavigationBarTitle({
             title: '好友'
@@ -53,71 +70,59 @@ Page({
         that.voiceButton();
     },
     textButton: function () {
-        chatInput.setTextMessageListener(function (e) {
+        chatInput.setTextMessageListener((e) => {
             let content = e.detail.value;
-            console.log(content);
+            this.msgManager.sendMsg({type: IMOperator.TextType, content});
         });
     },
     voiceButton: function () {
-        chatInput.recordVoiceListener(function (res, duration) {
+        chatInput.recordVoiceListener((res, duration) => {
             let tempFilePath = res.tempFilePath;
-            let vDuration = duration;
-            console.log(tempFilePath, vDuration);
+            this.msgManager.sendMsg({type: IMOperator.VoiceType, content: tempFilePath, duration});
         });
-        chatInput.setVoiceRecordStatusListener(function (status) {
-            switch (status) {
-                case chatInput.VRStatus.START://开始录音
-
-                    break;
-                case chatInput.VRStatus.SUCCESS://录音成功
-
-                    break;
-                case chatInput.VRStatus.CANCEL://取消录音
-
-                    break;
-                case chatInput.VRStatus.SHORT://录音时长太短
-
-                    break;
-                case chatInput.VRStatus.UNAUTH://未授权录音功能
-
-                    break;
-                case chatInput.VRStatus.FAIL://录音失败(已经授权了)
-
-                    break;
-            }
+        chatInput.setVoiceRecordStatusListener((status) => {
+            this.msgManager.stopAllVoice();
         })
+    },
+
+    //模拟上传文件，注意这里的cbOk回调函数传入的参数应该是上传文件成功时返回的文件url，这里因为模拟，我直接用的savedFilePath
+    simulateUploadFile: function ({savedFilePath, duration, itemIndex}, cbOk) {
+        setTimeout(() => {
+            let urlFromServerWhenUploadSuccess = savedFilePath;
+            cbOk && cbOk(urlFromServerWhenUploadSuccess);
+        }, 1000);
     },
     extraButton: function () {
         let that = this;
-        chatInput.clickExtraListener(function (e) {
-            console.log(e);
-            let itemIndex = parseInt(e.currentTarget.dataset.index);
-            if (itemIndex === 2) {
+        chatInput.clickExtraListener((e) => {
+            let chooseIndex = parseInt(e.currentTarget.dataset.index);
+            if (chooseIndex === 2) {
                 that.myFun();
                 return;
             }
             wx.chooseImage({
                 count: 1, // 默认9
                 sizeType: ['compressed'],
-                sourceType: itemIndex === 0 ? ['album'] : ['camera'],
-                success: function (res) {
-                    let tempFilePath = res.tempFilePaths[0];
+                sourceType: chooseIndex === 0 ? ['album'] : ['camera'],
+                success: (res) => {
+                    this.msgManager.sendMsg({type: IMOperator.ImageType, content: res.tempFilePaths[0]})
                 }
             });
+
         });
-        chatInput.setExtraButtonClickListener(function (dismiss) {
-            console.log('Extra弹窗是否消失', dismiss);
-        })
     },
+    /**
+     * 自定义事件
+     */
     myFun: function () {
         wx.showModal({
             title: '小贴士',
-            content: '这是用于拓展的自定义功能！',
+            content: '演示更新会话状态',
             confirmText: '确认',
             showCancel: true,
-            success: function (res) {
+            success: (res) => {
                 if (res.confirm) {
-                    toast.show('success', '自定义功能')
+                    this.msgManager.sendMsg({type: IMOperator.CustomType})
                 }
             }
         })
@@ -125,5 +130,34 @@ Page({
 
     resetInputStatus: function () {
         chatInput.closeExtraView();
+    },
+
+    sendMsg: function (content, itemIndex, cbOk) {
+        this.imOperator.onSimulateSendMsg({
+            content,
+            success: (msg) => {
+                this.UI.updateViewWhenSendSuccess(msg, itemIndex);
+                cbOk && cbOk(msg);
+            },
+            fail: () => {
+                this.UI.updateViewWhenSendFailed(itemIndex);
+            }
+        })
+    },
+    /**
+     * 重发消息
+     * @param e
+     */
+    resendMsgEvent: function (e) {
+        const itemIndex = parseInt(e.currentTarget.dataset.resendIndex);
+        const item = this.data.chatItems[itemIndex];
+        this.UI.updateDataWhenStartSending(item, false, false);
+        this.sendMsg(IMOperator.createChatItemContent({
+            type: item.type,
+            content: item.content,
+            duration: item.voiceDuration
+        }), itemIndex, (msg) => {
+            this.UI.updateListViewBySort();
+        });
     },
 });
