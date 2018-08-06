@@ -59,7 +59,6 @@ export default class IMWebSocket {
     _onSocketClose(cb) {
         wx.onSocketClose((res) => {
             this._isOpen = false;
-            this._socket = null;
             console.log('WebSocket 已关闭！', res)
         });
     }
