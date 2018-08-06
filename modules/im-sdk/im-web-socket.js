@@ -79,7 +79,7 @@ export default class IMWebSocket {
                 if (this._msgQueen.length) {
                     let temp;
                     while (temp = this._msgQueen.shift()) {
-                        this._sendMsg({content: temp});
+                        this._sendMsg({content: {...temp, userId: msg.userInfo.userId}});
                     }
                 }
             } else {
