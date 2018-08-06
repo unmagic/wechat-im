@@ -1,9 +1,11 @@
 export default class IMWebSocket {
     constructor() {
         this._isOpen = false;
+        this._msgQueen = [];
         this._onSocketOpen();
         this._onSocketMessage();
-        this._msgQueen = [];
+        this._onSocketError();
+        this._onSocketClose();
     }
 
     createSocket() {
@@ -47,14 +49,14 @@ export default class IMWebSocket {
         wx.closeSocket();
     }
 
-    onSocketError(cb) {
+    _onSocketError(cb) {
         wx.onSocketError((res) => {
             this._isOpen = false;
             console.log('WebSocket连接打开失败，请检查！', res);
         })
     }
 
-    onSocketClose(cb) {
+    _onSocketClose(cb) {
         wx.onSocketClose((res) => {
             this._isOpen = false;
             this._socket = null;
