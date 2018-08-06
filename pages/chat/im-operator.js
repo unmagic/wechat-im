@@ -29,16 +29,18 @@ export default class IMOperator {
                 friendId: this.getFriendId()
             }
         });
-        getApp().getIMWebSocket().setOnSocketReceiveMessageListener((msg) => {
-            if (!msg) {
-                return;
+        getApp().getIMWebSocket().setOnSocketReceiveMessageListener({
+            listener: (msg) => {
+                if (!msg) {
+                    return;
+                }
+                const item = !(msg.isMy = false) && this.createNormalChatItem(msg);
+                // const item = this.createNormalChatItem({type: 'voice', content: '上传文件返回的语音文件路径', isMy: false});
+                // const item = this.createNormalChatItem({type: 'image', content: '上传文件返回的图片文件路径', isMy: false});
+                this._latestTImestamp = item.timestamp;
+                //这里是收到好友消息的回调函数，建议传入的item是 由 createNormalChatItem 方法生成的。
+                cbOk && cbOk(item);
             }
-            const item = !(msg.isMy = false) && this.createNormalChatItem(msg);
-            // const item = this.createNormalChatItem({type: 'voice', content: '上传文件返回的语音文件路径', isMy: false});
-            // const item = this.createNormalChatItem({type: 'image', content: '上传文件返回的图片文件路径', isMy: false});
-            this._latestTImestamp = item.timestamp;
-            //这里是收到好友消息的回调函数，建议传入的item是 由 createNormalChatItem 方法生成的。
-            cbOk && cbOk(item);
         });
 
     }

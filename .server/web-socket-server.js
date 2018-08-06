@@ -94,8 +94,11 @@ class WebSocketServer {
                         }));
                     });
                     return;
-                }else if (msg.type === 'get-friends') {
-
+                } else if (msg.type === 'get-friends') {
+                    conn.sendText(JSON.stringify({
+                        type: msg.type,
+                        friends: this.users.filter(item => item.userId !== msg.userId)
+                    }));
 
 
                     return;

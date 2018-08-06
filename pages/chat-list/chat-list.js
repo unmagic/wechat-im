@@ -2,6 +2,9 @@
 import IMOperator from "../chat/im-operator";
 import ChatListManager from "./chat-list-manager";
 
+/**
+ * 会话列表页面
+ */
 Page({
 
     /**
@@ -15,13 +18,15 @@ Page({
      * 生命周期函数--监听页面加载
      */
     onLoad: function (options) {
-        getApp().getIMWebSocket().setOnSocketReceiveMessageListener((msg) => {
-            this.setData({conversations: msg.conversations.map(item => ChatListManager.getConversationsItem(item))})
-        });
         getApp().getIMWebSocket().sendMsg({
             content: {
                 type: 'get-conversations',
                 userId: getApp().globalData.userInfo.userId
+            }, success: () => {
+                console.log('获取会话列表消息发送成功');
+            },
+            fail: (res) => {
+                console.log('获取会话列表失败', res);
             }
         });
     },
@@ -38,7 +43,11 @@ Page({
      * 生命周期函数--监听页面显示
      */
     onShow: function () {
-
+        getApp().getIMWebSocket().setOnSocketReceiveMessageListener({
+            listener: (msg) => {
+                this.setData({conversations: msg.conversations.map(item => ChatListManager.getConversationsItem(item))})
+            }
+        });
     },
 
     /**

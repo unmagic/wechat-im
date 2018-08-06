@@ -9,15 +9,13 @@ export default class IMWebSocket {
     }
 
     createSocket() {
-        if (!this._socket) {
-            this._socket = wx.connectSocket({
-                url: 'ws://10.4.97.87:8001',
-                header: {
-                    'content-type': 'application/json'
-                },
-                method: 'GET'
-            });
-        }
+        !this._isOpen && wx.connectSocket({
+            url: 'ws://10.4.97.87:8001',
+            header: {
+                'content-type': 'application/json'
+            },
+            method: 'GET'
+        });
     }
 
     sendMsg({content, success, fail}) {
@@ -35,14 +33,13 @@ export default class IMWebSocket {
                 success && success(content);
             },
             fail: (res) => {
-                console.log('发送失败', res);
-                fail && fail();
+                fail && fail(res);
             }
         });
     }
 
-    setOnSocketReceiveMessageListener(cb) {
-        this._socketReceiveListener = cb;
+    setOnSocketReceiveMessageListener({listener}) {
+        this._socketReceiveListener = listener;
     }
 
     closeSocket() {

@@ -12,12 +12,12 @@ App({
     },
     onLaunch() {
         this.imWebSocket = new IMWebSocket();
-        this.imWebSocket.createSocket();
 
     },
     onHide() {
         // this.imWebSocket.closeSocket();
     },
     onShow() {
+        this.imWebSocket.createSocket();
     }
 });

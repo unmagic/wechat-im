@@ -1,30 +1,32 @@
 // pages/friends/friends.js
+import ChatListManager from "../chat-list/chat-list-manager";
+
+/**
+ * 获取好友列表
+ */
 Page({
 
     /**
      * 页面的初始数据
      */
     data: {},
-
-    /**
-     * 生命周期函数--监听页面加载
-     */
-    onLoad: function (options) {
-
-    },
-
-    /**
-     * 生命周期函数--监听页面初次渲染完成
-     */
-    onReady: function () {
-
-    },
-
     /**
      * 生命周期函数--监听页面显示
      */
     onShow: function () {
-
+        getApp().getIMWebSocket().sendMsg({
+            content: {
+                type: 'get-friends',
+                userId: getApp().globalData.userInfo.userId
+            }, fail: (res) => {
+                console.log('获取好友列表失败', res);
+            }
+        });
+        getApp().getIMWebSocket().setOnSocketReceiveMessageListener({
+            listener: (msg) => {
+                this.setData({conversations: msg.conversations.map(item => ChatListManager.getConversationsItem(item))})
+            }
+        });
     },
 
     /**
