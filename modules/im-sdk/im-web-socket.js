@@ -3,6 +3,7 @@ export default class IMWebSocket {
         this._isOpen = false;
         this._onSocketOpen();
         this._onSocketMessage();
+        this._msgQueen = [];
     }
 
     createSocket() {
@@ -19,18 +20,23 @@ export default class IMWebSocket {
 
     sendMsg({content, success, fail}) {
         if (this._isOpen) {
-            wx.sendSocketMessage({
-                data: content, success: () => {
-                    success && success(content);
-                },
-                fail: (res) => {
-                    console.log('发送失败', res);
-                    fail && fail();
-                }
-            });
+            this._sendMsg({content, success, fail});
         } else {
-            fail && fail();
+            console.log('添加到数组中', content);
+            this._msgQueen.push(content);
         }
+    }
+
+    _sendMsg({content, success, fail}) {
+        wx.sendSocketMessage({
+            data: JSON.stringify(content), success: () => {
+                success && success(content);
+            },
+            fail: (res) => {
+                console.log('发送失败', res);
+                fail && fail();
+            }
+        });
     }
 
     setOnSocketReceiveMessageListener(cb) {
@@ -67,12 +73,18 @@ export default class IMWebSocket {
         wx.onSocketMessage((res) => {
             let msg = JSON.parse(res.data);
             if ('login' === msg.type) {
-                getApp().globalData.userId = msg.content;
+                console.log(msg.userInfo);
+                getApp().globalData.userInfo = msg.userInfo;
                 getApp().globalData.friendsId = msg.friendsId;
+                if (this._msgQueen.length) {
+                    let temp;
+                    while (temp = this._msgQueen.shift()) {
+                        this._sendMsg({content: temp});
+                    }
+                }
             } else {
                 this._socketReceiveListener && this._socketReceiveListener(msg);
             }
-            console.log('收到服务器内容：' + res.data)
         })
     }
 

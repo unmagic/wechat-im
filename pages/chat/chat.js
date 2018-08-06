@@ -26,7 +26,7 @@ Page({
     onLoad: function (options) {
 
         const friend = JSON.parse(options.friend);
-
+        console.log(friend);
         this.initData();
         wx.setNavigationBarTitle({
             title: friend.friendName

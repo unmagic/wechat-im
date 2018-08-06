@@ -9,26 +9,26 @@ export default class IMOperator {
     static ImageType = 'image';
     static CustomType = 'custom';
     static ConversationId = 0;
-    static ChatListSocketAction = 'ChatList';
-    static ConversationSocketAction = 'Conversation';
 
     constructor(page, opts) {
-        this._page = page;
         this._opts = opts;
         this._latestTImestamp = 0;//最新消息的时间戳
-        this._myHeadUrl = '../../image/my_head.jpeg';
-        this._otherHeadUrl = this._opts.headUrl;
-        if (this._page.route === 'pages/chat/chat') {
-            getApp().globalData.currentSocketAction = IMOperator.ConversationSocketAction;
-        } else {
-            getApp().globalData.currentSocketAction = IMOperator.ChatListSocketAction;
-        }
+        this._myHeadUrl = getApp().globalData.userInfo.myHeadUrl;
+        this._otherHeadUrl = this._opts.friendHeadUrl;
     }
 
     getFriendId() {
-        return this._opts.userId;
+        return this._opts.friendId;
     }
+
     onSimulateReceiveMsg(cbOk) {
+        getApp().getIMWebSocket().sendMsg({
+            content: {
+                type: 'get-history',
+                userId: getApp().globalData.userInfo.userId,
+                friendId: this.getFriendId()
+            }
+        });
         getApp().getIMWebSocket().setOnSocketReceiveMessageListener((msg) => {
             if (!msg) {
                 return;
@@ -45,12 +45,12 @@ export default class IMOperator {
 
     onSimulateSendMsg({content, success, fail}) {
         //这里content即为要发送的数据
-        //这里的content是一个JSON格式的字符串，类似于：{"content":"233","type":"text"}
+        //这里的content是一个对象了，不再是一个JSON格式的字符串。这样可以在发送消息的底层统一处理。
         getApp().getIMWebSocket().sendMsg({
             content,
             success: (content) => {
-                //这个content格式一样
-                const item = this.createNormalChatItem(JSON.parse(content));
+                //这个content格式一样,也是一个对象
+                const item = this.createNormalChatItem(content);
                 this._latestTImestamp = item.timestamp;
                 success && success(item);
             },
@@ -60,15 +60,14 @@ export default class IMOperator {
 
     static createChatItemContent({type = IMOperator.TextType, content = '', duration, friendId} = {}) {
         if (!content.replace(/^\s*|\s*$/g, '')) return;
-        return JSON.stringify({
+        return {
             content,
             type,
             conversationId: IMOperator.ConversationId,
-            userId: getApp().globalData.userId,
-            socketAction: getApp().globalData.currentSocketAction,
+            userId: getApp().globalData.userInfo.userId,
             friendId: friendId,
             duration
-        });
+        };
     }
 
     createNormalChatItem({type = IMOperator.TextType, content = '', isMy = true, duration} = {}) {
@@ -77,7 +76,7 @@ export default class IMOperator {
         const time = dealChatTime(currentTimestamp, this._latestTImestamp);
         let obj = {
             msgId: 0,//消息id
-            friendId: 0,//好友id
+            friendId: this.getFriendId(),//好友id
             isMy: isMy,//我发送的消息？
             showTime: time.ifShowTime,//是否显示该次发送时间
             time: time.timeStr,//发送时间 如 09:15,

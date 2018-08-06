@@ -15,23 +15,17 @@ Page({
      * 生命周期函数--监听页面加载
      */
     onLoad: function (options) {
-
-    },
-
-    /**
-     * 生命周期函数--监听页面初次渲染完成
-     */
-    onReady: function () {
-        getApp().getIMWebSocket().sendMsg({
-            content: JSON.stringify({
-                type: 'get-conversations',
-                userId: getApp().globalData.userId
-            })
-        });
         getApp().getIMWebSocket().setOnSocketReceiveMessageListener((msg) => {
             this.setData({conversations: msg.conversations.map(item => ChatListManager.getConversationsItem(item))})
-        })
+        });
+        getApp().getIMWebSocket().sendMsg({
+            content: {
+                type: 'get-conversations',
+                userId: getApp().globalData.userInfo.userId
+            }
+        });
     },
+
     toChat: function (e) {
         let item = e.currentTarget.dataset.item;
         delete item.latestMsg;

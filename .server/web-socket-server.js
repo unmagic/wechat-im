@@ -6,50 +6,65 @@ let ws = require("nodejs-websocket");
 class WebSocketServer {
     constructor() {
         this.connMap = new Map();
-        this.usersId = ['user_001', 'user_002'];
+        this.users = [{
+            userId: 'user_001',
+            nickName: '柳如月',
+            myHeadUrl: 'http://downza.img.zz314.com/edu/pc/wlgj-1008/2016-06-23/64ec0888b15773e3ba5b5f744b9df16c.jpg'
+        }, {
+            userId: 'user_002',
+            nickName: '李恺新',
+            myHeadUrl: 'http://tx.haiqq.com/uploads/allimg/170504/0641415410-1.jpg'
+        }];
         this.msgHistory = {};
-        this.msgHistory[`${this.usersId[0]}`] = [{
+        this.msgHistory[`${this.users[0].userId}`] = [{
             content: JSON.stringify({
                 "type": "text",
                 "content": "周末有时间一起参加社团活动吗？"
             }),
-            friendId: this.usersId[1],
+            friendId: this.users[1].userId,
+            friendHeadUrl: this.users[1].myHeadUrl,
+            friendName: this.users[1].nickName,
+            msgUserId: this.users[1].userId,
             timestamp: 1533294362000,
             timeStr: '19:06'
         }];
-        this.msgHistory[`${this.usersId[1]}`] = [{
+        this.msgHistory[`${this.users[1].userId}`] = [{
             content: JSON.stringify({
                 "type": "text",
                 "content": "周末有时间一起参加社团活动吗？"
             }),
-            friendId: this.usersId[0],
+            friendId: this.users[0].userId,
+            friendHeadUrl: this.users[0].myHeadUrl,
+            friendName: this.users[0].nickName,
+            msgUserId: this.users[0].userId,
             timestamp: 1533296368000,
-            timeStr: '19:39'
+            timeStr: '19:39',
         }];
-        const firstLatestMsgObj = this.msgHistory[this.usersId[0]][0];
-        const secondLatestMsgObj = this.msgHistory[this.usersId[1]][0];
+        const oneLatestMsgObj = this.msgHistory[this.users[0].userId][0];
+        const otherLatestMsgObj = this.msgHistory[this.users[1].userId][0];
         this.conversations = [{
-            userId: this.usersId[0],
-            friendId: firstLatestMsgObj.friendId,
-            friendHeadUrl: 'http://downza.img.zz314.com/edu/pc/wlgj-1008/2016-06-23/64ec0888b15773e3ba5b5f744b9df16c.jpg',//好友头像
+            userId: this.users[0].userId,
+            friendId: oneLatestMsgObj.friendId,
+            msgUserId: oneLatestMsgObj.msgUserId,//消息的所有人id
+            friendHeadUrl: oneLatestMsgObj.friendHeadUrl,//好友头像
             conversationId: -1,//会话id，目前未用到
-            friendName: '柳如月',//好友昵称
-            latestMsg: firstLatestMsgObj.content,//最新一条消息
-            unread: 0,//未读消息计数
-            timestamp: firstLatestMsgObj.timestamp,//最新消息的时间戳
-            timeStr: firstLatestMsgObj.timeStr//最新消息的时间
-        }, {
-            userId: this.usersId[1],
-            friendId: secondLatestMsgObj.friendId,
-            friendHeadUrl: 'http://tx.haiqq.com/uploads/allimg/170504/0641415410-1.jpg',//好友头像
-            conversationId: -1,//会话id，目前未用到
-            friendName: '李恺新',//好友昵称
-            latestMsg: secondLatestMsgObj.content,//最新一条消息
+            friendName: oneLatestMsgObj.friendName,//好友昵称
+            latestMsg: oneLatestMsgObj.content,//最新一条消息
             unread: 1,//未读消息计数
-            timestamp: secondLatestMsgObj.timestamp,//最新消息的时间戳
-            timeStr: secondLatestMsgObj.timeStr//最新消息的时间
+            timestamp: oneLatestMsgObj.timestamp,//最新消息的时间戳
+            timeStr: oneLatestMsgObj.timeStr//最新消息的时间
+        }, {
+            userId: this.users[1].userId,
+            friendId: otherLatestMsgObj.friendId,
+            msgUserId: otherLatestMsgObj.msgUserId,//消息的所有人id
+            friendHeadUrl: otherLatestMsgObj.friendHeadUrl,//好友头像
+            conversationId: -1,//会话id，目前未用到
+            friendName: otherLatestMsgObj.friendName,//好友昵称
+            latestMsg: otherLatestMsgObj.content,//最新一条消息
+            unread: 0,//未读消息计数
+            timestamp: otherLatestMsgObj.timestamp,//最新消息的时间戳
+            timeStr: otherLatestMsgObj.timeStr//最新消息的时间
         }];
-
     }
 
     create() {
@@ -61,16 +76,36 @@ class WebSocketServer {
                 if (msg.type === 'get-conversations') {
                     conn.sendText(JSON.stringify({
                         type: msg.type,
-                        conversations: this.conversations.filter(item => item.userId !== msg.userId)
+                        conversations: this.conversations.filter(item => item.userId === msg.userId)
                     }));
+                    return;
+                } else if (msg.type === 'get-history') {
+                    let temp;
+                    this.msgHistory[msg.userId].filter(item => item.friendId === msg.friendId).forEach(item => {
+                        temp = JSON.parse(item.content);
+                        conn.sendText(JSON.stringify({
+                            type: temp.type,
+                            content: temp.content,
+                            msgUserId: item.msgUserId,
+                            userId: msg.userId,
+                            friendId: item.friendId,
+                            timestamp: item.timestamp,
+                            timeStr: item.timeStr
+                        }));
+                    });
+                    return;
+                }else if (msg.type === 'get-friends') {
+
+
+
                     return;
                 }
                 msg.timestamp = Date.now();
                 let connTemp = this.connMap.get(msg.friendId);
                 const msgSendFinally = JSON.stringify(msg);
-                let myHistoryList = this.msgHistory[msg.userId] || (this.msgHistory[msg.userId] = []);
-                let friendHistoryList = this.msgHistory[msg.friendsId] || (this.msgHistory[msg.friendsId] = []);
-                myHistoryList.push();
+                // let myHistoryList = this.msgHistory[msg.userId] || (this.msgHistory[msg.userId] = []);
+                // let friendHistoryList = this.msgHistory[msg.friendsId] || (this.msgHistory[msg.friendsId] = []);
+                // myHistoryList.push();
                 !!connTemp && connTemp.sendText(msgSendFinally);
             });
             conn.on("close", function (code, reason) {
@@ -81,9 +116,9 @@ class WebSocketServer {
             });
         }).listen(8001);
         this.server.on('connection', (conn) => {
-            let userId = this.usersId.shift();
-            this.connMap.set(userId, conn);
-            conn.sendText(JSON.stringify({type: 'login', content: userId}));
+            let user = this.users.shift();
+            this.connMap.set(user.userId, conn);
+            conn.sendText(JSON.stringify({type: 'login', userInfo: user}));
         });
         console.log("WebSocket服务端建立完毕")
     }
