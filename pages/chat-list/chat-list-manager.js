@@ -5,6 +5,7 @@ export default class ChatListManager {
 
     static getConversationsItem(item) {
         let {latestMsg, ...msg} = item;
+        console.log(latestMsg, msg);
         return Object.assign(msg, JSON.parse(latestMsg));
         // return {
         //     conversationId: item.conversationId,//会话id，目前未用到

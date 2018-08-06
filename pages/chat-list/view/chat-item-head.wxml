@@ -1,6 +1,6 @@
 <template name="chat-item-head">
     <view class="chat-item-head-super-style">
         <image class="chat-head-style" src="{{headUrl}}" />
-        <text wx:if="{{false}}" class="unread-style">{{unread<=99?unread:'99+'}}</text>
+        <text wx:if="{{unread>0}}" class="unread-style">{{unread<=99?unread:'99+'}}</text>
     </view>
 </template>

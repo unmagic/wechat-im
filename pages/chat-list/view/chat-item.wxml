@@ -1,9 +1,9 @@
 <import src="chat-item-head.wxml"/>
 <template name="chat-item">
     <view class="chat-item-style" bindtap="toChat" data-item="{{item}}" hover-class="press-style">
-        <template is="chat-item-head" data="{{headUrl:item.headUrl,unread:item.unread}}"/>
+        <template is="chat-item-head" data="{{headUrl:item.friendHeadUrl,unread:item.unread}}"/>
         <view class="chat-item-content-super-style">
-            <view class="chat-item-name-style">{{item.nickName}}</view>
+            <view class="chat-item-name-style">{{item.friendName}}</view>
             <!--<image src="./../../image/chat/send_fail.png" style="width: 28rpx;height: 28rpx;margin-right: 6rpx;"/>-->
             <text class="chat-item-content-style">{{item.content}}</text>
         </view>

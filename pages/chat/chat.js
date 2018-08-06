@@ -29,7 +29,7 @@ Page({
 
         this.initData();
         wx.setNavigationBarTitle({
-            title: friend.nickName
+            title: friend.friendName
         });
         this.imOperator = new IMOperator(this, friend);
         this.UI = new UI(this);

@@ -8,7 +8,7 @@ export default class IMWebSocket {
     createSocket() {
         if (!this._socket) {
             this._socket = wx.connectSocket({
-                url: 'ws://10.4.98.115:8001',
+                url: 'ws://10.4.97.87:8001',
                 header: {
                     'content-type': 'application/json'
                 },
@@ -19,8 +19,15 @@ export default class IMWebSocket {
 
     sendMsg({content, success, fail}) {
         if (this._isOpen) {
-            wx.sendSocketMessage({data: content});
-            success && success(content);
+            wx.sendSocketMessage({
+                data: content, success: () => {
+                    success && success(content);
+                },
+                fail: (res) => {
+                    console.log('发送失败', res);
+                    fail && fail();
+                }
+            });
         } else {
             fail && fail();
         }
