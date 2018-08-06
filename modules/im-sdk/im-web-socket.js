@@ -38,7 +38,7 @@ export default class IMWebSocket {
         });
     }
 
-    setOnSocketReceiveMessageListener({listener}) {
+    setOnSocketReceiveMessageListener({action, listener}) {
         this._socketReceiveListener = listener;
     }
 

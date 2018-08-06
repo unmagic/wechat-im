@@ -9,7 +9,9 @@ Page({
     /**
      * 页面的初始数据
      */
-    data: {},
+    data: {
+        friends: []
+    },
     /**
      * 生命周期函数--监听页面显示
      */
@@ -24,11 +26,20 @@ Page({
         });
         getApp().getIMWebSocket().setOnSocketReceiveMessageListener({
             listener: (msg) => {
-                this.setData({conversations: msg.conversations.map(item => ChatListManager.getConversationsItem(item))})
+                if (msg.type === 'get-friends') {
+                    this.setData({friends: msg.friends.map(item => this.createFriendItem(item))});
+                }
             }
         });
     },
 
+    createFriendItem(item) {
+        return {
+            friendId: item.userId,
+            friendHeadUrl: item.myHeadUrl,
+            friendName: item.nickName
+        };
+    },
     /**
      * 生命周期函数--监听页面隐藏
      */
@@ -36,31 +47,4 @@ Page({
 
     },
 
-    /**
-     * 生命周期函数--监听页面卸载
-     */
-    onUnload: function () {
-
-    },
-
-    /**
-     * 页面相关事件处理函数--监听用户下拉动作
-     */
-    onPullDownRefresh: function () {
-
-    },
-
-    /**
-     * 页面上拉触底事件的处理函数
-     */
-    onReachBottom: function () {
-
-    },
-
-    /**
-     * 用户点击右上角分享
-     */
-    onShareAppMessage: function () {
-
-    }
-})
+});

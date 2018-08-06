@@ -6,6 +6,7 @@ let ws = require("nodejs-websocket");
 class WebSocketServer {
     constructor() {
         this.connMap = new Map();
+        this._count = 0;
         this.users = [{
             userId: 'user_001',
             nickName: '柳如月',
@@ -15,6 +16,7 @@ class WebSocketServer {
             nickName: '李恺新',
             myHeadUrl: 'http://tx.haiqq.com/uploads/allimg/170504/0641415410-1.jpg'
         }];
+
         this.msgHistory = {};
         this.msgHistory[`${this.users[0].userId}`] = [{
             content: JSON.stringify({
@@ -119,9 +121,11 @@ class WebSocketServer {
             });
         }).listen(8001);
         this.server.on('connection', (conn) => {
-            let user = this.users.shift();
+            this._count = this._count >= this.users.length ? 0 : this._count;
+            let user = this.users[this._count];
             this.connMap.set(user.userId, conn);
             conn.sendText(JSON.stringify({type: 'login', userInfo: user}));
+            this._count++;
         });
         console.log("WebSocket服务端建立完毕")
     }

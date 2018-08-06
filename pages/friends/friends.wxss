@@ -1,1 +1,2 @@
 /* pages/friends/friends.wxss */
+@import "../chat-list/view/chat-item.wxss";

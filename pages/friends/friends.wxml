@@ -1,2 +1,11 @@
 <!--pages/friends/friends.wxml-->
-<text>pages/friends/friends.wxml</text>
+<import src="../chat-list/view/chat-item-head.wxml"/>
+<block wx:for="{{friends}}" wx:key="friendId">
+    <view class="chat-item-style">
+        <template is="chat-item-head" data="{{headUrl:item.friendHeadUrl,unread:0}}"/>
+        <view class="chat-item-content-super-style">
+            <view class="chat-item-name-style">{{item.friendName}}</view>
+        </view>
+    </view>
+    <view class="list-divide-line" style="width: 79.5%;margin-left: 20.5%"/>
+</block>
