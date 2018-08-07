@@ -204,7 +204,8 @@ chatInput.setExtraButtonClickListener(function (dismiss) {
 ```
 ### 至此，输入组件SDK的集成就完成了！
 
-## 会话页面UI
+## 客户端WebSocket功能及会话页面
+
 
 ### 效果图
 
@@ -214,24 +215,31 @@ chatInput.setExtraButtonClickListener(function (dismiss) {
 
 对于即时通讯方面的sdk，我是用的WebSocket，当然这部分内容仅供参考。你可以引入常见的sdk，比如腾讯的、网易的。
 
+目前实现了三个页面。会话列表页面、好友列表页面、会话页面。
+
+会话列表页面功能：
+- [x] 显示好友头像、昵称、最新一条消息内容及时间、未读计数展示。
+- [x] 实时更新好友最新一条消息及时间，实时更新未读计数。
+- [x] 从会话页面回退到会话列表页面后，会刷新列表页面。
+
+好友页面功能：
+- [x] 显示好友头像昵称。
+
+好友页面未实现功能：
+并未实现发起聊天功能，仅供演示，如有需要，请自行实现。
+
+会话页面功能：
+- 支持发送文本、语音、图片及自定义类型消息。因发送文件类型的消息需要上传文件的服务器，所以目前仅支持发送文本消息和自定义类型消息。如果你自己配置好了上传文件的服务器，那么就可以发送语音和图片消息了。
+
 ### 重要功能模块的流程图
 
 有网友建议画个流程图，梳理下项目中的各部分关系。
 
 这部分的东西包括WebSocket写完之后发现，并没有很多难点，所以我只说下使用时要注意的几点。
 
-### 示例页面
-
-目前实现了三个页面。会话列表页面、好友列表页面、会话页面。
-
 #### 会话列表页面
 
 示例页面是`pages/chat-list/chat-list`。
-
-会话列表页面功能：
-- [x] 显示好友头像、昵称、最新一条消息内容及时间、未读计数展示。
-- [x] 实时更新好友最新一条消息及时间，实时更新未读计数。
-- [x] 从会话页面回退到会话列表页面后，会刷新列表页面。
 
 代码非常简单。
 
@@ -538,6 +546,32 @@ export default class IMWebSocket {
 ```
 也很简单，对吧。
 
+### 在App.js中初始化IMWebSocket
+
+```
+//app.js
+import IMWebSocket from "./modules/im-sdk/im-web-socket";
+
+App({
+    globalData: {
+        userInfo: {},
+    },
+    getIMWebSocket() {
+        return this.imWebSocket;
+    },
+    onLaunch() {
+        this.imWebSocket = new IMWebSocket();
+
+    },
+    onHide() {
+        // this.imWebSocket.closeSocket();
+    },
+    onShow() {
+        this.imWebSocket.createSocket({url: 'ws://10.4.97.87:8001'});
+    }
+});
+```
+
 
 ### IM模拟类 `im-operator.js`
 最后重点说下IM的控制类 IMOperator。
@@ -565,14 +599,14 @@ export default class IMWebSocket {
 <font color=red>记住，你所有发送的消息和接收到的消息，都是以文本消息的形式，只是在渲染的时候解析，生成不同的消息类型来展示！！！</font>
 
 ```
- static createChatItemContent({type = IMOperator.TextType, content = '', duration, friendId} = {}) {
+ createChatItemContent({type = IMOperator.TextType, content = '', duration} = {}) {
          if (!content.replace(/^\s*|\s*$/g, '')) return;
          return {
              content,
              type,
-             conversationId: 0,//这里的conversationId目前没有用到
+             conversationId: 0,//会话id，目前未用到
              userId: getApp().globalData.userInfo.userId,
-             friendId: friendId,
+             friendId: this.getFriendId(),//好友id
              duration
          };
      }
@@ -583,7 +617,6 @@ export default class IMWebSocket {
 - type: 消息类型 TextType/VoiceType/ImageType/CustomType
 - content: 需要发送的原始文本信息。可以是文字、语音文件路径、图片文件路径。
 - duration: 语音时长。如果是语音类型，则需要传这个字段。
-- friendId: 好友id
 
 #### 生成消息对象
 除自定义消息类型外，其他的无论是自己发送的消息，还是好友的消息，在UI上渲染时，都是以该消息对象的格式来统一的。
@@ -630,69 +663,66 @@ static createCustomChatItem() {
     }
 ```
 
-
-
-
 #### 发送数据接口 
-这里是模拟的数据发送。我计划将来集成webSocket，实现完整的一套小程序IM体系，这部分还在研究。
+发送数据这块目前已经实现了WebSocket通信。
 
-我是在输入组件的录音监听回调接口中调用`this.msgManager`的发送消息方法`sendMsg()`
+支持发送文本、语音、图片及自定义类型消息。不过因发送文件类型的消息需要上传文件的服务器，所以目前仅支持发送文本消息和自定义类型消息。如果你自己配置好了上传文件的服务器，那么就可以发送语音和图片消息了。
+
+以发送文本消息为例：
+
+首先在输入组件的文本输入监听回调接口中调用`this.msgManager`的发送消息方法`sendMsg()`
 
 ```
-chatInput.recordVoiceListener((res, duration) => {
-            let tempFilePath = res.tempFilePath;
-            //type：消息类型，content：消息内容，是普通的字符串，duration：语音时长。如果是语音类型的话，需要传这个参数
-            this.msgManager.sendMsg({type: IMOperator.VoiceType, content: tempFilePath, duration});
+chatInput.setTextMessageListener((e) => {
+            let content = e.detail.value;
+            this.msgManager.sendMsg({type: IMOperator.TextType, content});
         });
 ```
-在`sendMsg`方法中会去判断发送的消息类型，最终都会调用下面的IM模拟发送接口。
+在`sendMsg`方法中会去判断发送的消息类型，最终都会调用下面的IM发送接口。
 
 ```
 onSimulateSendMsg({content, success, fail}) {
         //这里content即为要发送的数据
-        setTimeout(() => {
-            //这里的content是一个JSON格式的字符串，类似于：{"content":"233","type":"text"}
-            const item = this.createNormalChatItem(JSON.parse(content));
-            this._latestTImestamp = item.timestamp;
-
-            //使用随机数来模拟数据发送失败情况
-            const isSendSuccess = parseInt(Math.random() * 100) > 35;
-            console.log('随机数模拟是否发送成功', isSendSuccess);
-            const isChatClose = this._page.data.chatStatue === 'close';
-            if (isSendSuccess || isChatClose) {
-                success && success(item);
-            } else {
-                fail && fail();
-            }
-            if (isChatClose || !isSendSuccess) return;
-            setTimeout(() => {
-
-                const item = this.createNormalChatItem({type: 'text', content: '这是模拟好友回复的消息', isMy: false});
-                // const item = this.createNormalChatItem({type: 'voice', content: '上传文件返回的语音文件路径', isMy: false});
-                // const item = this.createNormalChatItem({type: 'image', content: '上传文件返回的图片文件路径', isMy: false});
+        //注意：这里的content是一个对象了，不再是一个JSON格式的字符串。这样可以在发送消息的底层接口中统一处理。
+        getApp().getIMWebSocket().sendMsg({
+            content,
+            success: (content) => {
+                //这个content格式一样,也是一个对象
+                const item = this.createNormalChatItem(content);
                 this._latestTImestamp = item.timestamp;
-                //这里是收到好友消息的回调函数，建议传入的item是 由 createNormalChatItem 方法生成的。
-                this.onSimulateReceiveMsgCb && this.onSimulateReceiveMsgCb(item);
-            }, 1000);
-        }, 300);
-
+                success && success(item);
+            },
+            fail
+        });
     }
 ```
 
-- content：这里的content是一个JSON格式的字符串，类似于：{"content":"233","type":"text"}，是由该类中`createChatItemContent`方法生成的，在发送消息时，必须使用该方法来生成`content`。
-- success：发送成功回调，我这里返回了`createNormalChatItem`生成的消息对象，模拟发送成功后IM-SDK返回的消息对象。
+- content：这里的content是一个对象，类似于：{"content":"233","type":"text"}，是由该类中`createChatItemContent`方法生成的。
+- success：发送成功回调，我这里返回了`createNormalChatItem`生成的消息对象。
 - fail：发送失败回调，你可以自行传参。
 
 其他消息的发送方式都是与之类似的。
 
 #### 接收数据接口 
-很多人问我，消息是怎么接收到的了，如果你问的是业务层的，那这是IM-SDK负责的事情，需要你自己去看你使用的IM-SDK文档。而现在我写的这个组件的IM业务层是使用延迟函数来模拟的！！所以不要再问我怎么接收数据了。
-
-如果你问的是视图层的，那你可以看下下面的调用方法。
+关于消息是怎么接收到的，
 
 ```
 onSimulateReceiveMsg(cbOk) {
-        this.onSimulateReceiveMsgCb = cbOk;
+        getApp().getIMWebSocket().setOnSocketReceiveMessageListener({
+            listener: (msg) => {
+                if (!msg) {
+                    return;
+                }
+                msg.isMy = msg.msgUserId === getApp().globalData.userInfo.userId;
+                const item = this.createNormalChatItem(msg);
+                // const item = this.createNormalChatItem({type: 'voice', content: '上传文件返回的语音文件路径', isMy: false});
+                // const item = this.createNormalChatItem({type: 'image', content: '上传文件返回的图片文件路径', isMy: false});
+                this._latestTImestamp = item.timestamp;
+                //这里是收到好友消息的回调函数，建议传入的item是 由 createNormalChatItem 方法生成的。
+                cbOk && cbOk(item);
+            }
+        });
+
     }
 ```
 - cbOk：接收到消息的回调，这里我也是模拟的，返回了由`this.createNormalChatItem({type: 'text', content: '这是模拟好友回复的消息', isMy: false})`生成的消息对象
@@ -702,12 +732,15 @@ onSimulateReceiveMsg(cbOk) {
 我是在`chat.js`的`onLoad`生命周期中注册的监听：
 
 ```
- onLoad: function (options) {
+onLoad: function (options) {
+
+        const friend = JSON.parse(options.friend);
+        console.log(friend);
         this.initData();
         wx.setNavigationBarTitle({
-            title: '呵呵哒的好朋友'
+            title: friend.friendName
         });
-        this.imOperator = new IMOperator(this);
+        this.imOperator = new IMOperator(this, friend);
         this.UI = new UI(this);
         this.msgManager = new MsgManager(this);
 
@@ -720,7 +753,6 @@ onSimulateReceiveMsg(cbOk) {
     },
 ```
 
-
 #### 渲染消息列表
 
 我使用`chatItems`来存储所有的消息类型，包括自定义消息类型。
@@ -731,7 +763,21 @@ onSimulateReceiveMsg(cbOk) {
 
 最上面说的输入组件，有各种交互情况下的事件回调，在回调函数中处理对应逻辑即可。这部分的所有代码我都放到了`chat.js`中。
 
-### 以上就是会话页面的所有难点内容
+### 以上就是客户端WebSocket及会话页面的所有难点内容
+
+### 服务端WebSocket实现的业务功能
+
+服务器端是用nodejs开发的，配合客户端实现了简单的IM消息展示逻辑。webSocket所有功能仅供学习和参考，如想商用，请自行开发。
+
+项目导入成功后
+1. 执行`npm install nodejs-websocket安装nodejs-websocket`安装nodejs-websocket。
+2. 运行.server文件夹下的web-socket-server.js文件。
+
+`nodejs-websocket`具体API详见https://www.npmjs.com/package/nodejs-websocket
+
+服务端简单实现了两人实时聊天功能，获取历史消息，获取会话列表、好友列表。目前消息都是在内存中，重启服务后所有数据会重置。
+
+服务端代码就不贴了。
 
 ### 最后说两句
 
