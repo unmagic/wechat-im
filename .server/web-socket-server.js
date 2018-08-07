@@ -53,6 +53,7 @@ class WebSocketServer {
                     }));
                     return;
                 } else if (msg.type === 'get-history') {
+                    this._unreadObj[msg.userId] = 0;
                     let temp;
                     this.getSingleHistoryMsg(msg.userId, msg.friendId).forEach(item => {
                         temp = JSON.parse(item.content);
