@@ -209,7 +209,9 @@ chatInput.setExtraButtonClickListener(function (dismiss) {
 
 ### 效果图
 
-<img src="https://github.com/unmagic/wechat-im/blob/master/.gif/效果图2.png" width="40%"/>
+<img src="https://github.com/unmagic/.gif/blob/master/wechat-im/会话列表页面.jpg" width="30%"/>会话列表页面
+<img src="https://github.com/unmagic/.gif/blob/master/wechat-im/会话页面.jpg" width="30%"/>会话页面
+<img src="https://github.com/unmagic/.gif/blob/master/wechat-im/好友页面.jpg" width="30%"/>好友页面
 
 会话页面，我将UI封装成了多个`template`，最后使用`chat-item.wxml`即可，UI相关的代码都放到了`chat-page`文件夹中；加载方面的UI放到了`loading`文件夹中；`image`文件夹中也新增了几张图片。
 
