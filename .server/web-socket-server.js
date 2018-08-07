@@ -169,7 +169,7 @@ class WebSocketServer {
     getMyTime(timestamp) {
         let date = new Date(timestamp);
         let hours = date.getHours(), minutes = date.getMinutes();
-        return `${hours > 10 ? hours : '0' + hours}:${minutes > 10 ? minutes : '0' + minutes}`
+        return `${hours >= 10 ? hours : '0' + hours}:${minutes > 10 ? minutes : '0' + minutes}`
     }
 }
 
