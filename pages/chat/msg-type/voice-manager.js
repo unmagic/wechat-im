@@ -33,11 +33,10 @@ export default class VoiceManager {
             });
             this._page.UI.showItemForMoment(temp, (itemIndex) => {
                 this._page.simulateUploadFile({savedFilePath, duration, itemIndex}, (content) => {
-                    this._page.sendMsg(IMOperator.createChatItemContent({
+                    this._page.sendMsg(this._page.imOperator.createChatItemContent({
                         type: IMOperator.VoiceType,
                         content: content,
-                        duration,
-                        friendId: this._page.imOperator.getFriendId()
+                        duration
                     }), itemIndex, (msg) => {
                         FileManager.set(msg, savedFilePath);
                     });

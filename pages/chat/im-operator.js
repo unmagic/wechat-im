@@ -60,14 +60,14 @@ export default class IMOperator {
         });
     }
 
-    static createChatItemContent({type = IMOperator.TextType, content = '', duration, friendId} = {}) {
+    createChatItemContent({type = IMOperator.TextType, content = '', duration} = {}) {
         if (!content.replace(/^\s*|\s*$/g, '')) return;
         return {
             content,
             type,
             conversationId: 0,
             userId: getApp().globalData.userInfo.userId,
-            friendId: friendId,
+            friendId: this.getFriendId(),
             duration
         };
     }

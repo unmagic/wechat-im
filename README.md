@@ -9,11 +9,11 @@
 
 转载请注明出处：https://blog.csdn.net/sinat_27612147/article/details/78456363
 
-<font color=red>2018-08-02 作者公告：现在拥有聊天页面UI的项目已经在当前的github仓库中更新了！！！模块拆分工作也已完成，大家可以在master分支上预览。如需了解聊天页面集成方式，请见下方聊天页面UI部分。</font>
+<font color=red>2018-08-07 作者公告：现在拥有会话页面展示及WebSocket功能的项目已经在当前的github仓库中更新了！！！大家可以在master分支上预览。</font>
 
 ## 聊天UI组件功能：
-
-- [x] 支持发送文本、图片、语音、emoji表情
+- [x] 目前项目中已使用webSocket，实现了IM的通信功能！目前包括会话列表页面、会话页面及好友页面。支持本地使用nodejs开启WebSocket服务。详见下方文档。
+- [x] 支持发送文本、图片、语音，支持输入法的emoji表情
 - [x] 支持拍照，图库选择图片、图片预览
 - [x] 支持切换到文本输入时，显示发送按钮。
 - [x] 支持语音播放及播放动画。
@@ -29,10 +29,10 @@
 - [x] 自定义功能，显示自定义气泡。
 - [x] 通过解析语音或图片消息信息，优先读取本地文件。
 - [x] 实现了文件存储算法，保证10M存储空间内的语音和图片文件均为最新。
+- [x] 最低支持微信基础库版本为1.4.0
 - [x] 各消息类型和各功能均已模块化，让你在浏览代码时愉悦轻松。（其实这算不上组件特性。。。）
 
 ## 聊天UI组件不支持的功能：
-- 内部现使用延迟函数模拟im-sdk消息收发功能，并没有集成真实的im-sdk，将来考虑集成webSocket。
 - 如果要使用群聊，目前的UI中，头像旁并没有展示成员昵称。
 - 本地没有存储历史聊天消息。这个原因请看文章结尾。
 
@@ -46,7 +46,7 @@
 ## 聊天输入组件
 
 近期一直在做微信小程序，业务上要求在小程序里实现即时通讯的功能。这部分功能需要用到文本和语音输入及一些语音相关的手势操作。所以我写了一个控件来处理这些操作。
-聊天输入组件和聊天页面组件是两个不同的组件，分别处理不同的业务。
+聊天输入组件和会话页面组件是两个不同的组件，分别处理不同的业务。
 
 ### 控件样式
 <img src="https://github.com/unmagic/wechat-im/blob/master/.gif/输入组件样式图.png" width="40%" alt=""/>
@@ -71,13 +71,13 @@
 
 输入组件相关文件在`modules/chat-input`和`image`文件夹下，示例页面是`pages/chat-input/chat-input`。
 
-<font color=red>聊天输入组件和聊天页面组件所有你需要集成的文件，打包后大小在65kb左右，已经很小了。需要注意的是，项目中的`.gif`文件夹是很多大的效果图，这个可以删除掉。`image`文件夹中有两张用于测试的用户头像，也可以删除掉。</font>。
+<font color=red>聊天输入组件和会话页面组件所有你需要集成的文件，打包后大小在65kb左右，已经很小了。需要注意的是，项目中的`.gif`文件夹是很多大的效果图，这个可以删除掉。`image`文件夹中有两张用于测试的用户头像，也可以删除掉。</font>。
 
 ----------
 
-#### 二、集成到聊天页面
+#### 二、集成到会话页面
 
-##### 1.	在聊天页面中导入chat-input文件
+##### 1.	在会话页面中导入chat-input文件
 
  - 在聊天页的js文件中导入 `let chatInput = require('../../modules/chat-input/chat-input');`
  - 在聊天页的wxml文件中引入布局
@@ -204,291 +204,118 @@ chatInput.setExtraButtonClickListener(function (dismiss) {
 ```
 ### 至此，输入组件SDK的集成就完成了！
 
-## 聊天页面UI
+## 会话页面UI
 
 ### 效果图
 
 <img src="https://github.com/unmagic/wechat-im/blob/master/.gif/效果图2.png" width="40%"/>
 
-聊天页面，我将UI封装成了多个`template`，最后使用`chat-item.wxml`即可，UI相关的代码都放到了`chat-list`文件夹中；加载方面的UI放到了`loading`文件夹中；`image`文件夹中也新增了几张图片。
+会话页面，我将UI封装成了多个`template`，最后使用`chat-item.wxml`即可，UI相关的代码都放到了`chat-page`文件夹中；加载方面的UI放到了`loading`文件夹中；`image`文件夹中也新增了几张图片。
 
-对于即时通讯方面的sdk，我是用`setTimeout`来模拟的。你可以引入常见的sdk，比如腾讯的、网易的。当然你也可以使用webSocket来自己实现。
+对于即时通讯方面的sdk，我是用的WebSocket，当然这部分内容仅供参考。你可以引入常见的sdk，比如腾讯的、网易的。
 
-这部分的东西写完之后发现，并没有很多难点，所以我只说下集成时要注意的几点。
+### 重要功能模块的流程图
+
+有网友建议画个流程图，梳理下项目中的各部分关系。
+
+这部分的东西包括WebSocket写完之后发现，并没有很多难点，所以我只说下使用时要注意的几点。
 
 ### 示例页面
 
-示例页面是`pages/chat/chat`，可以在微信开发工具直接打开。
+目前实现了三个页面。会话列表页面、好友列表页面、会话页面。
+
+#### 会话列表页面
+
+示例页面是`pages/chat-list/chat-list`。
+
+会话列表页面功能：
+- [x] 显示好友头像、昵称、最新一条消息内容及时间、未读计数展示。
+- [x] 实时更新好友最新一条消息及时间，实时更新未读计数。
+- [x] 从会话页面回退到会话列表页面后，会刷新列表页面。
+
+代码非常简单。
+
+```
+// pages/chat-list/chat-list.js
+
+/**
+ * 会话列表页面
+ */
+Page({
+
+    /**
+     * 页面的初始数据
+     */
+    data: {
+        conversations: []
+    },
+
+    /**
+     * 生命周期函数--监听页面加载
+     */
+    onLoad: function (options) {
+
+    },
+
+    toChat: function (e) {
+        let item = e.currentTarget.dataset.item;
+        delete item.latestMsg;
+        delete item.unread;
+        wx.navigateTo({
+            url: `../chat/chat?friend=${JSON.stringify(item)}`
+        });
+    },
+    /**
+     * 生命周期函数--监听页面显示
+     */
+    onShow: function () {
+
+        getApp().getIMWebSocket().setOnSocketReceiveMessageListener({
+            listener: (msg) => {
+                console.log('会话列表', msg);
+                msg.type === 'get-conversations' && this.setData({conversations: msg.conversations.map(item => this.getConversationsItem(item))})
+            }
+        });
+        getApp().getIMWebSocket().sendMsg({
+            content: {
+                type: 'get-conversations',
+                userId: getApp().globalData.userInfo.userId//这里获取的userInfo，就是在建立webSocket连接时服务器返回的，作为你的身份信息。
+            }, success: () => {
+                console.log('获取会话列表消息发送成功');
+            },
+            fail: (res) => {
+                console.log('获取会话列表失败', res);
+            }
+        });
+    },
+    getConversationsItem(item) {
+        let {latestMsg, ...msg} = item;
+        return Object.assign(msg, JSON.parse(latestMsg));
+    }
+});
+```
+就这些代码。结合流程图来看的话，相信你肯定能看懂。看不懂也没事，能理解思想就行，就是 注册监听、发起请求、回调监听、渲染页面。
+
+#### 好友列表页面
+
+示例页面是`pages/friends/friends`。
+
+同会话列表页面，没什么好说的。
+
+#### 会话页面
+
+示例页面是`pages/chat/chat`。
 
 在`chat`文件夹下，我封装了多个类，用于管理消息类型的收发和展示。
 
-### 文本消息管理类
-先看个最简单的，文本类型消息的收发和展示`text-manager.js`：
+首先是一个收发消息的工厂类，用于统一管理所有消息类型的收发。见`msg-manager.js`：
 
 ```
-import IMOperator from "../im-operator";
-
-export default class TextManager {
-    constructor(page) {
-        this._page = page;
-    }
-
-    /**
-     * 接收到消息时，通过UI类的管理进行渲染
-     * @param msg 接收到的消息，这个对象应是由 im-operator.js 中的createNormalChatItem()方法生成的。
-     */
-    showMsg({msg}) {
-        //UI类是用于管理UI展示的类。
-        this._page.UI.updateViewWhenReceive(msg);
-    }
-
-    /**
-     * 发送消息时，通过UI类来管理发送状态的切换和消息的渲染
-     * @param content 输入组件获取到的原始文本信息
-     */
-    sendOneMsg(content) {
-        this._page.UI.showItemForMoment(this._page.imOperator.createNormalChatItem({
-            type: IMOperator.TextType,
-            content
-        }), (itemIndex) => {
-            this._page.sendMsg(IMOperator.createChatItemContent({type: IMOperator.TextType, content}), itemIndex);
-        });
-    }
-}
-```
-### 语音消息管理类
-再来看个比较复杂的，语音消息的收发和展示`voice-manager.js`:
-
-```
-import {isVoiceRecordUseLatestVersion} from "../../../modules/chat-input/chat-input";
-import {saveFileRule} from "../../../utils/file";
-import IMOperator from "../im-operator";
-import FileManager from "../file-manager";
-
-export default class VoiceManager {
-    constructor(page) {
-        this._page = page;
-        this.isLatestVersion = isVoiceRecordUseLatestVersion();
-        //判断是否需要使用高版本语音播放接口
-        if (this.isLatestVersion) {
-            this.innerAudioContext = wx.createInnerAudioContext();
-        }
-        //在该类被初始化时，绑定语音点击播放事件
-        this._page.chatVoiceItemClickEvent = (e) => {
-            let dataset = e.currentTarget.dataset;
-            console.log('语音Item', dataset);
-            this._playVoice({dataset})
-        }
-    }
-
-    /**
-     * 发送语音消息
-     * @param tempFilePath 由输入组件接收到的临时文件路径
-     * @param duration 由输入组件接收到的录音时间
-     */
-    sendOneMsg(tempFilePath, duration) {
-        saveFileRule(tempFilePath, (savedFilePath) => {
-            const temp = this._page.imOperator.createNormalChatItem({
-                type: IMOperator.VoiceType,
-                content: savedFilePath,
-                duration
-            });
-            this._page.UI.showItemForMoment(temp, (itemIndex) => {
-                this._page.simulateUploadFile({savedFilePath, duration, itemIndex}, (content) => {
-                    this._page.sendMsg(IMOperator.createChatItemContent({
-                        type: IMOperator.VoiceType,
-                        content: content,
-                        duration
-                    }), itemIndex, (msg) => {
-                        FileManager.set(msg, savedFilePath);
-                    });
-                });
-            });
-        });
-    }
-
-    /**
-     * 停止播放所有语音
-     */
-    stopAllVoicePlay() {
-        let that = this._page;
-        if (this._page.data.isVoicePlaying) {
-            this._stopVoice();
-            that.data.chatItems.forEach(item => {
-                if (IMOperator.VoiceType === item.type) {
-                    item.isPlaying = false
-                }
-            });
-            that.setData({
-                chatItems: that.data.chatItems,
-                isVoicePlaying: false
-            })
-        }
-    }
-
-    /**
-     * 接收到消息时，通过UI类的管理进行渲染
-     * @param msg 接收到的消息，这个对象应是由 im-operator.js 中的createNormalChatItem()方法生成的。
-     */
-    showMsg({msg}) {
-        const url = msg.content;
-        const localVoicePath = FileManager.get(msg);
-        console.log('本地语音路径', localVoicePath);
-        if (!localVoicePath) {
-            wx.downloadFile({
-                url,
-                success: res => {
-                    saveFileRule(res.tempFilePath, (savedFilePath) => {
-                        const temp = this._page.imOperator.createNormalChatItem({
-                            type: IMOperator.VoiceType,
-                            content: savedFilePath
-                        });
-                        this._page.UI.updateViewWhenReceive(temp);
-                        FileManager.set(msg, savedFilePath);
-                    });
-                }
-            });
-        } else {
-            this._page.UI.updateViewWhenReceive(msg);
-        }
-    }
-
-    /**
-     * 停止播放 兼容低版本语音播放
-     * @private
-     */
-    _stopVoice() {
-        if (this.isLatestVersion) {
-            this.innerAudioContext.stop();
-        } else {
-            wx.stopVoice();
-        }
-    }
-
-    _playVoice({dataset}) {
-        let that = this._page;
-        if (dataset.voicePath === that.data.latestPlayVoicePath && that.data.chatItems[dataset.index].isPlaying) {
-            this.stopAllVoicePlay();
-        } else {
-            this._startPlayVoice(dataset);
-            let localPath = dataset.voicePath;//优先读取本地路径，可能不存在此文件
-
-            this._myPlayVoice(localPath, dataset, function () {
-                console.log('成功读取了本地语音');
-            }, () => {
-                console.log('读取本地语音文件失败，一般情况下是本地没有该文件，需要从服务器下载');
-                wx.downloadFile({
-                    url: dataset.voicePath,
-                    success: res => {
-                        console.log('下载语音成功', res);
-                        this.__playVoice({
-                            filePath: res.tempFilePath,
-                            success: () => {
-                                this.stopAllVoicePlay();
-                            },
-                            fail: (res) => {
-                                console.log('播放失败了', res);
-                            }
-                        });
-                    }
-                });
-            });
-        }
-    }
-
-    /**
-     * 播放语音 兼容低版本语音播放
-     * @param filePath
-     * @param success
-     * @param fail
-     * @private
-     */
-    __playVoice({filePath, success, fail}) {
-        if (this.isLatestVersion) {
-            this.innerAudioContext.src = filePath;
-            this.innerAudioContext.startTime = 0;
-            this.innerAudioContext.play();
-            this.innerAudioContext.onError((error) => {
-                this.innerAudioContext.offError();
-                fail && fail(error);
-            });
-            this.innerAudioContext.onEnded(() => {
-                this.innerAudioContext.offEnded();
-                success && success();
-            });
-        } else {
-            wx.playVoice({filePath, success, fail});
-        }
-    }
-
-    _myPlayVoice(filePath, dataset, cbOk, cbError) {
-        let that = this._page;
-        if (dataset.isMy || that.data.isAndroid) {
-            this.__playVoice({
-                filePath: filePath,
-                success: () => {
-                    this.stopAllVoicePlay();
-                    typeof cbOk === "function" && cbOk();
-                },
-                fail: (res) => {
-                    console.log('播放失败了1', res);
-                    typeof cbError === "function" && cbError(res);
-                }
-            });
-        } else {
-            wx.downloadFile({
-                url: dataset.voicePath,
-                success: res => {
-                    console.log('下载语音成功', res);
-                    this.__playVoice({
-                        filePath: res.tempFilePath,
-                        success: () => {
-                            this.stopAllVoicePlay();
-                            typeof cbOk === "function" && cbOk();
-                        },
-                        fail: (res) => {
-                            console.log('播放失败了', res);
-                            typeof cbError === "function" && cbError(res);
-                        }
-                    });
-                }
-            });
-        }
-
-    }
-
-    _startPlayVoice(dataset) {
-        let that = this._page;
-        let chatItems = that.data.chatItems;
-        chatItems[dataset.index].isPlaying = true;
-        if (that.data.latestPlayVoicePath && that.data.latestPlayVoicePath !== chatItems[dataset.index].content) {//如果重复点击同一个，则不将该isPlaying置为false
-            for (let i = 0, len = chatItems.length; i < len; i++) {
-                if ('voice' === chatItems[i].type && that.data.latestPlayVoicePath === chatItems[i].content) {
-                    chatItems[i].isPlaying = false;
-                    break;
-                }
-            }
-        }
-        that.setData({
-            chatItems: chatItems,
-            isVoicePlaying: true
-        });
-        that.data.latestPlayVoicePath = dataset.voicePath;
-    }
-
-}
-
-```
-对于微信我也是无话可说，接口动不动就废弃或是不维护了。小程序基础库1.6.0以后不再维护的语音播放和录制接口，我进行了兼容处理。
-图片类型的管理类与语音类型，就不上代码了。
-最后我创建一个管理类，来统一管理所有消息类型的收发。见`msg-manager.js`：
-
-```
-import VoiceManager from "./msg-type/voice-manager";
-import TextManager from "./msg-type/text-manager";
-import ImageManager from "./msg-type/image-manager";
-import IMOperator from "./im-operator";
-import CustomManager from "./msg-type/custom-manager";
+import VoiceManager from "./msg-type/voice-manager";//语音消息的收发和展示相关类
+import TextManager from "./msg-type/text-manager";//文本类型消息的收发和展示相关类
+import ImageManager from "./msg-type/image-manager";//图片类型消息的收发和展示相关类
+import CustomManager from "./msg-type/custom-manager";//自定义类型消息的收发和展示相关类
+import IMOperator from "./im-operator";//im行为管理类
 
 export default class MsgManager {
     constructor(page) {
@@ -537,6 +364,9 @@ export default class MsgManager {
     }
 }
 ```
+小程序基础库1.6.0以后不再维护的语音播放和录制接口，我进行了兼容处理。
+
+篇幅问题，各类型消息的相关类代码我就不贴了。想看的去下载吧。
 
 ### 缓存机制和文件类型消息的展示机制
 - 缓存和展示机制：在展示语音或图片类型的消息时，我会优先加载已经存储在本地的文件。可以看到`showMsg()`方法中先是取`const localVoicePath = FileManager.get(msg)`，来获取本地路径。
@@ -604,24 +434,156 @@ function saveFileRule(tempFilePath, cbOk, cbError) {
     });
 }
 ```
+
+### IMWebSocket `im-web-socket.js`
+这个文件位于modules文件夹下。
+
+所有的WebSocket基本操作都封装到了这个类中。我截取了重要的几处代码。
+
+```
+export default class IMWebSocket {
+    constructor() {
+        this._isLogin = false;
+        this._msgQueue = [];
+        this._onSocketOpen();
+        this._onSocketMessage();
+        this._onSocketError();
+        this._onSocketClose();
+    }
+
+    /**
+     * 创建WebSocket连接
+     * 如：this.imWebSocket = new IMWebSocket();
+     *    this.imWebSocket.createSocket({url: 'ws://10.4.97.87:8001'});
+     * 如果你使用本地服务器来测试，那么这里的url需要用ws，而不是wss，因为用wss无法成功连接到本地服务器
+     * @param url 传入你的服务端地址，端口号不是必需的。
+     */
+    createSocket({url}) {
+        !this._isLogin && wx.connectSocket({
+            url,
+            header: {
+                'content-type': 'application/json'
+            },
+            method: 'GET'
+        });
+    }
+
+    /**
+     * 发送消息
+     * @param content 需要发送的消息，是一个对象，如{type:'text',content:'abc'}
+     * @param success 发送成功回调
+     * @param fail 发送失败回调
+     */
+    sendMsg({content, success, fail}) {
+        if (this._isLogin) {
+            this._sendMsg({content, success, fail});
+        } else {
+            this._msgQueue.push(content);
+        }
+    }
+
+    _sendMsg({content, success, fail}) {
+        wx.sendSocketMessage({
+            data: JSON.stringify(content), success: () => {
+                success && success(content);
+            },
+            fail: (res) => {
+                fail && fail(res);
+            }
+        });
+    }
+
+    /**
+     * 消息接收监听函数
+     * @param listener
+     */
+    setOnSocketReceiveMessageListener({listener}) {
+        this._socketReceiveListener = listener;
+    }
+
+    /**
+     * 关闭webSocket
+     */
+    closeSocket() {
+        wx.closeSocket();
+    }
+
+    /**
+     * webSocket是在这里接收消息的
+     * 在socket连接成功时，服务器会主动给客户端推送一条消息类型为login的信息，携带了用户的基本信息，如id，头像和昵称。
+     * 在login信息接收前发送的所有消息，都会被推到msgQueue队列中，在登录成功后会自动重新发送。
+     * 这里我进行了事件的分发，接收到非login类型的消息，会回调监听函数。
+     * @private
+     */
+    _onSocketMessage() {
+        wx.onSocketMessage((res) => {
+            let msg = JSON.parse(res.data);
+            if ('login' === msg.type) {
+                this._isLogin = true;
+                getApp().globalData.userInfo = msg.userInfo;
+                getApp().globalData.friendsId = msg.friendsId;
+                if (this._msgQueue.length) {
+                    let temp;
+                    while (temp = this._msgQueue.shift()) {
+                        this._sendMsg({content: {...temp, userId: msg.userInfo.userId}});
+                    }
+                }
+            } else {
+                this._socketReceiveListener && this._socketReceiveListener(msg);
+            }
+        })
+    }
+
+}
+```
+也很简单，对吧。
+
+
 ### IM模拟类 `im-operator.js`
-最后重点说下IM的模拟类 IMOperator。
+最后重点说下IM的控制类 IMOperator。
+
+现在在创建IMOperator时，需要你额外传入好友信息，这个信息应该是在会话列表点击时传入的，如下所示：
+
+```
+ /**
+     * 生命周期函数--监听页面加载
+     */
+    onLoad: function (options) {
+        const friend = JSON.parse(options.friend);
+        this.initData();
+        wx.setNavigationBarTitle({
+            title: friend.friendName
+        });
+        this.imOperator = new IMOperator(this, friend);//额外传入好友信息
+        ...
+        ...
+    },
+```
+
 
 #### 生成发送的数据的文本
 <font color=red>记住，你所有发送的消息和接收到的消息，都是以文本消息的形式，只是在渲染的时候解析，生成不同的消息类型来展示！！！</font>
 
 ```
- static createChatItemContent({type = IMOperator.TextType, content = '', duration} = {}) {
-        if (!content.replace(/^\s*|\s*$/g, '')) return;
-        return JSON.stringify({content, type, duration});
-    }
+ static createChatItemContent({type = IMOperator.TextType, content = '', duration, friendId} = {}) {
+         if (!content.replace(/^\s*|\s*$/g, '')) return;
+         return {
+             content,
+             type,
+             conversationId: 0,//这里的conversationId目前没有用到
+             userId: getApp().globalData.userInfo.userId,
+             friendId: friendId,
+             duration
+         };
+     }
 
 ```
 
-这是生成发送数据的文本的方法。它会返回一个JSON格式的字符串。类似于：`{"content":"233","type":"text"}`。
+这是生成发送数据的文本的方法。它会返回一个对象。
 - type: 消息类型 TextType/VoiceType/ImageType/CustomType
 - content: 需要发送的原始文本信息。可以是文字、语音文件路径、图片文件路径。
 - duration: 语音时长。如果是语音类型，则需要传这个字段。
+- friendId: 好友id
 
 #### 生成消息对象
 除自定义消息类型外，其他的无论是自己发送的消息，还是好友的消息，在UI上渲染时，都是以该消息对象的格式来统一的。
@@ -633,12 +595,12 @@ createNormalChatItem({type = IMOperator.TextType, content = '', isMy = true, dur
         const time = dealChatTime(currentTimestamp, this._latestTImestamp);
         let obj = {
             msgId: 0,//消息id
-            friendId: 0,//好友id
+            friendId: this.getFriendId(),//好友id
             isMy: isMy,//我发送的消息？
             showTime: time.ifShowTime,//是否显示该次发送时间
             time: time.timeStr,//发送时间 如 09:15,
             timestamp: currentTimestamp,//该条数据的时间戳，一般用于排序
-            type: type,//内容的类型，目前有这几种类型： TextType/VoiceType/ImageType/CustomType | 文本/语音/图片/自定义
+            type: type,//内容的类型，目前有这几种类型： text/voice/image/custom | 文本/语音/图片/自定义
             content: content,// 显示的内容，根据不同的类型，在这里填充不同的信息。
             headUrl: isMy ? this._myHeadUrl : this._otherHeadUrl,//显示的头像，自己或好友的。
             sendStatus: 'success',//发送状态，目前有这几种状态：sending/success/failed | 发送中/发送成功/发送失败
@@ -654,8 +616,9 @@ createNormalChatItem({type = IMOperator.TextType, content = '', isMy = true, dur
 - isMy：是否是我自己的消息。
 - duration：语音时长。如果是语音类型，则需要传这个字段。
 
+
 #### 生成自定义消息类型对象
-自定义消息类型的UI类似于聊天页面中的展示聊天时间的UI。
+自定义消息类型的UI类似于会话页面中的展示聊天时间的UI。
 
 ```
 static createCustomChatItem() {
@@ -666,6 +629,9 @@ static createCustomChatItem() {
         }
     }
 ```
+
+
+
 
 #### 发送数据接口 
 这里是模拟的数据发送。我计划将来集成webSocket，实现完整的一套小程序IM体系，这部分还在研究。
@@ -765,7 +731,7 @@ onSimulateReceiveMsg(cbOk) {
 
 最上面说的输入组件，有各种交互情况下的事件回调，在回调函数中处理对应逻辑即可。这部分的所有代码我都放到了`chat.js`中。
 
-### 以上就是聊天页面的所有难点内容
+### 以上就是会话页面的所有难点内容
 
 ### 最后说两句
 
@@ -781,12 +747,16 @@ github地址https://github.com/unmagic/wechat-im
 
 更新日志：
 
+2018-08-07
+
+- 现将modules中的chat-list文件夹名改为chat-page，避免和page文件夹中的chat-list混淆。
+
 2018-08-03
-- 重要提醒：现修改了聊天页面和聊天输入组件展示页面的文件名称，令其更加符合业务名称。
+- 重要提醒：现修改了会话页面和聊天输入组件展示页面的文件名称，令其更加符合业务名称。
 
 2018-08-02
 - 修复重发消息成功后的没有排序到列表底部问题
-- 优化聊天页面回滚到底部场景
+- 优化会话页面回滚到底部场景
 - 调整了代码结构，使用统一的消息类型管理类来收发消息。
 
 2018-08-01

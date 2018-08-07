@@ -158,11 +158,10 @@ Page({
         const itemIndex = parseInt(e.currentTarget.dataset.resendIndex);
         const item = this.data.chatItems[itemIndex];
         this.UI.updateDataWhenStartSending(item, false, false);
-        this.sendMsg(IMOperator.createChatItemContent({
+        this.sendMsg(this.imOperator.createChatItemContent({
             type: item.type,
             content: item.content,
-            duration: item.voiceDuration,
-            friendId: this.imOperator.getFriendId()
+            duration: item.voiceDuration
         }), itemIndex, (msg) => {
             this.UI.updateListViewBySort();
         });
