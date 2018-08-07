@@ -18,6 +18,6 @@ App({
         // this.imWebSocket.closeSocket();
     },
     onShow() {
-        this.imWebSocket.createSocket();
+        this.imWebSocket.createSocket({url: 'ws://10.4.97.87:8001'});
     }
 });
