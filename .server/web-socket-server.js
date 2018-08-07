@@ -116,7 +116,8 @@ class WebSocketServer {
 
     sendText(conn, msg, cbOk) {
         if (this._pageMap.get(msg.friendId) !== 'get-conversations') {
-            const msgSendFinally = JSON.stringify(msg);
+            let {type, content} = msg;
+            const msgSendFinally = JSON.stringify({type, content});
             conn.sendText(msgSendFinally, () => {
                 cbOk && cbOk(msgSendFinally);
             });
@@ -139,6 +140,10 @@ class WebSocketServer {
     getConversation(userId) {
         let conversations = [];
         let item = this._msgPool[this._msgPool.length - 1];
+        const itemContent = JSON.parse(item.content);
+        delete itemContent.userId;
+        delete itemContent.friendId;
+
         if (item.msgUserId === userId) {//本人会话
             conversations.push({
                 friendId: item.friendId,
