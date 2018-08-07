@@ -12,6 +12,7 @@ export default class CustomManager {
     showMsg({msg}) {
         //UI类是用于管理UI展示的类。
         this._page.UI.updateViewWhenReceive(msg);
+        this._page.UI.updateChatStatus('会话已关闭', false);
     }
 
     /**
