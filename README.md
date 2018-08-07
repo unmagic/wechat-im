@@ -250,7 +250,7 @@ chatInput.setExtraButtonClickListener(function (dismiss) {
 
 - IM连接和会话列表页收发消息流程图：
 
-<img src="https://github.com/unmagic/.gif/blob/master/wechat-im/好友页面.jpg" width="100%"/>
+<img src="https://github.com/unmagic/.gif/blob/master/wechat-im/IM连接和收发消息流程图.png" width="100%"/>
 
 代码非常简单。
 
