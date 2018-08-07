@@ -18,17 +18,7 @@ Page({
      * 生命周期函数--监听页面加载
      */
     onLoad: function (options) {
-        getApp().getIMWebSocket().sendMsg({
-            content: {
-                type: 'get-conversations',
-                userId: getApp().globalData.userInfo.userId
-            }, success: () => {
-                console.log('获取会话列表消息发送成功');
-            },
-            fail: (res) => {
-                console.log('获取会话列表失败', res);
-            }
-        });
+
     },
 
     toChat: function (e) {
@@ -43,9 +33,22 @@ Page({
      * 生命周期函数--监听页面显示
      */
     onShow: function () {
+
         getApp().getIMWebSocket().setOnSocketReceiveMessageListener({
             listener: (msg) => {
-                this.setData({conversations: msg.conversations.map(item => ChatListManager.getConversationsItem(item))})
+                console.log('会话列表', msg);
+                msg.type === 'get-conversations' && this.setData({conversations: msg.conversations.map(item => ChatListManager.getConversationsItem(item))})
+            }
+        });
+        getApp().getIMWebSocket().sendMsg({
+            content: {
+                type: 'get-conversations',
+                userId: getApp().globalData.userInfo.userId
+            }, success: () => {
+                console.log('获取会话列表消息发送成功');
+            },
+            fail: (res) => {
+                console.log('获取会话列表失败', res);
             }
         });
     },
