@@ -65,9 +65,9 @@ export default class IMOperator {
         return {
             content,
             type,
-            conversationId: 0,
+            conversationId: 0,//会话id，目前未用到
             userId: getApp().globalData.userInfo.userId,
-            friendId: this.getFriendId(),
+            friendId: this.getFriendId(),//好友id
             duration
         };
     }
