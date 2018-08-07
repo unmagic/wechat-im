@@ -8,7 +8,6 @@ export default class IMOperator {
     static TextType = 'text';
     static ImageType = 'image';
     static CustomType = 'custom';
-    static ConversationId = 0;
 
     constructor(page, opts) {
         this._opts = opts;
@@ -66,7 +65,7 @@ export default class IMOperator {
         return {
             content,
             type,
-            conversationId: IMOperator.ConversationId,
+            conversationId: 0,
             userId: getApp().globalData.userInfo.userId,
             friendId: friendId,
             duration
