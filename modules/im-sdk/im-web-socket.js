@@ -22,7 +22,6 @@ export default class IMWebSocket {
         if (this._isOpen) {
             this._sendMsg({content, success, fail});
         } else {
-            console.log('添加到数组中', content);
             this._msgQueen.push(content);
         }
     }
@@ -38,7 +37,7 @@ export default class IMWebSocket {
         });
     }
 
-    setOnSocketReceiveMessageListener({action, listener}) {
+    setOnSocketReceiveMessageListener({listener}) {
         this._socketReceiveListener = listener;
     }
 
