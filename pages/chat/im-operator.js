@@ -34,7 +34,8 @@ export default class IMOperator {
                 if (!msg) {
                     return;
                 }
-                const item = !(msg.isMy = false) && this.createNormalChatItem(msg);
+                msg.isMy = msg.msgUserId === getApp().globalData.userInfo.userId;
+                const item = this.createNormalChatItem(msg);
                 // const item = this.createNormalChatItem({type: 'voice', content: '上传文件返回的语音文件路径', isMy: false});
                 // const item = this.createNormalChatItem({type: 'image', content: '上传文件返回的图片文件路径', isMy: false});
                 this._latestTImestamp = item.timestamp;
