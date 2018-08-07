@@ -1,6 +1,4 @@
 // pages/chat-list/chat-list.js
-import IMOperator from "../chat/im-operator";
-import ChatListManager from "./chat-list-manager";
 
 /**
  * 会话列表页面
@@ -37,7 +35,7 @@ Page({
         getApp().getIMWebSocket().setOnSocketReceiveMessageListener({
             listener: (msg) => {
                 console.log('会话列表', msg);
-                msg.type === 'get-conversations' && this.setData({conversations: msg.conversations.map(item => ChatListManager.getConversationsItem(item))})
+                msg.type === 'get-conversations' && this.setData({conversations: msg.conversations.map(item => this.getConversationsItem(item))})
             }
         });
         getApp().getIMWebSocket().sendMsg({
@@ -52,39 +50,8 @@ Page({
             }
         });
     },
-
-    /**
-     * 生命周期函数--监听页面隐藏
-     */
-    onHide: function () {
-
-    },
-
-    /**
-     * 生命周期函数--监听页面卸载
-     */
-    onUnload: function () {
-
-    },
-
-    /**
-     * 页面相关事件处理函数--监听用户下拉动作
-     */
-    onPullDownRefresh: function () {
-
-    },
-
-    /**
-     * 页面上拉触底事件的处理函数
-     */
-    onReachBottom: function () {
-
-    },
-
-    /**
-     * 用户点击右上角分享
-     */
-    onShareAppMessage: function () {
-
+    getConversationsItem(item) {
+        let {latestMsg, ...msg} = item;
+        return Object.assign(msg, JSON.parse(latestMsg));
     }
-})
+});

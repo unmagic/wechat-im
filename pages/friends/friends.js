@@ -1,5 +1,4 @@
 // pages/friends/friends.js
-import ChatListManager from "../chat-list/chat-list-manager";
 
 /**
  * 获取好友列表
