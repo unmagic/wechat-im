@@ -208,10 +208,14 @@ chatInput.setExtraButtonClickListener(function (dismiss) {
 
 
 ### 效果图
+- 会话列表
+<img src="https://github.com/unmagic/.gif/blob/master/wechat-im/会话列表页面.jpg" width="25%"/>
 
-<img src="https://github.com/unmagic/.gif/blob/master/wechat-im/会话列表页面.jpg" width="30%"/>会话列表页面
-<img src="https://github.com/unmagic/.gif/blob/master/wechat-im/会话页面.jpg" width="30%"/>会话页面
-<img src="https://github.com/unmagic/.gif/blob/master/wechat-im/好友页面.jpg" width="30%"/>好友页面
+- 会话页面
+<img src="https://github.com/unmagic/.gif/blob/master/wechat-im/会话页面.jpg" width="25%"/>
+
+- 好友页面
+<img src="https://github.com/unmagic/.gif/blob/master/wechat-im/好友页面.jpg" width="25%"/>
 
 会话页面，我将UI封装成了多个`template`，最后使用`chat-item.wxml`即可，UI相关的代码都放到了`chat-page`文件夹中；加载方面的UI放到了`loading`文件夹中；`image`文件夹中也新增了几张图片。
 
@@ -228,6 +232,7 @@ chatInput.setExtraButtonClickListener(function (dismiss) {
 - [x] 显示好友头像昵称。
 
 好友页面未实现功能：
+
 并未实现发起聊天功能，仅供演示，如有需要，请自行实现。
 
 会话页面功能：
@@ -242,6 +247,10 @@ chatInput.setExtraButtonClickListener(function (dismiss) {
 #### 会话列表页面
 
 示例页面是`pages/chat-list/chat-list`。
+
+- IM连接和会话列表页收发消息流程图：
+
+<img src="https://github.com/unmagic/.gif/blob/master/wechat-im/好友页面.jpg" width="100%"/>
 
 代码非常简单。
 
@@ -315,6 +324,10 @@ Page({
 #### 会话页面
 
 示例页面是`pages/chat/chat`。
+
+- 会话页面发送消息流程图：
+
+<img src="https://github.com/unmagic/.gif/blob/master/wechat-im/会话页面流程图.png" width="100%"/>
 
 在`chat`文件夹下，我封装了多个类，用于管理消息类型的收发和展示。
 
@@ -705,8 +718,14 @@ onSimulateSendMsg({content, success, fail}) {
 
 其他消息的发送方式都是与之类似的。
 
-#### 接收数据接口 
-关于消息是怎么接收到的，
+#### 会话页面接收数据接口 
+关于会话页面消息是怎么接收到的，下面的展示了一个完整的主要流程。
+
+- 会话页面接收消息流程图：
+
+<img src="https://github.com/unmagic/.gif/blob/master/wechat-im/接收消息流程图.png" width="100%"/>
+
+下面贴的是核心代码
 
 ```
 onSimulateReceiveMsg(cbOk) {
