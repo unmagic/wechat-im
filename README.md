@@ -9,7 +9,7 @@
 
 转载请注明出处：https://blog.csdn.net/sinat_27612147/article/details/78456363
 
-<font color=red>2018-08-07 作者公告：现在拥有会话页面展示及WebSocket功能的项目已经在当前的github仓库中更新了！！！大家可以在master分支上预览。项目中有WebSocket服务端代码，可以创建本地WebSocket服务。</font>
+<font color=red>2018-08-08 作者公告：现在拥有会话页面展示及WebSocket功能的项目已经在当前的github仓库中更新了！！！大家可以在master分支上预览。项目中有WebSocket服务端代码，可以创建本地WebSocket服务。</font>
 
 ## 聊天UI组件功能：
 - [x] 目前项目中已使用webSocket，实现了IM的通信功能！目前包括会话列表页面、会话页面及好友页面。支持本地使用nodejs开启WebSocket服务。详见下方文档。
@@ -37,7 +37,7 @@
 - 本地没有存储历史聊天消息。这个原因请看文章结尾。
 
 ### 整体效果图（加载有些慢）
-我们先来看下效果 (现在已经重新录制了动图，但因录制软件问题，图中的一些按钮的变色了，线条也少了很多像素。。。)
+我们先来看下效果 (因录制软件问题，图中的一些按钮的变色了，线条也少了很多像素。。。)
 
 <img src="https://github.com/unmagic/wechat-im/blob/master/.gif/发送图片和图片预览.gif" width="30%" alt="发送图片和图片预览"/>发送图片和图片预览
 <img src="https://github.com/unmagic/wechat-im/blob/master/.gif/消息重发和发送自定义消息.gif" width="30%" alt="消息重发和发送自定义消息"/>消息重发和发送自定义消息
@@ -814,7 +814,7 @@ github地址https://github.com/unmagic/wechat-im
 
 ### 更新日志：
 
-2018-08-07
+2018-08-08
 
 - 现已实现WebSocket通信，项目中有WebSocket服务端代码，可以创建本地WebSocket服务。
 - 现将modules中的chat-list文件夹名改为chat-page，避免和page文件夹中的chat-list混淆。
