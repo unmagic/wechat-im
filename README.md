@@ -43,25 +43,6 @@ wechat-im是一个可以让你在小程序平台快速实现即时通讯功能�
 ```
 #### 3. 使用开发者工具运行项目
 
-### 整体效果图（加载有些慢）
-我们先来看下效果 (因录制软件问题，图中的一些按钮的变色了，线条也少了很多像素。。。)
-
-- 发送图片和图片预览
-
-<img src="https://github.com/unmagic/.gif/blob/master/wechat-im/发送图片和图片预览.gif" width="30%" alt="发送图片和图片预览"/>
-
-- 消息重发和发送自定义消息
-
-<img src="https://github.com/unmagic/.gif/blob/master/wechat-im/消息重发和发送自定义消息.gif" width="30%" alt="消息重发和发送自定义消息"/>
-
-- 发送语音消息
-
-<img src="https://github.com/unmagic/.gif/blob/master/wechat-im/语音.gif" width="30%" alt="发送语音消息"/>
-
-使用中有什么问题的话，可以在博客或GitHub上联系我。我会及时回复。
-
-谢谢大家！
-
 ### LINK
 
 [Document](https://blog.csdn.net/sinat_27612147/article/details/78456363)
