@@ -48,11 +48,11 @@ wechat-im是一个可以让你在小程序平台快速实现即时通讯功能�
 
 - 发送图片和图片预览
 
-<img src="https://github.com/unmagic/.gif/blob/master/wechat-im/.gif/发送图片和图片预览.gif" width="30%" alt="发送图片和图片预览"/>
+<img src="https://github.com/unmagic/.gif/blob/master/wechat-im/发送图片和图片预览.gif" width="30%" alt="发送图片和图片预览"/>
 
 - 消息重发和发送自定义消息
 
-<img src="https://github.com/unmagic/.gif/blob/master/wechat-im/.gif/消息重发和发送自定义消息.gif" width="30%" alt="消息重发和发送自定义消息"/>
+<img src="https://github.com/unmagic/.gif/blob/master/wechat-im/消息重发和发送自定义消息.gif" width="30%" alt="消息重发和发送自定义消息"/>
 
 - 发送语音消息
 
