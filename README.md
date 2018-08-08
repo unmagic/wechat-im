@@ -34,16 +34,14 @@ wechat-im是一个可以让你在小程序平台快速实现即时通讯功能�
 
 ## 如何安装使用
 
-#### 开发者工具导入项目
+#### 1. 开发者工具导入项目
 
-#### 搭建本地WebSocket服务
+#### 2. 搭建本地WebSocket服务
 ```
 安装依赖 npm install nodejs-websocket
 运行 项目.server文件夹下的web-socket-server.js文件即可开启服务
 ```
-#### 使用开发者工具运行项目
-
------------
+#### 3. 使用开发者工具运行项目
 
 ### 整体效果图（加载有些慢）
 我们先来看下效果 (因录制软件问题，图中的一些按钮的变色了，线条也少了很多像素。。。)
@@ -67,4 +65,5 @@ wechat-im是一个可以让你在小程序平台快速实现即时通讯功能�
 ### LINK
 
 [Document](https://blog.csdn.net/sinat_27612147/article/details/78456363)
+
 [LICENSE](https://github.com/unmagic/wechat-im/blob/master/LICENSE)
