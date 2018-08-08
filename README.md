@@ -5,7 +5,7 @@
 
 #### 如果看不到图片 请看 http://blog.csdn.net/sinat_27612147/article/details/78456363
 
-# 小程序即时通讯——文本、语音输入控件（一）集成
+# 小程序即时通讯（一）输入组件及使用WebSocket通信
 
 转载请注明出处：https://blog.csdn.net/sinat_27612147/article/details/78456363
 
@@ -65,13 +65,13 @@
 ----------
 
 
-### 集成
+### 输入组件的集成
 
 #### 一、导入SDK相关文件
 
 输入组件相关文件在`modules/chat-input`和`image`文件夹下，示例页面是`pages/chat-input/chat-input`。
 
-<font color=red>聊天输入组件和会话页面组件所有你需要集成的文件，打包后大小在65kb左右，已经很小了。需要注意的是，项目中的`.gif`文件夹是很多大的效果图，这个可以删除掉。`image`文件夹中有两张用于测试的用户头像，也可以删除掉。</font>。
+<font color=red>聊天输入组件和会话页面组件所有你需要集成的文件，打包后大小在65kb左右，已经很小了。需要注意的是，项目中的原有`.gif`文件夹已经迁移到了别的仓库，`image`文件夹中有两张用于测试的用户头像，也可以删除掉。</font>。
 
 ----------
 
@@ -788,15 +788,15 @@ onLoad: function (options) {
 
 ### 服务端WebSocket实现的业务功能
 
-服务器端是用nodejs开发的，配合客户端实现了简单的IM消息展示逻辑。webSocket所有功能仅供学习和参考，如想商用，请自行开发。
+服务器端是用nodejs开发的，配合客户端实现了简单的IM消息展示逻辑。webSocket所有功能仅供学习和参考，若想商用，请自行开发。
 
 项目导入成功后
 1. 执行`npm install nodejs-websocket安装nodejs-websocket`安装nodejs-websocket。
-2. 运行.server文件夹下的web-socket-server.js文件。
+2. 运行.server文件夹下的web-socket-server.js文件即可开启服务。
 
 `nodejs-websocket`具体API详见https://www.npmjs.com/package/nodejs-websocket
 
-服务端简单实现了两人实时聊天功能，获取历史消息，获取会话列表、好友列表。目前消息都是在内存中，重启服务后所有数据会重置。
+服务端简单实现了两人实时聊天功能，获取历史消息，获取会话列表、好友列表。需要注意的是，目前消息都是在内存中，重启服务后所有数据会重置！
 
 服务端代码就不贴了。
 
@@ -812,11 +812,11 @@ github地址https://github.com/unmagic/wechat-im
 
 ----------
 
-更新日志：
+### 更新日志：
 
 2018-08-07
 
-- 现已实现WebSocket通信，项目中有WebSocket服务端代码，可以创建本地WebSocket服务端。
+- 现已实现WebSocket通信，项目中有WebSocket服务端代码，可以创建本地WebSocket服务。
 - 现将modules中的chat-list文件夹名改为chat-page，避免和page文件夹中的chat-list混淆。
 
 2018-08-03
