@@ -1,0 +1,8 @@
+{
+  "name": "wechat-im",
+  "version": "1.0.0",
+  "dependencies": {
+    "nodejs-websocket": "^1.7.1",
+    "wechat-mini-programs-apis": "^1.6.2"
+  }
+}
