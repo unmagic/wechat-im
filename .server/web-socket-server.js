@@ -3,7 +3,7 @@ let ws = require("nodejs-websocket");
 /**
  * 这个类是模拟webSocket服务端
  */
-class WebSocketServer {
+module.exports = class WebSocketServer {
     constructor() {
         this.connMap = new Map();
         this._pageMap = new Map();
@@ -177,6 +177,4 @@ class WebSocketServer {
         let hours = date.getHours(), minutes = date.getMinutes();
         return `${hours >= 10 ? hours : '0' + hours}:${minutes > 10 ? minutes : '0' + minutes}`
     }
-}
-
-new WebSocketServer().create();
+};
