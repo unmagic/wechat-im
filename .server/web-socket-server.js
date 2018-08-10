@@ -111,7 +111,13 @@ module.exports = class WebSocketServer {
             conn.sendText(JSON.stringify({type: 'login', userInfo: user}));
             this._count++;
         });
-        console.log("WebSocket服务端建立完毕")
+        console.log("WebSocket服务端建立完毕");
+        return this;
+    }
+
+    close() {
+        this.server.close();
+        console.log("WebSocket服务关闭");
     }
 
     sendText(conn, msg, cbOk) {
