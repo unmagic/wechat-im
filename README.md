@@ -69,3 +69,6 @@ Terminal运行 gulp 即可开启WebSocket服务
 
 如有合作意向或是想要推广您的产品，可加QQ：1178545208
 
+### 欢迎打赏
+
+<img src="https://github.com/unmagic/.gif/blob/master/admire/weixin.png" /><img src="https://github.com/unmagic/.gif/blob/master/admire/zhifubao.png" />
