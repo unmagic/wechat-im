@@ -449,16 +449,17 @@ function setTextMessageListener(cb) {
             })
         };
         _page.chatInputBindBlurEvent = function () {
-            _page.setData({
-                'inputObj.inputType': 'none',
-                'inputObj.extraObj.chatInputShowExtra': false
-            });
+            let obj = {};
+            !inputObj.inputValueEventTemp && (obj['inputObj.inputType'] = 'none');
+            obj['inputObj.extraObj.chatInputShowExtra'] = false;
+            _page.setData(obj);
         };
         _page.chatInputSendTextMessage = function (e) {
             _page.setData({
                 textMessage: ''
             });
             typeof cb === "function" && cb(e);
+            inputObj.inputValueEventTemp = null;
         };
         _page.chatInputSendTextMessage02 = function () {
             if (!!inputObj.inputValueEventTemp && !!inputObj.inputValueEventTemp.detail.value) {
