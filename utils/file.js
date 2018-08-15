@@ -1,4 +1,15 @@
-const MAX_SIZE = 95000000;
+const MAX_SIZE = 10400000;
+let wholeSize = 0;
+setTimeout(() => {
+    wx.getSavedFileList({
+        success: savedFileInfo => {
+            let {fileList} = savedFileInfo;
+            !!fileList && fileList.forEach(item => {
+                wholeSize += item.size;
+            });
+        }
+    });
+});
 
 function saveFileRule(tempFilePath, cbOk, cbError) {
     wx.getFileInfo({
@@ -12,12 +23,11 @@ function saveFileRule(tempFilePath, cbOk, cbError) {
             }
             wx.getSavedFileList({
                 success: savedFileInfo => {
-                    // console.log('查看已存储的文件列表', savedFileInfo);
-                    let fileList = savedFileInfo.fileList;
-                    let wholeSize = 0;
-                    fileList.forEach(item => {
-                        wholeSize += item.size;
-                    });
+                    let {fileList} = savedFileInfo;
+                    if (!fileList) {
+                        typeof cbError === "function" && cbError('获取到的fileList为空，请检查你的wx.getSavedFileList()函数的success返回值');
+                        return;
+                    }
                     //这里计算需要移除的总文件大小
                     let sizeNeedRemove = wholeSize + tempFileSize - MAX_SIZE;
                     if (sizeNeedRemove >= 0) {
@@ -27,13 +37,12 @@ function saveFileRule(tempFilePath, cbOk, cbError) {
                         });
                         let sizeCount = 0;
                         for (let i = 0, len = fileList.length; i < len; i++) {
-                            sizeCount += fileList[i].size;
-                            if (sizeCount >= sizeNeedRemove) {
+                            if ((sizeCount += fileList[i].size) >= sizeNeedRemove) {
                                 for (let j = 0; j < i; j++) {
                                     wx.removeSavedFile({
                                         filePath: fileList[j].filePath,
-                                        success: function (res) {
-                                            // console.log('移除文件', res);
+                                        success: function () {
+                                            wholeSize -= fileList[j].size;
                                         }
                                     });
                                 }
@@ -45,6 +54,7 @@ function saveFileRule(tempFilePath, cbOk, cbError) {
                     wx.saveFile({
                         tempFilePath: tempFilePath,
                         success: res => {
+                            wholeSize += tempFileSize;
                             typeof cbOk === "function" && cbOk(res.savedFilePath);
                         },
                         fail: cbError
