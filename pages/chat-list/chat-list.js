@@ -32,13 +32,13 @@ Page({
      */
     onShow: function () {
 
-        getApp().getIMWebSocket().setOnSocketReceiveMessageListener({
+        getApp().getIMHandler().setOnReceiveMessageListener({
             listener: (msg) => {
                 console.log('会话列表', msg);
                 msg.type === 'get-conversations' && this.setData({conversations: msg.conversations.map(item => this.getConversationsItem(item))})
             }
         });
-        getApp().getIMWebSocket().sendMsg({
+        getApp().getIMHandler().sendMsg({
             content: {
                 type: 'get-conversations',
                 userId: getApp().globalData.userInfo.userId

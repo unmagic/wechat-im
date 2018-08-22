@@ -15,7 +15,7 @@ Page({
      * 生命周期函数--监听页面显示
      */
     onShow: function () {
-        getApp().getIMWebSocket().sendMsg({
+        getApp().getIMHandler().sendMsg({
             content: {
                 type: 'get-friends',
                 userId: getApp().globalData.userInfo.userId
@@ -23,7 +23,7 @@ Page({
                 console.log('获取好友列表失败', res);
             }
         });
-        getApp().getIMWebSocket().setOnSocketReceiveMessageListener({
+        getApp().getIMHandler().setOnReceiveMessageListener({
             listener: (msg) => {
                 if (msg.type === 'get-friends') {
                     this.setData({friends: msg.friends.map(item => this.createFriendItem(item))});

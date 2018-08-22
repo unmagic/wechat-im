@@ -1,7 +1,8 @@
-export default class IMWebSocket {
+import IMHandler from "../i-im-handler";
+
+export default class WebSocketHandlerImp extends IMHandler{
     constructor() {
-        this._isLogin = false;
-        this._msgQueue = [];
+        super();
         this._onSocketOpen();
         this._onSocketMessage();
         this._onSocketError();
@@ -15,7 +16,7 @@ export default class IMWebSocket {
      * 如果你使用本地服务器来测试，那么这里的url需要用ws，而不是wss，因为用wss无法成功连接到本地服务器
      * @param url 传入你的服务端地址，端口号不是必需的。
      */
-    createSocket({url}) {
+    createConnection({url}) {
         !this._isLogin && wx.connectSocket({
             url,
             header: {
@@ -25,21 +26,7 @@ export default class IMWebSocket {
         });
     }
 
-    /**
-     * 发送消息
-     * @param content 需要发送的消息，是一个对象，如{type:'text',content:'abc'}
-     * @param success 发送成功回调
-     * @param fail 发送失败回调
-     */
-    sendMsg({content, success, fail}) {
-        if (this._isLogin) {
-            this._sendMsg({content, success, fail});
-        } else {
-            this._msgQueue.push(content);
-        }
-    }
-
-    _sendMsg({content, success, fail}) {
+    _sendMsgImp({content, success, fail}) {
         wx.sendSocketMessage({
             data: JSON.stringify(content), success: () => {
                 success && success(content);
@@ -50,18 +37,11 @@ export default class IMWebSocket {
         });
     }
 
-    /**
-     * 消息接收监听函数
-     * @param listener
-     */
-    setOnSocketReceiveMessageListener({listener}) {
-        this._socketReceiveListener = listener;
-    }
 
     /**
      * 关闭webSocket
      */
-    closeSocket() {
+    closeConnection() {
         wx.closeSocket();
     }
 
@@ -102,11 +82,11 @@ export default class IMWebSocket {
                 if (this._msgQueue.length) {
                     let temp;
                     while (temp = this._msgQueue.shift()) {
-                        this._sendMsg({content: {...temp, userId: msg.userInfo.userId}});
+                        this.sendMsg({content: {...temp, userId: msg.userInfo.userId}});
                     }
                 }
             } else {
-                this._socketReceiveListener && this._socketReceiveListener(msg);
+                this._receiveListener && this._receiveListener(msg);
             }
         })
     }

@@ -21,14 +21,14 @@ export default class IMOperator {
     }
 
     onSimulateReceiveMsg(cbOk) {
-        getApp().getIMWebSocket().sendMsg({
+        getApp().getIMHandler().sendMsg({
             content: {
                 type: 'get-history',
                 userId: getApp().globalData.userInfo.userId,
                 friendId: this.getFriendId()
             }
         });
-        getApp().getIMWebSocket().setOnSocketReceiveMessageListener({
+        getApp().getIMHandler().setOnReceiveMessageListener({
             listener: (msg) => {
                 if (!msg) {
                     return;
@@ -48,7 +48,7 @@ export default class IMOperator {
     onSimulateSendMsg({content, success, fail}) {
         //这里content即为要发送的数据
         //这里的content是一个对象了，不再是一个JSON格式的字符串。这样可以在发送消息的底层统一处理。
-        getApp().getIMWebSocket().sendMsg({
+        getApp().getIMHandler().sendMsg({
             content,
             success: (content) => {
                 //这个content格式一样,也是一个对象

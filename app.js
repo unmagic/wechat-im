@@ -1,21 +1,20 @@
 //app.js
-import IMWebSocket from "./modules/im-sdk/im-web-socket";
+import IMFactory from "./modules/im-sdk/im-factory";
 
 App({
     globalData: {
         userInfo: {},
     },
-    getIMWebSocket() {
-        return this.imWebSocket;
+    getIMHandler() {
+        return this.iIMHandler;
     },
     onLaunch() {
-        this.imWebSocket = new IMWebSocket();
-
+        this.iIMHandler = IMFactory.create();
     },
     onHide() {
-        // this.imWebSocket.closeSocket();
+        // this.iIMHandler.closeConnection();
     },
     onShow() {
-        this.imWebSocket.createSocket({url: 'ws://10.4.97.87:8001'});
+        this.iIMHandler.createConnection({url: 'ws://10.4.94.185:8001'});
     }
 });
