@@ -1,4 +1,4 @@
-import IMHandler from "../i-im-handler";
+import IMHandler from "../interface/i-im-handler";
 
 export default class WebSocketHandlerImp extends IMHandler{
     constructor() {
