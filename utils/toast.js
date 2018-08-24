@@ -1,5 +1,5 @@
 export default class Toast{
-    static showToast(icon, title, duration) {
+    static show(icon, title, duration) {
         if (icon === 'loading') {
             wx.showToast({
                 title: title,
@@ -21,7 +21,7 @@ export default class Toast{
         }
     }
 
-    static showNormalToast(text) {
+    static showNormalLoading(text) {
         if (wx.showLoading) {
             wx.showLoading({
                 title: text ? text : '加载中...',
@@ -36,7 +36,7 @@ export default class Toast{
         }
     }
 
-    static hiddenToast() {
+    static hidden() {
         wx.hideToast();
         if (wx.hideLoading) {
             wx.hideLoading();
