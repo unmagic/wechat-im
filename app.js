@@ -15,6 +15,6 @@ App({
         // this.iIMHandler.closeConnection();
     },
     onShow() {
-        this.iIMHandler.createConnection({url: 'ws://10.4.94.185:8001'});
+        this.iIMHandler.createConnection({options: {url: 'ws://10.4.94.185:8001'}});
     }
 });

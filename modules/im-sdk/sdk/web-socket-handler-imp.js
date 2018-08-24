@@ -1,6 +1,6 @@
-import IMHandler from "../interface/i-im-handler";
+import IIMHandler from "../interface/i-im-handler";
 
-export default class WebSocketHandlerImp extends IMHandler{
+export default class WebSocketHandlerImp extends IIMHandler {
     constructor() {
         super();
         this._onSocketOpen();
@@ -14,11 +14,11 @@ export default class WebSocketHandlerImp extends IMHandler{
      * 如：this.imWebSocket = new IMWebSocket();
      *    this.imWebSocket.createSocket({url: 'ws://10.4.97.87:8001'});
      * 如果你使用本地服务器来测试，那么这里的url需要用ws，而不是wss，因为用wss无法成功连接到本地服务器
-     * @param url 传入你的服务端地址，端口号不是必需的。
+     * @param options 建立连接时需要的配置信息，这里是传入的url，即你的服务端地址，端口号不是必需的。
      */
-    createConnection({url}) {
+    createConnection({options}) {
         !this._isLogin && wx.connectSocket({
-            url,
+            url: options.url,
             header: {
                 'content-type': 'application/json'
             },
