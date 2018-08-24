@@ -1,5 +1,6 @@
 // chat.js
-let toast = require('../../utils/toast.js');
+import Toast from "../../utils/toast";
+
 let chatInput = require('../../modules/chat-input/chat-input');
 /**
  * 聊天输入组件展示页面
@@ -120,7 +121,7 @@ Page({
             showCancel: true,
             success: function (res) {
                 if (res.confirm) {
-                    toast.show('success', '自定义功能')
+                    Toast.show('success', '自定义功能')
                 }
             }
         })
