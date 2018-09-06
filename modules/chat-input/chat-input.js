@@ -449,10 +449,15 @@ function setTextMessageListener(cb) {
             })
         };
         _page.chatInputBindBlurEvent = function () {
-            let obj = {};
-            !inputObj.inputValueEventTemp && (obj['inputObj.inputType'] = 'none');
-            obj['inputObj.extraObj.chatInputShowExtra'] = false;
-            _page.setData(obj);
+            setTimeout(() => {
+                let obj = {};
+                if (!inputObj.inputValueEventTemp || !inputObj.inputValueEventTemp.detail.value) {
+                    inputObj.inputValueEventTemp = null;
+                    obj['inputObj.inputType'] = 'none';
+                }
+                obj['inputObj.extraObj.chatInputShowExtra'] = false;
+                _page.setData(obj);
+            });
         };
         _page.chatInputSendTextMessage = function (e) {
             _page.setData({
