@@ -1,5 +1,3 @@
-import IMOperator from "../im-operator";
-
 export default class TextManager {
     constructor(page) {
         this._page = page;
@@ -17,16 +15,31 @@ export default class TextManager {
     /**
      * 发送消息时，通过UI类来管理发送状态的切换和消息的渲染
      * @param content 输入组件获取到的原始文本信息
+     * @param type
      */
-    sendOneMsg(content) {
+    sendOneMsg({content, type}) {
         this._page.UI.showItemForMoment(this._page.imOperator.createNormalChatItem({
-            type: IMOperator.TextType,
+            type,
             content
         }), (itemIndex) => {
-            this._page.sendMsg(this._page.imOperator.createChatItemContent({
-                type: IMOperator.TextType,
-                content
-            }), itemIndex);
+            this._page.sendMsg({
+                content: this._page.imOperator.createChatItemContent({type, content}),
+                itemIndex
+            });
+        });
+    }
+
+    resend({type, content, duration, itemIndex}) {
+        this._page.sendMsg({
+            content: this._page.imOperator.createChatItemContent({
+                type: item.type,
+                content: item.content,
+                duration: item.voiceDuration
+            }),
+            itemIndex,
+            success: (msg) => {
+                this._page.UI.updateListViewBySort();
+            }
         });
     }
 }
