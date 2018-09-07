@@ -1,8 +1,8 @@
 # wechat-im
 
 [![Build Status](https://travis-ci.org/unmagic/wechat-im.svg?branch=master)](https://travis-ci.org/unmagic/wechat-im)
-[![Version status](https://img.shields.io/badge/release-1.0.1-brightgreen.svg)](https://github.com/unmagic/wechat-im)
-[![Code Size](https://img.shields.io/badge/code%20size-83kb-brightgreen.svg)](https://github.com/unmagic/wechat-im)
+[![Version status](https://img.shields.io/badge/release-1.0.2-brightgreen.svg)](https://github.com/unmagic/wechat-im)
+[![Code Size](https://img.shields.io/badge/code%20size-88kb-brightgreen.svg)](https://github.com/unmagic/wechat-im)
 [![Dependency status](https://img.shields.io/badge/dependencies-none-brightgreen.svg)](https://img.shields.io/badge/dependencies-none-brightgreen.svg)
 [![GitHub](https://img.shields.io/github/license/mashape/apistatus.svg)](https://github.com/unmagic/wechat-im/blob/master/LICENSE)
 
