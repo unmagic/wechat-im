@@ -14,6 +14,10 @@ export default class MsgManager extends MsgTypeManager {
         this.getMsgManager({type}).sendOneMsg(arguments[0]);
     }
 
+    resend({type, content, duration, itemIndex}) {
+        this.getMsgManager({type}).resend(arguments[0]);
+    }
+
     stopAllVoice() {
         this.voiceManager.stopAllVoicePlay();
     }
