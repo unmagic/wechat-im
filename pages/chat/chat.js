@@ -138,12 +138,12 @@ Page({
         chatInput.closeExtraView();
     },
 
-    sendMsg: function (content, itemIndex, cbOk) {
+    sendMsg: function ({content, itemIndex, success}) {
         this.imOperator.onSimulateSendMsg({
             content,
             success: (msg) => {
                 this.UI.updateViewWhenSendSuccess(msg, itemIndex);
-                cbOk && cbOk(msg);
+                success && success(msg);
             },
             fail: () => {
                 this.UI.updateViewWhenSendFailed(itemIndex);
