@@ -29,7 +29,7 @@ Page({
         console.log(friend);
         this.initData();
         wx.setNavigationBarTitle({
-            title: friend.friendName
+            title: friend.friendName || ''
         });
         this.imOperator = new IMOperator(this, friend);
         this.UI = new UI(this);
@@ -92,10 +92,10 @@ Page({
     },
 
     //模拟上传文件，注意这里的cbOk回调函数传入的参数应该是上传文件成功时返回的文件url，这里因为模拟，我直接用的savedFilePath
-    simulateUploadFile: function ({savedFilePath, duration, itemIndex}, cbOk) {
+    simulateUploadFile: function ({savedFilePath, duration, itemIndex, success, fail}) {
         setTimeout(() => {
             let urlFromServerWhenUploadSuccess = savedFilePath;
-            cbOk && cbOk(urlFromServerWhenUploadSuccess);
+            success && success(urlFromServerWhenUploadSuccess);
         }, 1000);
     },
     extraButton: function () {
@@ -158,12 +158,6 @@ Page({
         const itemIndex = parseInt(e.currentTarget.dataset.resendIndex);
         const item = this.data.chatItems[itemIndex];
         this.UI.updateDataWhenStartSending(item, false, false);
-        this.sendMsg(this.imOperator.createChatItemContent({
-            type: item.type,
-            content: item.content,
-            duration: item.voiceDuration
-        }), itemIndex, (msg) => {
-            this.UI.updateListViewBySort();
-        });
+        this.msgManager.resend({...item, itemIndex});
     },
 });

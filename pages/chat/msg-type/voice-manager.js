@@ -1,11 +1,10 @@
 import {isVoiceRecordUseLatestVersion} from "../../../modules/chat-input/chat-input";
-import {saveFileRule} from "../../../utils/file";
 import IMOperator from "../im-operator";
-import FileManager from "../file-manager";
+import FileManager from "./base/file-manager";
 
-export default class VoiceManager {
+export default class VoiceManager extends FileManager{
     constructor(page) {
-        this._page = page;
+        super(page);
         this.isLatestVersion = isVoiceRecordUseLatestVersion();
         //判断是否需要使用高版本语音播放接口
         if (this.isLatestVersion) {
@@ -17,32 +16,6 @@ export default class VoiceManager {
             console.log('语音Item', dataset);
             this._playVoice({dataset})
         }
-    }
-
-    /**
-     * 发送语音消息
-     * @param tempFilePath 由输入组件接收到的临时文件路径
-     * @param duration 由输入组件接收到的录音时间
-     */
-    sendOneMsg(tempFilePath, duration) {
-        saveFileRule(tempFilePath, (savedFilePath) => {
-            const temp = this._page.imOperator.createNormalChatItem({
-                type: IMOperator.VoiceType,
-                content: savedFilePath,
-                duration
-            });
-            this._page.UI.showItemForMoment(temp, (itemIndex) => {
-                this._page.simulateUploadFile({savedFilePath, duration, itemIndex}, (content) => {
-                    this._page.sendMsg(this._page.imOperator.createChatItemContent({
-                        type: IMOperator.VoiceType,
-                        content: content,
-                        duration
-                    }), itemIndex, (msg) => {
-                        FileManager.set(msg, savedFilePath);
-                    });
-                });
-            });
-        });
     }
 
     /**
@@ -61,33 +34,6 @@ export default class VoiceManager {
                 chatItems: that.data.chatItems,
                 isVoicePlaying: false
             })
-        }
-    }
-
-    /**
-     * 接收到消息时，通过UI类的管理进行渲染
-     * @param msg 接收到的消息，这个对象应是由 im-operator.js 中的createNormalChatItem()方法生成的。
-     */
-    showMsg({msg}) {
-        const url = msg.content;
-        const localVoicePath = FileManager.get(msg);
-        console.log('本地语音路径', localVoicePath);
-        if (!localVoicePath) {
-            wx.downloadFile({
-                url,
-                success: res => {
-                    saveFileRule(res.tempFilePath, (savedFilePath) => {
-                        const temp = this._page.imOperator.createNormalChatItem({
-                            type: IMOperator.VoiceType,
-                            content: savedFilePath
-                        });
-                        this._page.UI.updateViewWhenReceive(temp);
-                        FileManager.set(msg, savedFilePath);
-                    });
-                }
-            });
-        } else {
-            this._page.UI.updateViewWhenReceive(msg);
         }
     }
 
