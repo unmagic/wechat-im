@@ -23,6 +23,7 @@ Page({
         let item = e.currentTarget.dataset.item;
         delete item.latestMsg;
         delete item.unread;
+        delete item.content;
         wx.navigateTo({
             url: `../chat/chat?friend=${JSON.stringify(item)}`
         });
