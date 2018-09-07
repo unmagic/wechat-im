@@ -122,15 +122,15 @@ module.exports = class WebSocketServer {
 
     sendText(conn, msg, cbOk) {
         if (this._pageMap.get(msg.friendId) !== 'get-conversations') {
-            let {type, content} = msg;
-            const msgSendFinally = JSON.stringify({type, content});
+            let {type, content, duration,timestamp} = msg;
+            const msgSendFinally = JSON.stringify({type, content, duration,timestamp});
             conn.sendText(msgSendFinally, () => {
                 cbOk && cbOk(msgSendFinally);
             });
         } else {
-            let {type, content, friendId} = msg;
+            let {type, content, friendId, duration,timestamp} = msg;
             this._unreadObj[friendId]++;
-            const msgSendFinally = JSON.stringify({type, content});
+            const msgSendFinally = JSON.stringify({type, content, duration,timestamp});
             cbOk && cbOk(msgSendFinally);
             conn.sendText(JSON.stringify({
                 type: 'get-conversations',
