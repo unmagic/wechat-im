@@ -1,5 +1,4 @@
 // pages/chat-list/chat-list.js
-import regeneratorRuntime from "./regenerator-runtime";
 
 /**
  * 会话列表页面
