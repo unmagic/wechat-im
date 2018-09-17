@@ -23,7 +23,7 @@ Page({
     /**
      * 生命周期函数--监听页面加载
      */
-    onLoad: function (options) {
+    onLoad(options) {
 
         const friend = JSON.parse(options.friend);
         console.log(friend);
@@ -40,7 +40,7 @@ Page({
         });
         this.UI.updateChatStatus('正在聊天中...');
     },
-    initData: function () {
+    initData() {
         let that = this;
         let systemInfo = wx.getSystemInfoSync();
         chatInput.init(this, {
@@ -75,13 +75,13 @@ Page({
         that.extraButton();
         that.voiceButton();
     },
-    textButton: function () {
+    textButton() {
         chatInput.setTextMessageListener((e) => {
             let content = e.detail.value;
             this.msgManager.sendMsg({type: IMOperator.TextType, content});
         });
     },
-    voiceButton: function () {
+    voiceButton() {
         chatInput.recordVoiceListener((res, duration) => {
             let tempFilePath = res.tempFilePath;
             this.msgManager.sendMsg({type: IMOperator.VoiceType, content: tempFilePath, duration});
@@ -92,13 +92,13 @@ Page({
     },
 
     //模拟上传文件，注意这里的cbOk回调函数传入的参数应该是上传文件成功时返回的文件url，这里因为模拟，我直接用的savedFilePath
-    simulateUploadFile: function ({savedFilePath, duration, itemIndex, success, fail}) {
+    simulateUploadFile({savedFilePath, duration, itemIndex, success, fail}) {
         setTimeout(() => {
             let urlFromServerWhenUploadSuccess = savedFilePath;
             success && success(urlFromServerWhenUploadSuccess);
         }, 1000);
     },
-    extraButton: function () {
+    extraButton() {
         let that = this;
         chatInput.clickExtraListener((e) => {
             let chooseIndex = parseInt(e.currentTarget.dataset.index);
@@ -120,7 +120,7 @@ Page({
     /**
      * 自定义事件
      */
-    myFun: function () {
+    myFun() {
         wx.showModal({
             title: '小贴士',
             content: '演示更新会话状态',
@@ -134,11 +134,11 @@ Page({
         })
     },
 
-    resetInputStatus: function () {
+    resetInputStatus() {
         chatInput.closeExtraView();
     },
 
-    sendMsg: function ({content, itemIndex, success}) {
+    sendMsg({content, itemIndex, success}) {
         this.imOperator.onSimulateSendMsg({
             content,
             success: (msg) => {
@@ -154,7 +154,7 @@ Page({
      * 重发消息
      * @param e
      */
-    resendMsgEvent: function (e) {
+    resendMsgEvent(e) {
         const itemIndex = parseInt(e.currentTarget.dataset.resendIndex);
         const item = this.data.chatItems[itemIndex];
         this.UI.updateDataWhenStartSending(item, false, false);

@@ -19,10 +19,10 @@ Page({
     /**
      * 生命周期函数--监听页面加载
      */
-    onLoad: function (options) {
+    onLoad(options) {
         this.initData();
     },
-    initData: function () {
+    initData() {
         let that = this;
         let systemInfo = wx.getSystemInfoSync();
         chatInput.init(this, {
@@ -56,13 +56,13 @@ Page({
         that.extraButton();
         that.voiceButton();
     },
-    textButton: function () {
+    textButton() {
         chatInput.setTextMessageListener(function (e) {
             let content = e.detail.value;
             console.log(content);
         });
     },
-    voiceButton: function () {
+    voiceButton() {
         chatInput.recordVoiceListener(function (res, duration) {
             let tempFilePath = res.tempFilePath;
             let vDuration = duration;
@@ -91,7 +91,7 @@ Page({
             }
         })
     },
-    extraButton: function () {
+    extraButton() {
         let that = this;
         chatInput.clickExtraListener(function (e) {
             console.log(e);
@@ -113,7 +113,7 @@ Page({
             console.log('Extra弹窗是否消失', dismiss);
         })
     },
-    myFun: function () {
+    myFun() {
         wx.showModal({
             title: '小贴士',
             content: '这是用于拓展的自定义功能！',
@@ -127,7 +127,7 @@ Page({
         })
     },
 
-    resetInputStatus: function () {
+    resetInputStatus() {
         chatInput.closeExtraView();
     },
 });

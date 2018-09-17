@@ -1,4 +1,5 @@
 // pages/chat-list/chat-list.js
+import regeneratorRuntime from "./regenerator-runtime";
 
 /**
  * 会话列表页面
@@ -15,11 +16,11 @@ Page({
     /**
      * 生命周期函数--监听页面加载
      */
-    onLoad: function (options) {
+    onLoad (options) {
 
     },
 
-    toChat: function (e) {
+    toChat (e) {
         let item = e.currentTarget.dataset.item;
         delete item.latestMsg;
         delete item.unread;
@@ -31,7 +32,7 @@ Page({
     /**
      * 生命周期函数--监听页面显示
      */
-    onShow: function () {
+    onShow () {
 
         getApp().getIMHandler().setOnReceiveMessageListener({
             listener: (msg) => {

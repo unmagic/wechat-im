@@ -14,7 +14,7 @@ Page({
     /**
      * 生命周期函数--监听页面显示
      */
-    onShow: function () {
+    onShow() {
         getApp().getIMHandler().sendMsg({
             content: {
                 type: 'get-friends',
@@ -39,11 +39,6 @@ Page({
             friendName: item.nickName
         };
     },
-    /**
-     * 生命周期函数--监听页面隐藏
-     */
-    onHide: function () {
 
-    },
 
 });
