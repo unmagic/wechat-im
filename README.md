@@ -73,8 +73,6 @@ Terminal运行 gulp 即可开启WebSocket服务
 
 如有合作意向或是想要推广您的产品，可加QQ：1178545208
 
-有很多萌新使用这个项目，不懂ip是什么，不知道如何使用gulp，不知道npm是什么，怎么安装依赖，这些都是最基本的前端知识，希望你自行学习，今后我不再一一解答。
-
 ### 欢迎打赏
 
 <img src="https://github.com/unmagic/.gif/blob/master/admire/weixin.png" /><img src="https://github.com/unmagic/.gif/blob/master/admire/zhifubao.png" />
