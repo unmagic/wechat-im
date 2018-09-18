@@ -15,11 +15,11 @@ Page({
     /**
      * 生命周期函数--监听页面加载
      */
-    onLoad (options) {
+    onLoad(options) {
 
     },
 
-    toChat (e) {
+    toChat(e) {
         let item = e.currentTarget.dataset.item;
         delete item.latestMsg;
         delete item.unread;
@@ -31,7 +31,7 @@ Page({
     /**
      * 生命周期函数--监听页面显示
      */
-    onShow () {
+    onShow() {
 
         getApp().getIMHandler().setOnReceiveMessageListener({
             listener: (msg) => {
