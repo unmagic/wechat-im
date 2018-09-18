@@ -1,20 +1,21 @@
 //app.js
-import IMFactory from "./modules/im-sdk/im-factory";
+import AppIMDelegate from "./delegate/app-im-delegate";
 
 App({
     globalData: {
         userInfo: {},
     },
     getIMHandler() {
-        return this.iIMHandler;
+        return this.appIMDelegate.getIMHandlerDelegate();
     },
-    onLaunch() {
-        this.iIMHandler = IMFactory.create();
+    onLaunch(options) {
+        this.appIMDelegate = new AppIMDelegate(this);
+        this.appIMDelegate.onLaunch(options);
     },
     onHide() {
-        // this.iIMHandler.closeConnection();
+        this.appIMDelegate.onHide();
     },
-    onShow() {
-        this.iIMHandler.createConnection({options: {url: 'ws://10.4.94.185:8001'}});
+    onShow(options) {
+        this.appIMDelegate.onShow(options);
     }
 });
