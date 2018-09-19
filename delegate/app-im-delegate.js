@@ -1,4 +1,4 @@
-import {getIMHandlerFactory} from "./../modules/im-sdk/im-factory";
+import {getIMHandlerFactory} from "../libs/im-sdk/im-factory";
 
 export default class AppIMDelegate {
     constructor(app) {
