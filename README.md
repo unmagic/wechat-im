@@ -57,6 +57,10 @@ Terminal运行 gulp 即可开启WebSocket服务
 
 如果你的项目使用这个框架并且正式投入运营，方便的话可以提供下你们的小程序二维码，我可以在这里为大家推广。
 
+目前已上线的微信小程序：
+
+<img src="https://github.com/unmagic/.gif/tree/master/wechat-im/other-qr/ai_fa_sheng.jpg"  width="150" height="150" />
+
 ### LINK
 
 [Document](https://blog.csdn.net/sinat_27612147/article/details/78456363)
