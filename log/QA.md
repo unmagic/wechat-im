@@ -4,7 +4,7 @@
 ```
 1. 开发者工具提示错误`WebSocket connection to 'ws://10.4.96.52:8001/' 
    failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED`
-答：这是本地WebSocket服务没有开启，请先开启本地服务。
+答：这是本地WebSocket服务没有开启，请先开启本地服务，端口号必须写，必须和服务端的8001保持一致。
 
 2. 开发者工具使用报`wx://xx.xx.xx.xx不在以下 socket 合法域名列表中`。
 答：点击开发者工具右上角 `详情—>不校验合法域名、web-view（业务域名）、TLS 版本以及 HTTPS 证书` 挑勾 
