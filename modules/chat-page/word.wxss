@@ -6,7 +6,7 @@
     color: #213d52;
     margin-right: -1rpx;
     margin-left: 14rpx;
-    word-wrap:break-word;
+    word-wrap: break-word;
 }
 
 .isOtherWordStyle {
@@ -14,6 +14,7 @@
     color: #333333;
     margin-right: 14rpx;
     margin-left: -1rpx;
+    word-wrap: break-word;
 }
 
 .chat-list-pic-style {
