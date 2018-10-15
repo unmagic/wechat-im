@@ -61,7 +61,7 @@ Terminal运行 gulp 即可开启WebSocket服务
 
 目前已上线的微信小程序：
 
-<img src="https://github.com/unmagic/.gif/blob/master/wechat-im/other-qr/ai_fa_sheng.jpg"  width="150" height="150" /><img src="https://github.com/unmagic/.gif/blob/master/wechat-im/other-qr/zhi_ye_ming_pian.png"  width="150" height="150" />
+<img src="https://github.com/unmagic/.gif/blob/master/wechat-im/other-qr/ai_fa_sheng.jpg"  width="150" height="150" />
 
 ### LINK
 
