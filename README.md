@@ -10,6 +10,8 @@
 
 开发这个项目付出了我很多心血，如果对你有帮助和启发的话，希望在`GitHub`上给个`star`！也是对我工作的支持和肯定！
 
+也非常感谢[kulovecc](https://github.com/kulovecc)对项目中文本超长溢出布局的问题的修正和提交！
+
 ## 介绍：
 wechat-im是一个可以让你在小程序平台快速实现即时通讯功能的完整模板。
 
@@ -59,7 +61,7 @@ Terminal运行 gulp 即可开启WebSocket服务
 
 目前已上线的微信小程序：
 
-<img src="https://github.com/unmagic/.gif/blob/master/wechat-im/other-qr/ai_fa_sheng.jpg"  width="150" height="150" /><img src="https://github.com/unmagic/.gif/blob/master/wechat-im/other-qr/zhi_ye_ming_pian.png"  width="150" height="150" />
+<img src="https://github.com/unmagic/.gif/blob/master/wechat-im/other-qr/ai_fa_sheng.jpg"  width="150" height="150" />
 
 ### LINK
 
