@@ -32,9 +32,9 @@ export default class TextManager {
     resend({type, content, duration, itemIndex}) {
         this._page.sendMsg({
             content: this._page.imOperator.createChatItemContent({
-                type: item.type,
-                content: item.content,
-                duration: item.voiceDuration
+                type: type,
+                content: content,
+                duration: duration
             }),
             itemIndex,
             success: (msg) => {
