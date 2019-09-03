@@ -28,5 +28,6 @@
         "selectedIconPath": "image/tabbar/friend.png"
       }
     ]
-  }
+  },
+  "sitemapLocation": "sitemap.json"
 }

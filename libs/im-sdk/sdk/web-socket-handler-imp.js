@@ -81,7 +81,7 @@ export default class WebSocketHandlerImp extends IIMHandler {
                 getApp().globalData.friendsId = msg.friendsId;
                 if (this._msgQueue.length) {
                     let temp;
-                    while (temp = this._msgQueue.shift()) {
+                    while (!!(temp = this._msgQueue.shift())) {
                         this.sendMsg({content: {...temp, userId: msg.userInfo.userId}});
                     }
                 }

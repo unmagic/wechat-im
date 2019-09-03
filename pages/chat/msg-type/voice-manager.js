@@ -4,12 +4,9 @@ import FileManager from "./base/file-manager";
 export default class VoiceManager extends FileManager {
     constructor(page) {
         super(page);
-        this.isLatestVersion = !!wx.getRecorderManager;
 
         //判断是否需要使用高版本语音播放接口
-        if (this.isLatestVersion) {
-            this.innerAudioContext = wx.createInnerAudioContext();
-        }
+        this.innerAudioContext = wx.createInnerAudioContext();
         //在该类被初始化时，绑定语音点击播放事件
         this._page.chatVoiceItemClickEvent = (e) => {
             let dataset = e.currentTarget.dataset;
@@ -44,11 +41,7 @@ export default class VoiceManager extends FileManager {
      * @private
      */
     _stopVoice() {
-        if (this.isLatestVersion) {
-            this.innerAudioContext.stop();
-        } else {
-            wx.stopVoice();
-        }
+        this.innerAudioContext.stop();
     }
 
     _playVoice({dataset}) {
@@ -90,26 +83,20 @@ export default class VoiceManager extends FileManager {
      * @private
      */
     __playVoice({filePath, success, fail}) {
-        if (this.isLatestVersion) {
-            this.innerAudioContext.src = filePath;
-            this.innerAudioContext.startTime = 0;
-            this.innerAudioContext.play();
-            this.innerAudioContext.onError((error) => {
-                this.innerAudioContext.offError();
-                fail && fail(error);
-            });
-            this.innerAudioContext.onEnded(() => {
-                this.innerAudioContext.offEnded();
-                success && success();
-            });
-        } else {
-            wx.playVoice({filePath, success, fail});
-        }
+        this.innerAudioContext.src = filePath;
+        this.innerAudioContext.startTime = 0;
+        this.innerAudioContext.play();
+        this.innerAudioContext.onError((error) => {
+            this.innerAudioContext.offError();
+            fail && fail(error);
+        });
+        this.innerAudioContext.onEnded(() => {
+            this.innerAudioContext.offEnded();
+            success && success();
+        });
     }
 
     _myPlayVoice(filePath, dataset, cbOk, cbError) {
-        let that = this._page;
-        // if (dataset.isMy || that.data.isAndroid) {
         this.__playVoice({
             filePath: filePath,
             success: () => {
@@ -117,30 +104,9 @@ export default class VoiceManager extends FileManager {
                 typeof cbOk === "function" && cbOk();
             },
             fail: (res) => {
-                // console.log('播放失败了1', res);
                 typeof cbError === "function" && cbError(res);
             }
         });
-        // } else {
-        //     wx.downloadFile({
-        //         url: dataset.voicePath,
-        //         success: res => {
-        //             // console.log('下载语音成功', res);
-        //             this.__playVoice({
-        //                 filePath: res.tempFilePath,
-        //                 success: () => {
-        //                     this.stopAllVoicePlay();
-        //                     typeof cbOk === "function" && cbOk();
-        //                 },
-        //                 fail: (res) => {
-        //                     // console.log('播放失败了2', res);
-        //                     typeof cbError === "function" && cbError(res);
-        //                 }
-        //             });
-        //         }
-        //     });
-        // }
-
     }
 
     _startPlayVoice(dataset) {
