@@ -79,12 +79,12 @@ export default class IMOperator {
         let obj = {
             msgId: 0,//消息id
             friendId: this.getFriendId(),//好友id
-            isMy: isMy,//我发送的消息？
+            isMy,//我发送的消息？
             showTime: time.ifShowTime,//是否显示该次发送时间
             time: time.timeStr,//发送时间 如 09:15,
             timestamp: currentTimestamp,//该条数据的时间戳，一般用于排序
-            type: type,//内容的类型，目前有这几种类型： text/voice/image/custom | 文本/语音/图片/自定义
-            content: content,// 显示的内容，根据不同的类型，在这里填充不同的信息。
+            type,//内容的类型，目前有这几种类型： text/voice/image/custom | 文本/语音/图片/自定义
+            content,// 显示的内容，根据不同的类型，在这里填充不同的信息。
             headUrl: isMy ? this._myHeadUrl : this._otherHeadUrl,//显示的头像，自己或好友的。
             sendStatus: 'success',//发送状态，目前有这几种状态：sending/success/failed | 发送中/发送成功/发送失败
             voiceDuration: duration,//语音时长 单位秒
