@@ -35,7 +35,9 @@ Page({
 
         const friend = JSON.parse(options.friend);
         console.log(friend);
-        this.initData();
+        this.setData({
+            pageHeight: wx.getSystemInfoSync().windowHeight,
+        });
         wx.setNavigationBarTitle({
             title: friend.friendName || ''
         });
@@ -50,14 +52,6 @@ Page({
     },
     onReady() {
         this.chatInput = this.selectComponent('#chatInput');
-    },
-    initData() {
-        let that = this;
-        let systemInfo = wx.getSystemInfoSync();
-
-        that.setData({
-            pageHeight: systemInfo.windowHeight,
-        });
     },
     onSendMessageEvent(e) {
         let content = e.detail.value;
