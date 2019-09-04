@@ -275,7 +275,7 @@ Component({
         },
         _chatInput$extra$item$click$event(e) {
             const {currentTarget: {dataset}} = e;
-            this.triggerEvent(EVENT.EXTRA_ITEM_CLICK, {dataset}, {});
+            this.triggerEvent(EVENT.EXTRA_ITEM_CLICK, {...dataset}, {});
         },
 
         sendVoiceListener(cbOk, cbError) {

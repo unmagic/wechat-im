@@ -61,9 +61,6 @@ Page({
         wx.setNavigationBarTitle({
             title: '好友'
         });
-        // that.textButton();
-        // that.extraButton();
-        // that.voiceButton();
     },
     onSendMessageEvent(e) {
         console.log('发送的消息',e);
@@ -87,23 +84,20 @@ Page({
             success && success(urlFromServerWhenUploadSuccess);
         }, 1000);
     },
-    extraButton() {
-        let that = this;
-        chatInput.clickExtraListener((e) => {
-            let chooseIndex = parseInt(e.currentTarget.dataset.index);
-            if (chooseIndex === 2) {
-                that.myFun();
-                return;
+    onExtraItemClickEvent(e) {
+        console.warn(e);
+        let chooseIndex = parseInt(e.detail.index);
+        if (chooseIndex === 2) {
+            this.myFun();
+            return;
+        }
+        wx.chooseImage({
+            count: 1, // 默认9
+            sizeType: ['compressed'],
+            sourceType: chooseIndex === 0 ? ['album'] : ['camera'],
+            success: (res) => {
+                this.msgManager.sendMsg({type: IMOperator.ImageType, content: res.tempFilePaths[0]})
             }
-            wx.chooseImage({
-                count: 1, // 默认9
-                sizeType: ['compressed'],
-                sourceType: chooseIndex === 0 ? ['album'] : ['camera'],
-                success: (res) => {
-                    this.msgManager.sendMsg({type: IMOperator.ImageType, content: res.tempFilePaths[0]})
-                }
-            });
-
         });
     },
     /**
