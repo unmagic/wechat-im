@@ -1,6 +1,5 @@
 <!--pages/list/list.wxml-->
 <import src="../../modules/chat-page/chat-item.wxml"/>
-<import src="../../modules/chat-input/chat-input.wxml"/>
 <import src="../../modules/chat-page/chat-page-status.wxml"/>
 
 <template is="chat-page-status" data="{{chatStatue,chatStatusContent}}"/>

@@ -1,3 +1,12 @@
-<import src="../../modules/chat-input/chat-input.wxml" />
-
-<template is="chat-input" data="{{inputObj:inputObj,textMessage:textMessage,showVoicePart:true}}" />
+<chat-input
+        id="chatInput"
+        min-voice-time="{{1}}"
+        max-voice-time="{{60}}"
+        start-time-down="{{54}}"
+        tabBarHeight="{{0}}"
+        format="mp3"
+        extra-array="{{extraArr}}"
+        bind:extraClickEvent="onExtraClickEvent"
+        bind:extraItemClickEvent="onExtraItemClickEvent"
+        bind:voiceRecordEvent="onVoiceRecordEvent"
+        bind:sendMessageEvent="onSendMessageEvent"></chat-input>

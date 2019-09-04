@@ -66,6 +66,9 @@ Component({
         }
     },
     methods: {
+        getRecordStatus() {
+            return {...status};
+        },
         closeExtraView() {
             this.setData({
                 'extraObj.chatInputShowExtra': false
