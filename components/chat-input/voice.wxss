@@ -1,0 +1,39 @@
+
+.btn-voice-press {
+    background-color: gainsboro;
+}
+
+button{
+    font-size: 32rpx;
+    width:100%;
+    line-height: 74rpx;
+    margin-top: 15rpx;
+    margin-bottom: 15rpx;
+}
+.voice-status-style{
+    position: absolute;
+    left: 0;
+    bottom: 22rpx;
+    width: 80%;
+    text-align: center;
+    font-size: 24rpx;
+    color: white;
+    padding-top: 5rpx;
+    padding-bottom: 5rpx;
+    margin-left: 10%;
+    border-radius: 10rpx;
+}
+
+.voice-record-git-status-style{
+    position: absolute;
+    left: 0;
+    bottom: 75rpx;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+
+.voice-record-git-size-style{
+    width: 58rpx;
+    height: 10rpx;
+}
