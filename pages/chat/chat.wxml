@@ -26,7 +26,7 @@
         format="mp3"
         extra-array="{{extraArr}}"
         bind:extraClickEvent="onExtraClickEvent"
-            bind:extraItemClickEvent="onExtraItemClickEvent"
-            bind:voiceRecordEvent="onVoiceRecordEvent"
-            bind:sendMessageEvent="onSendMessageEvent"></chat-input>
+        bind:extraItemClickEvent="onExtraItemClickEvent"
+        bind:voiceRecordEvent="onVoiceRecordEvent"
+        bind:sendMessageEvent="onSendMessageEvent"></chat-input>
 <!--<template is="chat-input" data="{{inputObj,textMessage,showVoicePart:true}}"/>-->

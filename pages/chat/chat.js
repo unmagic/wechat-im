@@ -58,32 +58,26 @@ Page({
         that.setData({
             pageHeight: systemInfo.windowHeight,
         });
-        wx.setNavigationBarTitle({
-            title: '好友'
-        });
     },
     onSendMessageEvent(e) {
-        console.log('发送的消息',e);
         let content = e.detail.value;
         this.msgManager.sendMsg({type: IMOperator.TextType, content});
     },
-    voiceButton() {
-        chatInput.recordVoiceListener((res, duration) => {
-            let tempFilePath = res.tempFilePath;
-            this.msgManager.sendMsg({type: IMOperator.VoiceType, content: tempFilePath, duration});
-        });
-        chatInput.setVoiceRecordStatusListener((status) => {
-            this.msgManager.stopAllVoice();
-        })
+    onVoiceRecordEvent(e) {
+        const {detail: {recordStatus, duration, tempFilePath, fileSize,}} = e;
+        if (recordStatus === 2) {
+            this.msgManager.sendMsg({
+                type: IMOperator.VoiceType,
+                content: tempFilePath,
+                duration: Math.floor(duration / 1000)
+            });
+        }
+        this.msgManager.stopAllVoice();
     },
-
-    //模拟上传文件，注意这里的cbOk回调函数传入的参数应该是上传文件成功时返回的文件url，这里因为模拟，我直接用的savedFilePath
-    simulateUploadFile({savedFilePath, duration, itemIndex, success, fail}) {
-        setTimeout(() => {
-            let urlFromServerWhenUploadSuccess = savedFilePath;
-            success && success(urlFromServerWhenUploadSuccess);
-        }, 1000);
-    },
+    /**
+     * 点击extra中的item时触发
+     * @param e
+     */
     onExtraItemClickEvent(e) {
         console.warn(e);
         let chooseIndex = parseInt(e.detail.index);
@@ -100,6 +94,21 @@ Page({
             }
         });
     },
+    /**
+     * 点击extra按钮时触发
+     * @param e
+     */
+    onExtraClickEvent(e) {
+        console.log(e);
+    },
+    //模拟上传文件，注意这里的cbOk回调函数传入的参数应该是上传文件成功时返回的文件url，这里因为模拟，我直接用的savedFilePath
+    simulateUploadFile({savedFilePath, duration, itemIndex, success, fail}) {
+        setTimeout(() => {
+            let urlFromServerWhenUploadSuccess = savedFilePath;
+            success && success(urlFromServerWhenUploadSuccess);
+        }, 1000);
+    },
+
     /**
      * 自定义事件
      */

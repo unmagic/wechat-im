@@ -141,16 +141,17 @@ Component({
         },
         _dealVoiceLongClickEventWithHighVersion() {
             this.recorderManager.onStart(() => {
-                singleVoiceTimeCount = 0;
+                this.data.singleVoiceTimeCount = 0;
+                const {_startTimeDown, maxVoiceTime} = this.data;
                 //设置定时器计时60秒
                 this.data.timer = setInterval(() => {
-                    singleVoiceTimeCount++;
-                    if (singleVoiceTimeCount >= startTimeDown && singleVoiceTimeCount < maxVoiceTime) {
+                    const voiceTimeCount = ++this.data.singleVoiceTimeCount;
+                    if (voiceTimeCount >= _startTimeDown && voiceTimeCount < maxVoiceTime) {
                         this.setData({
-                            'voiceObj.timeDownNum': maxVoiceTime - singleVoiceTimeCount,
+                            'voiceObj.timeDownNum': maxVoiceTime - voiceTimeCount,
                             'voiceObj.status': 'timeDown'
                         })
-                    } else if (singleVoiceTimeCount >= maxVoiceTime) {
+                    } else if (voiceTimeCount >= maxVoiceTime) {
                         this.setData({
                             'voiceObj.status': 'timeout'
                         });
@@ -278,24 +279,22 @@ Component({
             this.triggerEvent(EVENT.EXTRA_ITEM_CLICK, {...dataset}, {});
         },
 
-        sendVoiceListener(cbOk, cbError) {
-            if (!!this.recorderManager) {
-                typeof cbOk === "function" && (this.recorderManager.onStop((res) => {
-                    console.log(res, this.data.voiceObj.status);
-                    if (this.data.voiceObj.status === 'short') {//录音时间太短或者移动到了取消录音区域， 则取消录音
-                        this._triggerVoiceRecordEvent({status: status.SHORT});
-                        return;
-                    } else if (this.data.voiceObj.moveToCancel) {
-                        this._triggerVoiceRecordEvent({status: status.CANCEL});
-                        return;
-                    }
-                    console.log('录音成功');
-                    this._triggerVoiceRecordEvent({status: status.SUCCESS, dataset: res});
-                }));
-                typeof cbError === "function" && (this.recorderManager.onError((res) => {
-                    this._triggerVoiceRecordEvent({status: status.FAIL, dataset: res});
-                }));
-            }
+        _setVoiceListener() {
+            this.recorderManager.onStop((res) => {
+                console.log(res, this.data.voiceObj.status);
+                if (this.data.voiceObj.status === 'short') {//录音时间太短或者移动到了取消录音区域， 则取消录音
+                    this._triggerVoiceRecordEvent({status: status.SHORT});
+                    return;
+                } else if (this.data.voiceObj.moveToCancel) {
+                    this._triggerVoiceRecordEvent({status: status.CANCEL});
+                    return;
+                }
+                console.log('录音成功');
+                this._triggerVoiceRecordEvent({status: status.SUCCESS, dataset: res});
+            });
+            this.recorderManager.onError((res) => {
+                this._triggerVoiceRecordEvent({status: status.FAIL, dataset: res});
+            });
         },
 
         _checkRecordAuth(cbOk, cbError) {
@@ -331,10 +330,10 @@ Component({
             this.data.windowWidth = windowWidth;
             this.data.cancelLineYPosition = windowHeight * 0.12;
             this._dealVoiceLongClickEventWithHighVersion();
+            this._setVoiceListener();
         },
         attached() {
             this._initVoiceData();
-
         },
         detached() {
             clearInterval(this.data.timer);
