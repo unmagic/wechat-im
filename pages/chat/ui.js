@@ -1,5 +1,3 @@
-import * as chatInput from "../../modules/chat-input/chat-input";
-
 /**
  * 用户处理消息的收发UI更新
  */
@@ -38,7 +36,7 @@ export default class UI {
      * @param needScroll
      */
     updateDataWhenStartSending(sendMsg, addToArr = true, needScroll = true) {
-        chatInput.closeExtraView();
+        this._page.chatInput.closeExtraView();
         sendMsg.sendStatus = 'sending';
         addToArr && this._page.data.chatItems.push(sendMsg);
         let obj = {};

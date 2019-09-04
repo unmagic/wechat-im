@@ -32,6 +32,10 @@ Component({
         format: {
             type: String,
             value: 'mp3'
+        },
+        extraArray: {
+            type: Array,
+            value: []
         }
     },
     data: {
@@ -44,21 +48,27 @@ Component({
         textMessage: '',
         voiceObj: {moveToCancel: false},
         extraObj: {
-            chatInputShowExtra: false
+            chatInputShowExtra: false,
+            chatInputExtraArr: []
         },
         inputStatus: 'text',
         inputValueEventTemp: ''
     },
     observers: {
-        'startTimeDown': function (startTimeDown) {
+        'extraArray'(value) {
+            this.setData({
+                'extraObj.chatInputExtraArr': value || []
+            })
+        },
+        'startTimeDown'(startTimeDown) {
             const data = this.data;
             data._startTimeDown = startTimeDown && startTimeDown < data.maxVoiceTime && startTimeDown > 0 ? startTimeDown : START_TIME_DOWN;
         }
     },
     methods: {
-        initExtraData(extra$arr) {
+        closeExtraView() {
             this.setData({
-                'extraObj.chatInputExtraArr': extra$arr
+                'extraObj.chatInputShowExtra': false
             });
         },
         _chatInput$extra$click$event() {
@@ -78,7 +88,7 @@ Component({
         _triggerVoiceRecordEvent({status, dataset}) {
             this.triggerEvent(EVENT.VOICE_RECORD, {recordStatus: status, ...dataset}, {});
         },
-        long$click$voice$btn(e) {
+        _long$click$voice$btn(e) {
             if ('send$voice$btn' === e.currentTarget.id) {//长按时需要打开录音功能，开始录音
                 this._checkRecordAuth(() => {
                     const {maxVoiceTime, singleVoiceTimeCount} = this.data;
@@ -96,7 +106,7 @@ Component({
                     //录音失败
                     console.error('录音拒绝授权');
                     clearInterval(timer);
-                    this.endRecord();
+                    this._endRecord();
                     this.setData({
                         'voiceObj.status': 'end',
                         'voiceObj.showCancelSendVoicePart': false
@@ -144,14 +154,14 @@ Component({
                         this.setData({
                             'voiceObj.status': 'timeout'
                         });
-                        this.delayDismissCancelView();
+                        this._delayDismissCancelView();
                         clearInterval(this.data.timer);
-                        this.endRecord();
+                        this._endRecord();
                     }
                 }, 1000);
             })
         },
-        send$voice$move$event(e) {
+        _send$voice$move$event(e) {
             if ('send$voice$btn' === e.currentTarget.id) {
                 const {windowHeight, voiceObj, tabBarHeight, cancelLineYPosition} = this.data,
                     y = windowHeight + tabBarHeight - e.touches[0].clientY;
@@ -171,14 +181,14 @@ Component({
 
             }
         },
-        send$voice$move$end$event(e) {
+        _send$voice$move$end$event(e) {
             if ('send$voice$btn' === e.currentTarget.id) {
                 const {singleVoiceTimeCount, minVoiceTime, timer} = this.data;
                 if (singleVoiceTimeCount < minVoiceTime) {//语音时间太短
                     this.setData({
                         'voiceObj.status': 'short'
                     });
-                    this.delayDismissCancelView();
+                    this._delayDismissCancelView();
                 } else {//语音时间正常
                     this.setData({
                         'voiceObj.showCancelSendVoicePart': false,
@@ -186,7 +196,7 @@ Component({
                     });
                 }
                 clearInterval(timer);
-                this.endRecord();
+                this._endRecord();
             }
         },
         _initVoiceData() {
@@ -203,13 +213,7 @@ Component({
                 'voiceObj.voicePartPositionToLeft': (windowWidth - width) / 2
             });
         },
-        closeExtraView() {
-            this.setData({
-                'extraObj.chatInputShowExtra': false
-            });
-        },
-
-        delayDismissCancelView() {
+        _delayDismissCancelView() {
             setTimeout(() => {
                 if (this.data.voiceObj.status !== 'start') {
                     this.setData({
@@ -220,7 +224,7 @@ Component({
             }, 1000);
         },
 
-        endRecord() {
+        _endRecord() {
             this.setData({
                 'voiceObj.startStatus': 0
             }, () => {
@@ -269,7 +273,7 @@ Component({
                 textMessage
             })
         },
-        chatInputExtraItemClickEvent(e) {
+        _chatInput$extra$item$click$event(e) {
             const {currentTarget: {dataset}} = e;
             this.triggerEvent(EVENT.EXTRA_ITEM_CLICK, {dataset}, {});
         },

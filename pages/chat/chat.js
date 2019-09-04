@@ -1,5 +1,4 @@
 // pages/list/list.js
-import * as chatInput from "../../modules/chat-input/chat-input";
 import IMOperator from "./im-operator";
 import UI from "./ui";
 import MsgManager from "./msg-manager";
@@ -16,8 +15,17 @@ Page({
         textMessage: '',
         chatItems: [],
         latestPlayVoicePath: '',
-        isAndroid: true,
-        chatStatue: 'open'
+        chatStatue: 'open',
+        extraArr: [{
+            picName: 'choose_picture',
+            description: '照片'
+        }, {
+            picName: 'take_photos',
+            description: '拍摄'
+        }, {
+            picName: 'close_chat',
+            description: '自定义功能'
+        }],
     },
 
     /**
@@ -40,46 +48,27 @@ Page({
         });
         this.UI.updateChatStatus('正在聊天中...');
     },
+    onReady() {
+        this.chatInput = this.selectComponent('#chatInput');
+    },
     initData() {
         let that = this;
         let systemInfo = wx.getSystemInfoSync();
-        chatInput.init(this, {
-            systemInfo: systemInfo,
-            minVoiceTime: 1,
-            maxVoiceTime: 60,
-            startTimeDown: 56,
-            format: 'mp3',//aac/mp3
-            sendButtonBgColor: 'mediumseagreen',
-            sendButtonTextColor: 'white',
-            extraArr: [{
-                picName: 'choose_picture',
-                description: '照片'
-            }, {
-                picName: 'take_photos',
-                description: '拍摄'
-            }, {
-                picName: 'close_chat',
-                description: '自定义功能'
-            }],
-            // tabbarHeigth: 48
-        });
 
         that.setData({
             pageHeight: systemInfo.windowHeight,
-            isAndroid: systemInfo.system.indexOf("Android") !== -1,
         });
         wx.setNavigationBarTitle({
             title: '好友'
         });
-        that.textButton();
-        that.extraButton();
-        that.voiceButton();
+        // that.textButton();
+        // that.extraButton();
+        // that.voiceButton();
     },
-    textButton() {
-        chatInput.setTextMessageListener((e) => {
-            let content = e.detail.value;
-            this.msgManager.sendMsg({type: IMOperator.TextType, content});
-        });
+    onSendMessageEvent(e) {
+        console.log('发送的消息',e);
+        let content = e.detail.value;
+        this.msgManager.sendMsg({type: IMOperator.TextType, content});
     },
     voiceButton() {
         chatInput.recordVoiceListener((res, duration) => {
@@ -135,7 +124,7 @@ Page({
     },
 
     resetInputStatus() {
-        chatInput.closeExtraView();
+        this.chatInput.closeExtraView();
     },
 
     sendMsg({content, itemIndex, success}) {

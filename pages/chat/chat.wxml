@@ -6,6 +6,7 @@
 <template is="chat-page-status" data="{{chatStatue,chatStatusContent}}"/>
 
 <scroll-view
+        enable-flex="{{true}}"
         style="height:{{pageHeight}}px;width: 100%;display: flex;flex-direction: column;margin-top: 54rpx;"
         scroll-y="true"
         scroll-top="{{scrollTopVal}}"
@@ -16,4 +17,16 @@
     </block>
 
 </scroll-view>
-<template is="chat-input" data="{{inputObj,textMessage,showVoicePart:true}}"/>
+<chat-input
+        id="chatInput"
+        min-voice-time="{{1}}"
+        max-voice-time="{{60}}"
+        start-time-down="{{54}}"
+        tabBarHeight="{{0}}"
+        format="mp3"
+        extra-array="{{extraArr}}"
+        bind:extraClickEvent="onExtraClickEvent"
+            bind:extraItemClickEvent="onExtraItemClickEvent"
+            bind:voiceRecordEvent="onVoiceRecordEvent"
+            bind:sendMessageEvent="onSendMessageEvent"></chat-input>
+<!--<template is="chat-input" data="{{inputObj,textMessage,showVoicePart:true}}"/>-->

@@ -1,6 +1,6 @@
 <template name="voice">
-    <button bind:longpress="long$click$voice$btn" catch:touchmove="send$voice$move$event"
-            catch:touchend="send$voice$move$end$event" id="send$voice$btn" hover-class="btn-voice-press">{{voiceObj.startStatus?'松开 结束':'按住 说话'}}
+    <button bind:longpress="_long$click$voice$btn" catch:touchmove="_send$voice$move$event"
+            catch:touchend="_send$voice$move$end$event" id="send$voice$btn" hover-class="btn-voice-press">{{voiceObj.startStatus?'松开 结束':'按住 说话'}}
     </button>
     <view wx:if="{{voiceObj.showCancelSendVoicePart}}"
           style="width: {{voiceObj.voicePartWidth}}px;height: {{voiceObj.voicePartWidth}}px;display: flex;position: fixed;left: {{voiceObj.voicePartPositionToLeft}}px;bottom: {{voiceObj.voicePartPositionToBottom}}px;justify-content:center;align-items: center;border-radius: 20rpx;">
