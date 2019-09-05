@@ -1,7 +1,7 @@
 # wechat-im
 
 [![Build Status](https://travis-ci.org/unmagic/wechat-im.svg?branch=master)](https://travis-ci.org/unmagic/wechat-im)
-[![Version status](https://img.shields.io/badge/release-1.0.2-brightgreen.svg)](https://github.com/unmagic/wechat-im)
+[![Version status](https://img.shields.io/badge/release-2.0.0-brightgreen.svg)](https://github.com/unmagic/wechat-im)
 [![Code Size](https://img.shields.io/badge/code%20size-88kb-brightgreen.svg)](https://github.com/unmagic/wechat-im)
 [![Dependency status](https://img.shields.io/badge/dependencies-none-brightgreen.svg)](https://img.shields.io/badge/dependencies-none-brightgreen.svg)
 [![GitHub](https://img.shields.io/github/license/mashape/apistatus.svg)](https://github.com/unmagic/wechat-im/blob/master/LICENSE)
@@ -18,9 +18,11 @@ wechat-im是一个可以让你在小程序平台快速实现即时通讯功能�
 # 现已更新2.0.0版本
 
 ## 相对1.0.x及之前的版本，2.x.x新增的特性
-- [x] 全面使用ES6语法，异步操作使用Promise和async语法糖，让代码更符合语义！
-- [x] 文本输入功能已使用Component组件化，比之前的版本性能更好
+- [x] 全面使用ES6语法，异步操作使用Promise和async语法糖，让代码更符合语义！（<font color="red">需要较新的微信开发工具，并开启"增强编译"</font>）
+- [x] 文本输入功能已使用Component组件化，比之前的版本性能更好！
 - [x] 最低支持微信基础库版本为2.6.1（之前的最低支持是1.4.0）
+- [x] 修复了一些场景下的问题。比如播放语音消息时，退出聊天界面，依旧会播放语音的问题。
+- [ ] 2.0.0文档，过些日子再更新吧。有能力的同学可以更新啦，大部分是语法的更新和组件化。我近期比较忙，很抱歉各位同学。
 
 ## 特性：
 - [x] 目前项目中已使用webSocket，实现了IM的通信功能！目前包括会话列表页面、会话页面及好友页面。支持使用nodejs开启本地WebSocket服务。
