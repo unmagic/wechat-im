@@ -14,15 +14,7 @@ Page({
     /**
      * 生命周期函数--监听页面显示
      */
-    onShow() {
-        getApp().getIMHandler().sendMsg({
-            content: {
-                type: 'get-friends',
-                userId: getApp().globalData.userInfo.userId
-            }, fail: (res) => {
-                console.log('获取好友列表失败', res);
-            }
-        });
+    async onShow() {
         getApp().getIMHandler().setOnReceiveMessageListener({
             listener: (msg) => {
                 if (msg.type === 'get-friends') {
@@ -30,6 +22,17 @@ Page({
                 }
             }
         });
+
+        try {
+            await getApp().getIMHandler().sendMsg({
+                content: {
+                    type: 'get-friends',
+                    userId: getApp().globalData.userInfo.userId
+                }
+            });
+        } catch (e) {
+            console.log('获取好友列表失败', e);
+        }
     },
 
     createFriendItem(item) {

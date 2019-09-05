@@ -17,15 +17,14 @@ export default class TextManager {
      * @param content 输入组件获取到的原始文本信息
      * @param type
      */
-    sendOneMsg({content, type}) {
-        this._page.UI.showItemForMoment(this._page.imOperator.createNormalChatItem({
+   async sendOneMsg({content, type}) {
+        const itemIndex = await this._page.UI.showItemForMoment(this._page.imOperator.createNormalChatItem({
             type,
             content
-        }), (itemIndex) => {
-            this._page.sendMsg({
-                content: this._page.imOperator.createChatItemContent({type, content}),
-                itemIndex
-            });
+        }));
+       await this._page.sendMsg({
+            content: this._page.imOperator.createChatItemContent({type, content}),
+            itemIndex
         });
     }
 

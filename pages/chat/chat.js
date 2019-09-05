@@ -96,11 +96,13 @@ Page({
         console.log(e);
     },
     //模拟上传文件，注意这里的cbOk回调函数传入的参数应该是上传文件成功时返回的文件url，这里因为模拟，我直接用的savedFilePath
-    simulateUploadFile({savedFilePath, duration, itemIndex, success, fail}) {
-        setTimeout(() => {
-            let urlFromServerWhenUploadSuccess = savedFilePath;
-            success && success(urlFromServerWhenUploadSuccess);
-        }, 1000);
+    simulateUploadFile({savedFilePath, duration, itemIndex}) {
+        return new Promise((resolve, reject) => {
+            setTimeout(() => {
+                let urlFromServerWhenUploadSuccess = savedFilePath;
+                resolve({url: urlFromServerWhenUploadSuccess});
+            }, 1000);
+        });
     },
 
     /**
@@ -124,17 +126,14 @@ Page({
         this.chatInput.closeExtraView();
     },
 
-    sendMsg({content, itemIndex, success}) {
-        this.imOperator.onSimulateSendMsg({
-            content,
-            success: (msg) => {
-                this.UI.updateViewWhenSendSuccess(msg, itemIndex);
-                success && success(msg);
-            },
-            fail: () => {
-                this.UI.updateViewWhenSendFailed(itemIndex);
-            }
-        })
+    async sendMsg({content, itemIndex}) {
+        try {
+            const {msg} = await this.imOperator.onSimulateSendMsg({content})
+            this.UI.updateViewWhenSendSuccess(msg, itemIndex);
+            return {msg};
+        } catch (e) {
+            this.UI.updateViewWhenSendFailed(itemIndex);
+        }
     },
     /**
      * 重发消息

@@ -1,6 +1,5 @@
 // chat.js
 import Toast from "../../utils/toast";
-import IMOperator from "../chat/im-operator";
 
 /**
  * 聊天输入组件展示页面

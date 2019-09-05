@@ -31,7 +31,7 @@ Page({
     /**
      * 生命周期函数--监听页面显示
      */
-    onShow() {
+    async onShow() {
 
         getApp().getIMHandler().setOnReceiveMessageListener({
             listener: (msg) => {
@@ -39,17 +39,19 @@ Page({
                 msg.type === 'get-conversations' && this.setData({conversations: msg.conversations.map(item => this.getConversationsItem(item))})
             }
         });
-        getApp().getIMHandler().sendMsg({
-            content: {
-                type: 'get-conversations',
-                userId: getApp().globalData.userInfo.userId
-            }, success: () => {
-                console.log('获取会话列表消息发送成功');
-            },
-            fail: (res) => {
-                console.log('获取会话列表失败', res);
-            }
-        });
+        try {
+            await getApp().getIMHandler().sendMsg({
+                content: {
+                    type: 'get-conversations',
+                    userId: getApp().globalData.userInfo.userId
+                }
+            });
+            console.log('获取会话列表消息发送成功');
+        } catch (e) {
+            console.log('获取会话列表失败', e);
+        }
+
+
     },
     getConversationsItem(item) {
         let {latestMsg, ...msg} = item;

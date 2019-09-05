@@ -1,4 +1,5 @@
 import FileSaveManager from "../../file-save-manager";
+import {downloadFile} from "../../../../utils/tools";
 
 export default class FileManager {
 
@@ -10,29 +11,20 @@ export default class FileManager {
      * 接收到消息时，通过UI类的管理进行渲染
      * @param msg 接收到的消息，这个对象应是由 im-operator.js 中的createNormalChatItem()方法生成的。
      */
-    showMsg({msg}) {
+    async showMsg({msg}) {
         const url = msg.content;
         const localFilePath = FileSaveManager.get(msg);
         if (!localFilePath) {
-            wx.downloadFile({
-                url,
-                success: res => {
-                    // console.log('下载成功', res);
-                    FileSaveManager.saveFileRule({
-                            tempFilePath: res.tempFilePath,
-                            success: (savedFilePath) => {
-                                msg.content = savedFilePath;
-                                this._page.UI && this._page.UI.updateViewWhenReceive(msg);
-                                FileSaveManager.set(msg, savedFilePath);
-                            },
-                            fail: res => {
-                                // console.log('存储失败', res);
-                                this._page.UI && this._page.UI.updateViewWhenReceive(msg);
-                            }
-                        }
-                    )
-                }
-            });
+            try {
+                const {tempFilePath} = await downloadFile({url});
+                const {savedFilePath} = await FileSaveManager.saveFileRule({tempFilePath});
+                msg.content = savedFilePath;
+                this._page.UI && this._page.UI.updateViewWhenReceive(msg);
+                FileSaveManager.set(msg, savedFilePath);
+            } catch (e) {
+                console.warn('文件类型消息下载或存储失败，将使用网络url访问该文件', e);
+                this._page.UI && this._page.UI.updateViewWhenReceive(msg);
+            }
         } else {
             msg.content = localFilePath;
             this._page.UI.updateViewWhenReceive(msg);
@@ -45,43 +37,34 @@ export default class FileManager {
      * @param content 由输入组件接收到的临时文件路径
      * @param duration 由输入组件接收到的录音时间
      */
-    sendOneMsg({type, content, duration}) {
-        FileSaveManager.saveFileRule({
-            tempFilePath: content,
-            success: (savedFilePath) => {
-                this._sendFileMsg({content: savedFilePath, duration, type});
-            }, fail: res => {
-                this._sendFileMsg({content, type, duration});
-            }
-        });
+    async sendOneMsg({type, content, duration}) {
+        try {
+            const {savedFilePath} = await FileSaveManager.saveFileRule({tempFilePath: content});
+            await this._sendFileMsg({content: savedFilePath, duration, type});
+        } catch (e) {
+            await this._sendFileMsg({content, type, duration});
+        }
+
+
     }
 
-    _sendFileMsg({content, duration, type}) {
+    async _sendFileMsg({content, duration, type}) {
         const temp = this._page.imOperator.createNormalChatItem({
             type,
             content,
             duration
         });
-        this._page.UI.showItemForMoment(temp, (itemIndex) => {
-            this.uploadFileAndSend({content, duration, itemIndex, type})
-        });
+        const {itemIndex} = await this._page.UI.showItemForMoment(temp);
+        await this.uploadFileAndSend({content, duration, itemIndex, type})
     }
 
-    uploadFileAndSend({content, duration, type, itemIndex}) {
-        this._page.simulateUploadFile({
-            savedFilePath: content, duration, itemIndex,
-            success: (content) => {
-                this._page.sendMsg({
-                    content: this._page.imOperator.createChatItemContent({type, content, duration}),
-                    itemIndex,
-                    success: (msg) => {
-                        FileSaveManager.set(msg, content);
-                    }
-                });
-            }, fail: () => {
-
-            }
+    async uploadFileAndSend({content, duration, type, itemIndex}) {
+        const {url} = await this._page.simulateUploadFile({savedFilePath: content, duration, itemIndex});
+        const {msg} = await this._page.sendMsg({
+            content: this._page.imOperator.createChatItemContent({type, content: url, duration}),
+            itemIndex,
         });
+        FileSaveManager.set(msg, content);
     }
 
     resend({}) {

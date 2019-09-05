@@ -45,19 +45,18 @@ export default class IMOperator {
 
     }
 
-    onSimulateSendMsg({content, success, fail}) {
+    async onSimulateSendMsg({content}) {
         //这里content即为要发送的数据
         //这里的content是一个对象了，不再是一个JSON格式的字符串。这样可以在发送消息的底层统一处理。
-        getApp().getIMHandler().sendMsg({
-            content,
-            success: (content) => {
-                //这个content格式一样,也是一个对象
-                const item = this.createNormalChatItem(content);
-                this._latestTImestamp = item.timestamp;
-                success && success(item);
-            },
-            fail
-        });
+        try {
+            const {content: contentSendSuccess} = await getApp().getIMHandler().sendMsg({content});
+            //这个contentSendSuccess格式一样,也是一个对象
+            const msg = this.createNormalChatItem(contentSendSuccess);
+            this._latestTImestamp = msg.timestamp;
+            return Promise.resolve({msg});
+        } catch (e) {
+            return Promise.reject(e);
+        }
     }
 
     createChatItemContent({type = IMOperator.TextType, content = '', duration} = {}) {
