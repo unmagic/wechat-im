@@ -126,6 +126,10 @@ Page({
         this.chatInput.closeExtraView();
     },
 
+    onUnload() {
+        this.msgManager.stopAllVoice();
+    },
+
     async sendMsg({content, itemIndex}) {
         try {
             const {msg} = await this.imOperator.onSimulateSendMsg({content})
