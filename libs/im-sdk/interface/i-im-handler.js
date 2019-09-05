@@ -23,15 +23,15 @@ export default class IIMHandler {
     /**
      * 发送消息
      * @param content 需要发送的消息，是一个对象，如{type:'text',content:'abc'}
-     * @param success 发送成功回调
-     * @param fail 发送失败回调
      */
-    sendMsg({content, success, fail}) {
-        if (this._isLogin) {
-            this._sendMsgImp({content, success, fail});
-        } else {
-            this._msgQueue.push(content);
-        }
+    sendMsg({content}) {
+        return new Promise((resolve, reject) => {
+            if (this._isLogin) {
+                return this._sendMsgImp({content, success: resolve, fail: reject});
+            } else {
+                this._msgQueue.push({content, resolve, reject});
+            }
+        });
     }
 
     /**
