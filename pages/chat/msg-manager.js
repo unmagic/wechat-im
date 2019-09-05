@@ -19,6 +19,6 @@ export default class MsgManager extends MsgTypeManager {
     }
 
     stopAllVoice() {
-        this.voiceManager.stopAllVoicePlay();
+        this.voiceManager.stopAllVoicePlay(true);
     }
 }
