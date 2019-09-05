@@ -46,8 +46,8 @@ export default class VoiceManager extends FileManager {
     }
 
     async _playVoice({dataset}) {
-        let that = this._page;
-        if (dataset.voicePath === that.data.latestPlayVoicePath && that.data.chatItems[dataset.index].isPlaying) {
+        let data = this._page.data;
+        if (dataset.voicePath === data.latestPlayVoicePath && data.chatItems[dataset.index].isPlaying) {
             this.stopAllVoicePlay();
         } else {
             this._startPlayVoice(dataset);
