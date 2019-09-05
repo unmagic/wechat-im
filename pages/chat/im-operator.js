@@ -89,7 +89,9 @@ export default class IMOperator {
             voiceDuration: duration,//语音时长 单位秒
             isPlaying: false,//语音是否正在播放
         };
-        obj.saveKey = obj.friendId + '_' + obj.msgId;//saveKey是存储文件时的key
+        if (type !== IMOperator.TextType) {
+            obj.saveKey = content;//saveKey是存储文件时的key
+        }
         return obj;
     }
 
