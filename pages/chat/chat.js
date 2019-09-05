@@ -136,6 +136,7 @@ Page({
             this.UI.updateViewWhenSendSuccess(msg, itemIndex);
             return {msg};
         } catch (e) {
+            console.error(e);
             this.UI.updateViewWhenSendFailed(itemIndex);
         }
     },

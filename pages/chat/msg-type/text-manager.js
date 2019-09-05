@@ -18,7 +18,7 @@ export default class TextManager {
      * @param type
      */
    async sendOneMsg({content, type}) {
-        const itemIndex = await this._page.UI.showItemForMoment(this._page.imOperator.createNormalChatItem({
+        const {itemIndex} = await this._page.UI.showItemForMoment(this._page.imOperator.createNormalChatItem({
             type,
             content
         }));
