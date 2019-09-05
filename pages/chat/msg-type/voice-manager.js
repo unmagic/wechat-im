@@ -95,9 +95,9 @@ export default class VoiceManager extends FileManager {
             currentPlayItem = chatItems[dataset.index];//本次要播放的语音消息
         currentPlayItem.isPlaying = true;
         if (latestPlayVoicePath && latestPlayVoicePath !== currentPlayItem.content) {//如果重复点击同一个，则不将该isPlaying置为false
-            for (let chatItem of chatItems) {
-                if (IMOperator.VoiceType === chatItem.type && latestPlayVoicePath === chatItems.content) {
-                    chatItems.isPlaying = false;
+            for (let item of chatItems) {
+                if (IMOperator.VoiceType === item.type && latestPlayVoicePath === item.content) {
+                    item.isPlaying = false;
                     break;
                 }
             }
