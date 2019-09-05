@@ -44,16 +44,10 @@ export default class FileManager {
         } catch (e) {
             await this._sendFileMsg({content, type, duration});
         }
-
-
     }
 
     async _sendFileMsg({content, duration, type}) {
-        const temp = this._page.imOperator.createNormalChatItem({
-            type,
-            content,
-            duration
-        });
+        const temp = this._page.imOperator.createNormalChatItem({type, content, duration});
         const {itemIndex} = await this._page.UI.showItemForMoment(temp);
         await this.uploadFileAndSend({content, duration, itemIndex, type})
     }
