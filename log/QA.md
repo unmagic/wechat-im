@@ -2,6 +2,20 @@
 
 #### 疑难问题及解答
 ```
+2.x.x版本
+
+1. 开发者工具提示错误 `Uncaught ReferenceError: regeneratorRuntime is not defined`
+答：开发者工具要升级到较新版本，并开启增强编译功能！
+
+
+```
+
+
+
+
+```
+1.0.x版本
+
 1. 开发者工具提示错误`WebSocket connection to 'ws://10.4.96.52:8001/' 
    failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED`
 答：这是本地WebSocket服务没有开启，请先开启本地服务，端口号必须写，必须和服务端的8001保持一致。
@@ -26,6 +40,7 @@
     3.再将这个url作为消息发给对方。
     4.对方接收到url，现在并显示图片。
     所以知道该怎么做了吧。
+
 ```
 
 #### bug
