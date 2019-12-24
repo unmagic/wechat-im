@@ -113,7 +113,7 @@ module.exports = class WebSocketServer {
             conn.sendText(JSON.stringify({type: 'login', userInfo: user}));
             this._count++;
         });
-        console.log("WebSocket服务端建立完毕");
+        console.log("WebSocket服务端建立完毕，您可以使用小程序进行通信了");
         return this;
     }
 
