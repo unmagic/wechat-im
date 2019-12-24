@@ -65,8 +65,8 @@ this.imWebSocket.createSocket({url: 'ws://10.4.97.87:8001'});
 
 #### 2. 搭建本地WebSocket服务
 ```
-安装依赖 npm install
 项目根目录下启动Terminal
+需先安装依赖 npm install
 执行 npm run server  即可开启WebSocket服务
 ```
 #### 3. 使用开发者工具运行项目
